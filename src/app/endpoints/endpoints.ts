@@ -15,5 +15,11 @@ export const API_ENDPOINTS = {
         ADD_SOCIAL_ACCOUNT: '/setting/addSocialMediaAccounts',
         GET_USER_SOCIAL_ACCOUNT: (userId: string) =>
             `/setting/getUserSocialAccountDetails/${userId}`,
-    }
+    },
+
+    AI_CALENDAR: {
+        CREATE: '/aicalender/createMarketingCalendar',
+        GET_BY_USER_ID: (userId: string) =>
+            `/aicalender/getMarketingCalendar/${userId}`,
+    },
 };
