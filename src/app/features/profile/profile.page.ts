@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
 import { MockDataService } from '@core/services/mock-data.service';
@@ -27,6 +27,7 @@ export class ProfilePage {
   data = inject(MockDataService);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private navCtrl = inject(NavController);
   private profileService = inject(Profile);
   readonly profile = signal<UserProfile | null>(null);
   readonly profileName = computed(() => this.profile()?.name || this.data.ownerName());
@@ -36,6 +37,7 @@ export class ProfilePage {
       || profile?.profile?.selectedBusinessVertical
       || this.data.workspace();
   });
+  walletBalance = signal<number>(0);
   readonly profileImage = computed(() => this.profile()?.profile?.profileImage || null);
   readonly profileInitials = computed(() => this.profileName()
     .split(' ')
@@ -46,8 +48,25 @@ export class ProfilePage {
     .toUpperCase());
 
 
-  ngOnInit() {
+  ionViewWillEnter() {
     this.getUserProfileData();
+    this.getUserWalletData();
+  }
+
+  getUserWalletData() {
+    this.profileService.getUserWalletData().subscribe({
+      next: (response) => {
+        console.log('Wallet API Response:', response);
+
+        console.log('Balance Coins:', response.balanceCoins);
+
+        this.walletBalance.set(response.balanceCoins);
+      },
+      error: (error) => {
+        console.error('Wallet API Error:', error);
+        this.walletBalance.set(0);
+      }
+    });
   }
   options: ProfileOption[] = [
     { label: 'Settings', detail: 'Appearance, accounts and approval rules', icon: 'settings-outline', path: '/tabs/settings' },
@@ -55,6 +74,12 @@ export class ProfilePage {
     { label: 'Brand brief', detail: 'Your positioning and content guardrails', icon: 'diamond-outline', path: '/tabs/brand-brief' },
     { label: 'Reports', detail: 'Performance and campaign insights', icon: 'bar-chart-outline', path: '/tabs/reports' },
     { label: 'Help & support', detail: 'Talk to the MarketOS team', icon: 'chatbubble-ellipses-outline', action: () => this.contactSupport() },
+    {
+      label: 'Log Out',
+      detail: 'Sign out of your MarketOS account',
+      icon: 'log-out-outline',
+      action: () => this.logout()
+    }
   ];
 
   contactSupport(): void {
@@ -81,5 +106,17 @@ export class ProfilePage {
         console.error('Error fetching user profile data:', error);
       },
     });
+  }
+
+
+  logout() {
+    // Clear all local storage
+    localStorage.clear();
+
+    // Clear session storage as well
+    sessionStorage.clear();
+
+    // Navigate to login and remove previous navigation history
+    this.navCtrl.navigateRoot('/login');
   }
 }

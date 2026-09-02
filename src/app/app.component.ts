@@ -23,7 +23,7 @@ interface NavGroup {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterLink, RouterLinkActive, ThemeToggleComponent],
+  imports: [CommonModule, IonicModule, RouterLink, RouterLinkActive],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { SocialMediaAccount } from '@app/core/interfaces/socialMediaAcounts.interface';
+import { SocialMediaAccount, WalletData } from '@app/core/interfaces/socialMediaAcounts.interface';
 import { API_ENDPOINTS } from '@app/endpoints/endpoints';
 import { environment } from '@env/environment';
 
@@ -94,6 +94,19 @@ export class Profile {
 
     return this.http.get<SocialMediaAccount[]>(
       `${environment.apiUrl}${API_ENDPOINTS.PROFILE.GET_USER_SOCIAL_ACCOUNT(userId)}`
+    );
+  }
+
+  // get user wallet amount 
+
+  /**
+ * Get logged-in user's wallet data
+ */
+  getUserWalletData() {
+    const userId = this.getUserId();
+
+    return this.http.get<WalletData>(
+      `${environment.apiUrl}${API_ENDPOINTS.WALLET.GET_WALLET_DATA(userId)}`
     );
   }
 }
