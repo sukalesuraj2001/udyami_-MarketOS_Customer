@@ -1,6 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Calendar</ion-title>
+
     <ion-buttons slot="end">
       <mk-theme-toggle></mk-theme-toggle>
     </ion-buttons>
@@ -8,70 +9,537 @@
 </ion-header>
 
 <ion-content>
-  <mk-section-header title="September" subtitle="Approved items publish automatically at the scheduled time. Drafts wait for you.">
+
+  <mk-section-header [title]="getCalendarMonth() || 'Marketing Calendar'"
+    subtitle="Approved items publish automatically at the scheduled time. Drafts wait for you.">
     <ion-select interface="popover" [value]="filter()" (ionChange)="onFilterChange($event)" class="chan-select">
-      <ion-select-option value="all">All channels</ion-select-option>
-      <ion-select-option value="ig">Instagram only</ion-select-option>
-      <ion-select-option value="fb">Facebook only</ion-select-option>
-      <ion-select-option value="yt">YouTube only</ion-select-option>
+      <ion-select-option value="all">
+        All channels
+      </ion-select-option>
+
+      <ion-select-option value="instagram">
+        Instagram
+      </ion-select-option>
+
+      <ion-select-option value="facebook">
+        Facebook
+      </ion-select-option>
+
+      <ion-select-option value="linkedin">
+        LinkedIn
+      </ion-select-option>
+
+      <ion-select-option value="youtube">
+        YouTube
+      </ion-select-option>
+
+      <ion-select-option value="google_ads">
+        Google Ads
+      </ion-select-option>
+
+      <ion-select-option value="meta_ads">
+        Meta Ads
+      </ion-select-option>
     </ion-select>
+
   </mk-section-header>
 
-  <div class="agenda mk-stagger">
-    @for (day of activeDays(); track day) {
-      <div class="day-row">
-        <div class="date-badge">
-          <span class="d mono">{{ day }}</span>
-          <span class="m">SEP</span>
-        </div>
-        <div class="day-events">
-          @for (ev of eventsFor(day); track ev.label + ev.channel) {
-            <button class="ev" [ngClass]="ev.channel" (click)="openEvent(ev, day)">
-              <span class="dot"></span>
-              <span class="lbl">{{ ev.label }}</span>
-              <ion-icon name="chevron-forward-outline"></ion-icon>
-            </button>
-          }
-        </div>
-      </div>
-    }
+
+  <!-- Loading -->
+  @if (loading()) {
+
+  <div class="ion-padding ion-text-center">
+
+    <ion-spinner name="crescent"></ion-spinner>
+
+    <p>
+      Loading your marketing calendar...
+    </p>
+
   </div>
 
+  }
+
+
+  <!-- Empty -->
+  @else if (filteredCalendar().length === 0) {
+
+  <div class="ion-padding ion-text-center">
+
+    <ion-icon name="calendar-outline" style="font-size: 48px;"></ion-icon>
+
+    <h3>No marketing calendar found</h3>
+
+    <p>
+      Your 30-day marketing calendar will appear here.
+    </p>
+
+  </div>
+
+  }
+
+
+  <!-- Calendar -->
+  @else {
+
+  <div class="agenda mk-stagger">
+
+    @for (day of activeDays(); track day) {
+
+    <div class="day-row">
+
+      <div class="date-badge">
+
+        <span class="d mono">
+          {{ getDateDay(eventsFor(day)[0]?.date) }}
+        </span>
+
+        <span class="m">
+          {{ getMonthName(eventsFor(day)[0]?.date) }}
+        </span>
+
+      </div>
+
+
+      <div class="day-events">
+
+        @for (
+        event of eventsFor(day);
+        track event.day + '-' + event.activity + '-' + event.platform
+        ) {
+
+        <button type="button" class="ev" [ngClass]="getPlatformClass(event.platform)"
+          [class.past]="isPastDate(event.date)" [disabled]="isPastDate(event.date)" (click)="openEvent(event)">
+
+          <span class="dot"></span>
+
+          <span class="lbl">
+            {{ event.title }}
+          </span>
+
+          <span class="time">
+            {{ event.time }}
+          </span>
+
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+
+        </button>
+
+        }
+
+      </div>
+
+    </div>
+
+    }
+
+  </div>
+
+  }
+
+
+  <!-- Add button -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+
     <ion-fab-button color="primary" (click)="showAdd.set(true)">
+
       <ion-icon name="add-outline"></ion-icon>
+
     </ion-fab-button>
+
   </ion-fab>
 
-  <ion-modal [isOpen]="showAdd()" (didDismiss)="showAdd.set(false)" [breakpoints]="[0, 0.55]" [initialBreakpoint]="0.55">
+
+  <!-- Add post modal -->
+  <ion-modal [isOpen]="showAdd()" (didDismiss)="showAdd.set(false)" [breakpoints]="[0, 0.55]"
+    [initialBreakpoint]="0.55">
+
     <ng-template>
+
       <ion-header>
+
         <ion-toolbar>
-          <ion-title>Add a post</ion-title>
-          <ion-buttons slot="end"><ion-button (click)="showAdd.set(false)">Close</ion-button></ion-buttons>
+
+          <ion-title>
+            Add a post
+          </ion-title>
+
+          <ion-buttons slot="end">
+
+            <ion-button (click)="showAdd.set(false)">
+              Close
+            </ion-button>
+
+          </ion-buttons>
+
         </ion-toolbar>
+
       </ion-header>
+
+
       <ion-content class="ion-padding">
+
         <div class="field">
-          <label>What's it about?</label>
+
+          <label>
+            What's it about?
+          </label>
+
           <ion-input class="inp" [(ngModel)]="newTopic" placeholder="New 5-axis machine arriving next week"></ion-input>
+
         </div>
+
+
         <div class="field">
-          <label>Channel</label>
+
+          <label>
+            Channel
+          </label>
+
           <ion-select class="inp" interface="popover" [(ngModel)]="newChannel">
-            <ion-select-option>Instagram · Reel</ion-select-option>
-            <ion-select-option>Instagram · Carousel</ion-select-option>
-            <ion-select-option>Facebook · Image</ion-select-option>
-            <ion-select-option>YouTube · Short</ion-select-option>
+
+            <ion-select-option>
+              Instagram · Reel
+            </ion-select-option>
+
+            <ion-select-option>
+              Instagram · Carousel
+            </ion-select-option>
+
+            <ion-select-option>
+              Facebook · Image
+            </ion-select-option>
+
+            <ion-select-option>
+              YouTube · Short
+            </ion-select-option>
+
           </ion-select>
+
         </div>
+
+
         <div class="field">
-          <label>When</label>
+
+          <label>
+            When
+          </label>
+
           <ion-input class="inp" type="date" [(ngModel)]="newDate"></ion-input>
+
         </div>
-        <p class="mini">We'll draft copy and creative from your brief, then send it back here for approval.</p>
-        <ion-button expand="block" color="primary" style="margin-top:16px" (click)="createDraft()">Create draft</ion-button>
+
+
+        <p class="mini">
+          We'll draft copy and creative from your brief,
+          then send it back here for approval.
+        </p>
+
+
+        <ion-button expand="block" color="primary" style="margin-top:16px" (click)="createDraft()">
+          Create draft
+        </ion-button>
+
       </ion-content>
+
     </ng-template>
+
   </ion-modal>
+
+
+  <!-- Event Details Bottom Sheet -->
+<ion-modal
+  class="event-details-modal"
+  [isOpen]="showEventDetails()"
+  (didDismiss)="closeEventDetails()"
+  [breakpoints]="[0, 0.72, 0.95]"
+  [initialBreakpoint]="0.72"
+  [handle]="true"
+>
+  <ng-template>
+
+    <ion-content class="event-details-content">
+
+      @if (selectedEvent(); as event) {
+
+        <div class="event-sheet">
+
+          <!-- Header -->
+          <div class="event-sheet-header">
+
+            <div
+              class="platform-badge"
+              [ngClass]="getPlatformClass(event.platform)"
+            >
+              <ion-icon
+                [name]="getPlatformIcon(event.platform)"
+              ></ion-icon>
+
+              <span>
+                {{ event.platform }}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="close-btn"
+              (click)="closeEventDetails()"
+            >
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
+
+          </div>
+
+
+          <!-- Title -->
+          <div class="event-title-section">
+
+            <div class="activity-type-row">
+
+              <ion-icon
+                [name]="getActivityIcon(event.activity)"
+              ></ion-icon>
+
+              <span class="activity-type">
+                {{ event.activity }}
+              </span>
+
+            </div>
+
+            <h1>
+              {{ event.title }}
+            </h1>
+
+          </div>
+
+
+          <!-- Schedule Card -->
+          <div class="schedule-card">
+
+            <div class="schedule-icon">
+              <ion-icon name="calendar-outline"></ion-icon>
+            </div>
+
+            <div class="schedule-content">
+
+              <span class="schedule-label">
+                Scheduled for
+              </span>
+
+              <strong>
+                {{ formatDate(event.date) }}
+              </strong>
+
+            </div>
+
+            <div class="schedule-time">
+
+              <ion-icon name="time-outline"></ion-icon>
+
+              <span>
+                {{ event.time }}
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- Status -->
+          <div class="status-row">
+
+            <ion-icon
+              name="checkmark-circle-outline"
+              class="status-icon"
+            ></ion-icon>
+
+            <span>
+              {{ getEventStatus(event) }}
+            </span>
+
+          </div>
+
+
+          <!-- Description -->
+          <div class="detail-section">
+
+            <div class="section-title">
+
+              <div class="section-title-icon">
+                <ion-icon name="document-text-outline"></ion-icon>
+              </div>
+
+              <h3>
+                What to do
+              </h3>
+
+            </div>
+
+            <p>
+              {{ event.description }}
+            </p>
+
+          </div>
+
+
+          <!-- Activity Details -->
+          <div class="detail-section">
+
+            <div class="section-title">
+
+              <div class="section-title-icon">
+                <ion-icon name="information-circle-outline"></ion-icon>
+              </div>
+
+              <h3>
+                Activity details
+              </h3>
+
+            </div>
+
+
+            <div class="details-card">
+
+              <!-- Activity -->
+              <div class="detail-item">
+
+                <div class="detail-icon">
+                  <ion-icon
+                    [name]="getActivityIcon(event.activity)"
+                  ></ion-icon>
+                </div>
+
+                <div class="detail-text">
+
+                  <span>
+                    Activity
+                  </span>
+
+                  <strong>
+                    {{ event.activity }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+
+              <!-- Platform -->
+              <div class="detail-item">
+
+                <div class="detail-icon">
+                  <ion-icon
+                    [name]="getPlatformIcon(event.platform)"
+                  ></ion-icon>
+                </div>
+
+                <div class="detail-text">
+
+                  <span>
+                    Platform
+                  </span>
+
+                  <strong>
+                    {{ event.platform }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+
+              <!-- Calendar Day -->
+              <div class="detail-item">
+
+                <div class="detail-icon">
+                  <ion-icon name="calendar-number-outline"></ion-icon>
+                </div>
+
+                <div class="detail-text">
+
+                  <span>
+                    Calendar day
+                  </span>
+
+                  <strong>
+                    Day {{ event.day }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+
+              <!-- Date -->
+              <div class="detail-item">
+
+                <div class="detail-icon">
+                  <ion-icon name="today-outline"></ion-icon>
+                </div>
+
+                <div class="detail-text">
+
+                  <span>
+                    Date
+                  </span>
+
+                  <strong>
+                    {{ event.date }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+
+              <!-- Time -->
+              <div class="detail-item">
+
+                <div class="detail-icon">
+                  <ion-icon name="alarm-outline"></ion-icon>
+                </div>
+
+                <div class="detail-text">
+
+                  <span>
+                    Scheduled time
+                  </span>
+
+                  <strong>
+                    {{ event.time }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Action -->
+          <ion-button
+            expand="block"
+            class="event-action-btn"
+            (click)="closeEventDetails()"
+          >
+            <ion-icon
+              slot="start"
+              name="checkmark-circle-outline"
+            ></ion-icon>
+
+            Got it
+
+          </ion-button>
+
+        </div>
+
+      }
+
+    </ion-content>
+
+  </ng-template>
+</ion-modal>
+
 </ion-content>
