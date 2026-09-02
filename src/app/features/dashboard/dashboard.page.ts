@@ -35,4 +35,37 @@ export class DashboardPage {
   refresh(ev: CustomEvent): void {
     setTimeout(() => (ev.target as HTMLIonRefresherElement).complete(), 700);
   }
+
+  getGreeting(): string {
+    const hour = new Date().getHours();
+
+    if (hour < 12) {
+      return 'Good morning';
+    }
+
+    if (hour < 17) {
+      return 'Good afternoon';
+    }
+
+    if (hour < 21) {
+      return 'Good evening';
+    }
+
+    return 'Good night';
+  }
+  get ownerName(): string {
+    try {
+      const stored = localStorage.getItem('marketos.auth');
+
+      if (!stored) {
+        return '';
+      }
+
+      const auth = JSON.parse(stored);
+
+      return auth?.user?.name ?? '';
+    } catch {
+      return '';
+    }
+  }
 }

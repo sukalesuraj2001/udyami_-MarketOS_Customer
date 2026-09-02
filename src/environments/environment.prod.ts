@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  appName: 'MarketOS'
+  appName: 'MarketOS',
+  apiUrl: 'https://backend.udyamikutumba.com',
 };

@@ -1,9 +1,16 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'tabs/dashboard', pathMatch: 'full' },
   {
+    path: 'login',
+    loadComponent: () => import('./features/auth/login/login.page').then((m) => m.LoginPage),
+    title: 'Sign in · MarketOS',
+  },
+  {
     path: 'tabs',
+    canActivate: [authGuard],
     loadComponent: () => import('./tabs.page').then((m) => m.TabsPage),
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

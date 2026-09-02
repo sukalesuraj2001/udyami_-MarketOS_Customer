@@ -95,14 +95,38 @@ export class MockDataService {
     { name: 'Boost — Creative 04', channel: 'Meta', spend: '₹9,400', qualified: 0, costPerQualified: '—', status: 'paused' },
   ]);
 
-  readonly connections = signal<ConnectedAccount[]>([
-    { name: 'Facebook Page', detail: 'Sri Lakshmi Industries', connected: true },
-    { name: 'Instagram Business', detail: '@srilakshmi.precision', connected: true },
-    { name: 'Meta Ads account', detail: 'act_8841029', connected: true },
-    { name: 'Google Ads', detail: '481-229-3306', connected: true },
-    { name: 'Google Analytics 4', detail: 'Not connected', connected: false },
-    { name: 'Your ERP', detail: 'Webhook active · lead stages flowing', connected: true },
-  ]);
+readonly connections = signal<ConnectedAccount[]>([
+  {
+    name: 'Facebook Page',
+    detail: 'Sri Lakshmi Industries',
+    connected: false,
+  },
+  {
+    name: 'Instagram Business',
+    detail: '@srilakshmi.precision',
+    connected: false,
+  },
+  {
+    name: 'Meta Ads account',
+    detail: 'act_8841029',
+    connected: false,
+  },
+  {
+    name: 'Google Ads',
+    detail: '481-229-3306',
+    connected: false,
+  },
+  {
+    name: 'Google Analytics 4',
+    detail: 'Not connected',
+    connected: false,
+  },
+  {
+    name: 'Your ERP',
+    detail: 'Webhook active · lead stages flowing',
+    connected: false,
+  },
+]);
 
   readonly bars = signal<CreativeBar[]>([
     { label: 'Creative 04', pct: 38, spend: '₹19,800' },

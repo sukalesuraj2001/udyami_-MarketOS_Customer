@@ -9,11 +9,15 @@
 
 <ion-content>
   <section class="profile-hero mk-anim-in">
-    <div class="avatar">SK</div>
+    @if (profileImage(); as image) {
+      <img class="avatar" [src]="image" [alt]="profileName()" />
+    } @else {
+      <div class="avatar">{{ profileInitials() }}</div>
+    }
     <div class="identity">
       <span class="eyebrow mono">WORKSPACE OWNER</span>
-      <h1>{{ data.ownerName() }}</h1>
-      <p>{{ data.workspace() }}</p>
+      <h1>{{ profileName() }}</h1>
+      <p>{{ profileWorkspace() }}</p>
     </div>
     <button class="edit-button" aria-label="Edit profile" (click)="contactSupport()">
       <ion-icon name="create-outline"></ion-icon>
