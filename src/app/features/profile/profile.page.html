@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Profile</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <section class="profile-hero mk-anim-in">
+    <div class="avatar">SK</div>
+    <div class="identity">
+      <span class="eyebrow mono">WORKSPACE OWNER</span>
+      <h1>{{ data.ownerName() }}</h1>
+      <p>{{ data.workspace() }}</p>
+    </div>
+    <button class="edit-button" aria-label="Edit profile" (click)="contactSupport()">
+      <ion-icon name="create-outline"></ion-icon>
+    </button>
+  </section>
+
+  <div class="status-row mk-anim-in">
+    <div>
+      <span class="status-dot"></span>
+      <b>Supervised mode</b>
+    </div>
+    <span class="credits mono">{{ data.credits() }}</span>
+  </div>
+
+  <div class="section-title">
+    <span>Account</span>
+    <small class="mono">{{ options.length }} OPTIONS</small>
+  </div>
+
+  <div class="option-list mk-anim-in">
+    @for (option of options; track option.label) {
+      <button type="button" (click)="openOption(option)" class="option-row">
+        <span class="option-icon" slot="start"><ion-icon [name]="option.icon"></ion-icon></span>
+        <span class="option-copy">
+          <b>{{ option.label }}</b>
+          <p>{{ option.detail }}</p>
+        </span>
+        <ion-icon name="chevron-forward-outline" class="option-chevron"></ion-icon>
+      </button>
+    }
+  </div>
+
+  <ion-button expand="block" fill="outline" class="workspace-button" (click)="openWorkspace()">
+    <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+    Back to workspace
+  </ion-button>
+
+  <p class="version mono">MARKETOS MOBILE · V1.0.0</p>
+</ion-content>

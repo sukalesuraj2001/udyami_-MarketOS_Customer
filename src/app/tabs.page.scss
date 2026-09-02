@@ -1,0 +1,32 @@
+.main-tabs {
+  --background: var(--mk-surf);
+  --border: 1px solid var(--mk-line);
+  height: 64px;
+  padding: 5px 4px max(5px, env(safe-area-inset-bottom));
+}
+
+ion-router-outlet {
+  pointer-events: none;
+}
+
+ion-router-outlet > * {
+  pointer-events: auto;
+}
+
+ion-tabs {
+  touch-action: pan-y;
+}
+
+.main-tabs ion-tab-button {
+  --color: var(--mk-dim);
+  --color-selected: var(--mk-gold);
+  min-height: 54px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.main-tabs ion-icon {
+  font-size: 21px;
+  margin-bottom: 3px;
+}

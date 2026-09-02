@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Calendar</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <mk-section-header title="September" subtitle="Approved items publish automatically at the scheduled time. Drafts wait for you.">
+    <ion-select interface="popover" [value]="filter()" (ionChange)="onFilterChange($event)" class="chan-select">
+      <ion-select-option value="all">All channels</ion-select-option>
+      <ion-select-option value="ig">Instagram only</ion-select-option>
+      <ion-select-option value="fb">Facebook only</ion-select-option>
+      <ion-select-option value="yt">YouTube only</ion-select-option>
+    </ion-select>
+  </mk-section-header>
+
+  <div class="agenda mk-stagger">
+    @for (day of activeDays(); track day) {
+      <div class="day-row">
+        <div class="date-badge">
+          <span class="d mono">{{ day }}</span>
+          <span class="m">SEP</span>
+        </div>
+        <div class="day-events">
+          @for (ev of eventsFor(day); track ev.label + ev.channel) {
+            <button class="ev" [ngClass]="ev.channel" (click)="openEvent(ev, day)">
+              <span class="dot"></span>
+              <span class="lbl">{{ ev.label }}</span>
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary" (click)="showAdd.set(true)">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-modal [isOpen]="showAdd()" (didDismiss)="showAdd.set(false)" [breakpoints]="[0, 0.55]" [initialBreakpoint]="0.55">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Add a post</ion-title>
+          <ion-buttons slot="end"><ion-button (click)="showAdd.set(false)">Close</ion-button></ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <div class="field">
+          <label>What's it about?</label>
+          <ion-input class="inp" [(ngModel)]="newTopic" placeholder="New 5-axis machine arriving next week"></ion-input>
+        </div>
+        <div class="field">
+          <label>Channel</label>
+          <ion-select class="inp" interface="popover" [(ngModel)]="newChannel">
+            <ion-select-option>Instagram · Reel</ion-select-option>
+            <ion-select-option>Instagram · Carousel</ion-select-option>
+            <ion-select-option>Facebook · Image</ion-select-option>
+            <ion-select-option>YouTube · Short</ion-select-option>
+          </ion-select>
+        </div>
+        <div class="field">
+          <label>When</label>
+          <ion-input class="inp" type="date" [(ngModel)]="newDate"></ion-input>
+        </div>
+        <p class="mini">We'll draft copy and creative from your brief, then send it back here for approval.</p>
+        <ion-button expand="block" color="primary" style="margin-top:16px" (click)="createDraft()">Create draft</ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

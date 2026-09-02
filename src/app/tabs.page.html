@@ -1,0 +1,26 @@
+<ion-tabs>
+  <ion-router-outlet></ion-router-outlet>
+
+  <ion-tab-bar slot="bottom" class="main-tabs">
+    <ion-tab-button tab="dashboard" routerLink="/tabs/dashboard">
+      <ion-icon name="grid-outline"></ion-icon>
+      <ion-label>Overview</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="calendar" routerLink="/tabs/calendar">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <ion-label>Calendar</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="campaigns" routerLink="/tabs/campaigns">
+      <ion-icon name="radio-outline"></ion-icon>
+      <ion-label>Campaigns</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="leads" routerLink="/tabs/leads">
+      <ion-icon name="people-outline"></ion-icon>
+      <ion-label>Leads</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="profile" routerLink="/tabs/profile">
+      <ion-icon name="person-circle-outline"></ion-icon>
+      <ion-label>Profile</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>

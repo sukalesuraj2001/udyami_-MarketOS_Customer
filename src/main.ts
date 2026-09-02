@@ -1,0 +1,61 @@
+import { bootstrapApplication } from '@angular/platform-browser';
+import { addIcons } from 'ionicons';
+import {
+	addOutline,
+	alertOutline,
+	arrowBackOutline,
+	arrowForwardOutline,
+	barChartOutline,
+	calendarOutline,
+	chatbubbleEllipsesOutline,
+	checkmarkCircleOutline,
+	checkmarkOutline,
+	chevronDownOutline,
+	chevronForwardOutline,
+	createOutline,
+	diamondOutline,
+	downloadOutline,
+	gridOutline,
+	moonOutline,
+	paperPlaneOutline,
+	peopleOutline,
+	personCircleOutline,
+	phonePortraitOutline,
+	powerOutline,
+	radioOutline,
+	settingsOutline,
+	sunnyOutline,
+} from 'ionicons/icons';
+import { appConfig } from './app/app.config';
+import { AppComponent } from './app/app.component';
+
+addIcons({
+	'add-outline': addOutline,
+	'alert-outline': alertOutline,
+	'arrow-back-outline': arrowBackOutline,
+	'arrow-forward-outline': arrowForwardOutline,
+	'bar-chart-outline': barChartOutline,
+	'calendar-outline': calendarOutline,
+	'chatbubble-ellipses-outline': chatbubbleEllipsesOutline,
+	'checkmark-circle-outline': checkmarkCircleOutline,
+	'checkmark-outline': checkmarkOutline,
+	'chevron-down-outline': chevronDownOutline,
+	'chevron-forward-outline': chevronForwardOutline,
+	'create-outline': createOutline,
+	'diamond-outline': diamondOutline,
+	'download-outline': downloadOutline,
+	'grid-outline': gridOutline,
+	'moon-outline': moonOutline,
+	moon: moonOutline,
+	'paper-plane-outline': paperPlaneOutline,
+	'people-outline': peopleOutline,
+	'person-circle-outline': personCircleOutline,
+	'phone-portrait-outline': phonePortraitOutline,
+	'power-outline': powerOutline,
+	'radio-outline': radioOutline,
+	'settings-outline': settingsOutline,
+	'sunny-outline': sunnyOutline,
+	sunny: sunnyOutline,
+});
+
+bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));

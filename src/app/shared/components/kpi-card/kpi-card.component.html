@@ -1,0 +1,14 @@
+<div class="mk-card kpi tappable">
+  <div class="lab">{{ kpi.label }}</div>
+  <div class="val mono" [class.gold]="kpi.accent === 'gold'">
+    <span #valueEl class="mk-countup">{{ kpi.value }}</span>
+  </div>
+  <div class="sub">
+    @if (kpi.trend && kpi.trendLabel) {
+      <span [class.up]="kpi.trend === 'up'" [class.down]="kpi.trend === 'down'">{{ kpi.trendLabel }}</span>
+      {{ kpi.sub }}
+    } @else {
+      {{ kpi.sub }}
+    }
+  </div>
+</div>

@@ -1,0 +1,154 @@
+/*
+ * MarketOS design tokens
+ * Two palettes — light (default) and dark — toggled via `body.theme-dark`.
+ * Custom `--mk-*` tokens drive the app's own components; the `--ion-*`
+ * tokens are mapped alongside so native Ionic components stay in sync.
+ */
+
+:root {
+  // ---- brand ----
+  --mk-gold: #b8862a;
+  --mk-gold-2: #d4a438;
+  --mk-gold-fade: rgba(184, 134, 42, 0.1);
+
+  // ---- semantic ----
+  --mk-green: #1f8f5f;
+  --mk-red: #c23f2c;
+  --mk-amber: #b87a1e;
+  --mk-blue: #2a6fa8;
+
+  // ---- surfaces (light) ----
+  --mk-bg: #f7f5f0;
+  --mk-surf: #ffffff;
+  --mk-surf-2: #f1eee6;
+  --mk-surf-3: #e8e3d8;
+  --mk-line: #e2ddd0;
+  --mk-line-2: #d3ccba;
+
+  // ---- text (light) ----
+  --mk-text: #1b2430;
+  --mk-muted: #5b6b7a;
+  --mk-dim: #93a0ac;
+
+  --mk-radius: 14px;
+  --mk-radius-sm: 10px;
+  --mk-shadow: 0 10px 30px rgba(27, 36, 48, 0.08);
+  --mk-shadow-lg: 0 20px 55px rgba(27, 36, 48, 0.16);
+
+  --mk-font-display: 'Archivo', system-ui, sans-serif;
+  --mk-font-body: 'Inter', system-ui, sans-serif;
+  --mk-font-mono: 'JetBrains Mono', monospace;
+
+  --mk-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --mk-speed-fast: 160ms;
+  --mk-speed: 260ms;
+  --mk-speed-slow: 420ms;
+
+  // ---- Ionic system mapping (light) ----
+  --ion-background-color: var(--mk-bg);
+  --ion-text-color: var(--mk-text);
+  --ion-toolbar-background: var(--mk-surf);
+  --ion-item-background: var(--mk-surf);
+  --ion-border-color: var(--mk-line);
+  --ion-color-step-50: var(--mk-surf-2);
+  --ion-color-step-150: var(--mk-surf-3);
+
+  --ion-color-primary: #b8862a;
+  --ion-color-primary-rgb: 184, 134, 42;
+  --ion-color-primary-contrast: #171008;
+  --ion-color-primary-contrast-rgb: 23, 16, 8;
+  --ion-color-primary-shade: #a2761f;
+  --ion-color-primary-tint: #c2934a;
+
+  --ion-color-success: #1f8f5f;
+  --ion-color-success-rgb: 31, 143, 95;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #1b7e54;
+  --ion-color-success-tint: #359a70;
+
+  --ion-color-danger: #c23f2c;
+  --ion-color-danger-rgb: 194, 63, 44;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #ab3827;
+  --ion-color-danger-tint: #c85342;
+
+  --ion-color-warning: #b87a1e;
+  --ion-color-warning-rgb: 184, 122, 30;
+  --ion-color-warning-contrast: #171008;
+  --ion-color-warning-contrast-rgb: 23, 16, 8;
+  --ion-color-warning-shade: #a26b1a;
+  --ion-color-warning-tint: #c28734;
+
+  --ion-color-medium: #5b6b7a;
+  --ion-color-medium-rgb: 91, 107, 122;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #505e6b;
+  --ion-color-medium-tint: #6b7a87;
+}
+
+// ================= DARK PALETTE =================
+body.theme-dark {
+  --mk-gold: #d4a438;
+  --mk-gold-2: #f0ce7a;
+  --mk-gold-fade: rgba(212, 164, 56, 0.14);
+
+  --mk-green: #3fb27f;
+  --mk-red: #e5644e;
+  --mk-amber: #e0a030;
+  --mk-blue: #5a9bd8;
+
+  --mk-bg: #0b0f14;
+  --mk-surf: #121a23;
+  --mk-surf-2: #18222d;
+  --mk-surf-3: #1f2b38;
+  --mk-line: #26323f;
+  --mk-line-2: #324150;
+
+  --mk-text: #e6edf3;
+  --mk-muted: #8b9aab;
+  --mk-dim: #5d6d7e;
+
+  --mk-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --mk-shadow-lg: 0 24px 70px rgba(0, 0, 0, 0.6);
+
+  --ion-background-color: var(--mk-bg);
+  --ion-text-color: var(--mk-text);
+  --ion-toolbar-background: var(--mk-surf);
+  --ion-item-background: var(--mk-surf);
+  --ion-border-color: var(--mk-line);
+  --ion-color-step-50: var(--mk-surf-2);
+  --ion-color-step-150: var(--mk-surf-3);
+
+  --ion-color-primary: #d4a438;
+  --ion-color-primary-rgb: 212, 164, 56;
+  --ion-color-primary-contrast: #171008;
+  --ion-color-primary-contrast-rgb: 23, 16, 8;
+  --ion-color-primary-shade: #bb9031;
+  --ion-color-primary-tint: #d8ad4c;
+
+  --ion-color-success: #3fb27f;
+  --ion-color-success-rgb: 63, 178, 127;
+
+  --ion-color-danger: #e5644e;
+  --ion-color-danger-rgb: 229, 100, 78;
+
+  --ion-color-warning: #e0a030;
+  --ion-color-warning-rgb: 224, 160, 48;
+
+  --ion-color-medium: #8b9aab;
+  --ion-color-medium-rgb: 139, 154, 171;
+
+  color-scheme: dark;
+}
+
+body {
+  transition: background-color var(--mk-speed) var(--mk-ease);
+}
+
+ion-app,
+ion-content {
+  --background: var(--mk-bg);
+}

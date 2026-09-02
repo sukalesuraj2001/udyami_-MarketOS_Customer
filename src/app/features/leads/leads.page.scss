@@ -1,0 +1,76 @@
+.seg {
+  --background: var(--mk-surf-2);
+  border-radius: 10px;
+  max-width: 280px;
+}
+
+.kpi {
+  min-height: 96px;
+  .lab {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mk-dim);
+  }
+  .val {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 8px 0 3px;
+    color: var(--mk-text);
+    &.green {
+      color: var(--mk-green);
+    }
+  }
+  .sub {
+    font-size: 11px;
+    color: var(--mk-muted);
+  }
+}
+
+.lead-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lead-card {
+  cursor: pointer;
+
+  .top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .who {
+    display: flex;
+    flex-direction: column;
+    b {
+      font-size: 14px;
+      color: var(--mk-text);
+    }
+    .mini {
+      font-size: 11.5px;
+      color: var(--mk-dim);
+      margin-top: 2px;
+    }
+  }
+  .reason {
+    font-size: 12.5px;
+    color: var(--mk-muted);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+  .bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .mini {
+    font-size: 11px;
+    color: var(--mk-dim);
+  }
+}

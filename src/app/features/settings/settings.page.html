@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Settings</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <mk-section-header title="Settings" subtitle="Connections, approval rules, appearance, and the switch that stops everything."></mk-section-header>
+
+  <div class="mk-card mk-anim-in" style="margin-bottom:14px">
+    <h3>Appearance</h3>
+    <p class="mini" style="margin-bottom:14px">Pick a look, or let the app follow your device.</p>
+    <ion-segment [value]="theme.mode()" (ionChange)="onThemeChange($event.detail.value)">
+      <ion-segment-button value="light">
+        <ion-icon name="sunny-outline"></ion-icon>
+        <ion-label>Light</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="dark">
+        <ion-icon name="moon-outline"></ion-icon>
+        <ion-label>Dark</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="system">
+        <ion-icon name="phone-portrait-outline"></ion-icon>
+        <ion-label>System</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <div class="mk-card mk-anim-in" style="margin-bottom:14px">
+    <h3>Connected accounts</h3>
+    <div class="conn-list">
+      @for (c of data.connections(); track c.name) {
+        <div class="rowb">
+          <div>
+            <b>{{ c.name }}</b>
+            <div class="mini">{{ c.detail }}</div>
+          </div>
+          @if (c.connected) {
+            <span class="mk-tag ok">Connected</span>
+          } @else {
+            <ion-button size="small" color="primary" (click)="connect(c.name)">Connect</ion-button>
+          }
+        </div>
+      }
+    </div>
+    <p class="mini" style="margin-top:12px;line-height:1.6">We connect through your Business Manager as a partner. We never ask for your password — if anyone does, refuse.</p>
+  </div>
+
+  <div class="mk-card mk-anim-in" style="margin-bottom:14px">
+    <h3>Approval rules</h3>
+    <div class="field">
+      <label>Anything above this amount needs the owner</label>
+      <ion-input class="inp mono" [(ngModel)]="threshold" (ionChange)="onThresholdChange()"></ion-input>
+    </div>
+    <div class="field">
+      <label>Where we ask you</label>
+      <ion-select class="inp" interface="popover" [(ngModel)]="approvalChannel" (ionChange)="onChannelChange()">
+        <ion-select-option>Telegram + this app</ion-select-option>
+        <ion-select-option>This app only</ion-select-option>
+        <ion-select-option>Email digest</ion-select-option>
+      </ion-select>
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>If you don't respond within</label>
+      <ion-select class="inp" interface="popover" [(ngModel)]="escalation" (ionChange)="onEscalationChange()">
+        <ion-select-option>24 hours → escalate, then pause</ion-select-option>
+        <ion-select-option>48 hours → escalate, then pause</ion-select-option>
+      </ion-select>
+    </div>
+  </div>
+
+  <div class="mk-card mk-anim-in danger">
+    <h3 class="danger-title">Pause everything</h3>
+    <p class="mini" style="margin-bottom:12px;line-height:1.6">Stops every scheduled post and pauses every campaign within 60 seconds. Your data stays. You can restart any time.</p>
+    <ion-button expand="block" color="danger" fill="outline" (click)="pauseEverything()">
+      <ion-icon name="power-outline" slot="start"></ion-icon>
+      Pause everything
+    </ion-button>
+  </div>
+</ion-content>

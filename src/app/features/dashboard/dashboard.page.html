@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>MarketOS</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <mk-section-header title="Good morning, {{ data.ownerName() }}" subtitle="Five items are waiting for your approval. Nothing publishes and nothing spends until you say so.">
+    <ion-button color="primary" (click)="goApprovals()">
+      Review approvals
+      <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+    </ion-button>
+  </mk-section-header>
+
+  @if (data.loading()) {
+    <div class="mk-grid cols-2" style="margin-bottom:16px">
+      @for (s of skeletonRows; track $index) {
+        <div class="mk-card">
+          <div class="mk-skeleton" style="height:10px;width:60%;margin-bottom:12px"></div>
+          <div class="mk-skeleton" style="height:22px;width:80%;margin-bottom:10px"></div>
+          <div class="mk-skeleton" style="height:9px;width:50%"></div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="mk-grid cols-2 mk-stagger" style="margin-bottom:16px">
+      @for (kpi of data.kpis(); track kpi.label) {
+        <mk-kpi-card [kpi]="kpi"></mk-kpi-card>
+      }
+    </div>
+  }
+
+  <div class="mk-card mk-anim-in" style="margin-bottom:14px">
+    <div class="card-title">
+      <h3>Last night's brief</h3>
+      <p class="mini">Generated 06:00 · reviewed 41 metrics across Meta, Google and your CRM</p>
+    </div>
+
+    <div class="brief">
+      <p><b>Creative 04 is carrying the account.</b> It produced 61% of qualified leads on 28% of spend. Everything else is close to breakeven.</p>
+      <p><b>Creative 07 should be retired.</b> 340 clicks, 19 leads, zero qualified. It attracts job seekers — the search terms confirm it.</p>
+      <p><b>One risk:</b> your qualified-lead event fired 31 times last week. Meta needs about 50 per ad set to optimise reliably. I would move optimisation up one stage to "contacted and confirmed" until volume grows.</p>
+    </div>
+
+    <hr class="mk-divider" />
+
+    <div class="row-actions">
+      <ion-button size="small" color="success" fill="outline" (click)="actOnCreative()">
+        <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+        Act on Creative 07
+      </ion-button>
+      <ion-button size="small" fill="clear" routerLink="/reports">See full report</ion-button>
+    </div>
+  </div>
+
+  <div class="mk-card mk-anim-in">
+    <div class="card-title">
+      <h3>Activity</h3>
+    </div>
+    <div class="feed mk-stagger">
+      @for (f of data.feed(); track f.text) {
+        <div class="feed-row">
+          <div class="left">
+            <i class="dot" [class]="f.tone"></i>
+            <span class="txt">{{ f.text }}</span>
+          </div>
+          <span class="time mono">{{ f.time }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</ion-content>

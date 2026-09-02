@@ -1,0 +1,134 @@
+.chan-select {
+  --background: var(--mk-surf-2);
+  --border-radius: 8px;
+  border: 1px solid var(--mk-line-2);
+  border-radius: 8px;
+  font-size: 12.5px;
+  max-width: 160px;
+}
+
+.agenda {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 90px;
+}
+
+.day-row {
+  display: flex;
+  gap: 12px;
+  background: var(--mk-surf);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-radius);
+  padding: 12px;
+}
+
+.date-badge {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: var(--mk-surf-2);
+  border: 1px solid var(--mk-line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .d {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--mk-text);
+    line-height: 1;
+  }
+  .m {
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+    color: var(--mk-dim);
+    margin-top: 2px;
+  }
+}
+
+.day-events {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ev {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: filter var(--mk-speed-fast) var(--mk-ease), transform var(--mk-speed-fast) var(--mk-ease);
+  border-left: 2.5px solid transparent;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .lbl {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  ion-icon {
+    font-size: 13px;
+    opacity: 0.6;
+    flex: none;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex: none;
+  }
+
+  &.ig {
+    background: rgba(212, 164, 56, 0.12);
+    border-left-color: var(--mk-gold);
+    color: var(--mk-gold-2);
+    .dot { background: var(--mk-gold); }
+  }
+  &.fb {
+    background: rgba(90, 155, 216, 0.12);
+    border-left-color: var(--mk-blue);
+    color: var(--mk-blue);
+    .dot { background: var(--mk-blue); }
+  }
+  &.yt {
+    background: rgba(229, 100, 78, 0.12);
+    border-left-color: var(--mk-red);
+    color: var(--mk-red);
+    .dot { background: var(--mk-red); }
+  }
+}
+
+.field {
+  margin-bottom: 14px;
+  label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--mk-muted);
+    margin-bottom: 5px;
+  }
+}
+.inp {
+  --background: var(--mk-surf-2);
+  --border-radius: 8px;
+  border: 1px solid var(--mk-line-2);
+  border-radius: 8px;
+  font-size: 13px;
+}

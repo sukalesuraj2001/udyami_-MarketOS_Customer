@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Leads</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Search name or company" (ionInput)="onSearch($event)" [debounce]="150"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <mk-section-header title="Leads" subtitle="Every score comes with a reason. If the reason doesn't convince you, the score is wrong — tell us.">
+    <ion-segment [value]="filter()" (ionChange)="onFilterChange($event)" class="seg">
+      <ion-segment-button value="all"><ion-label>All</ion-label></ion-segment-button>
+      <ion-segment-button value="hot"><ion-label>Qualified</ion-label></ion-segment-button>
+      <ion-segment-button value="dq"><ion-label>Disqualified</ion-label></ion-segment-button>
+    </ion-segment>
+  </mk-section-header>
+
+  <div class="mk-grid cols-2 mk-stagger" style="margin-bottom:16px">
+    <div class="mk-card kpi"><div class="lab">This month</div><div class="val mono">142</div><div class="sub">raw leads captured</div></div>
+    <div class="mk-card kpi"><div class="lab">Qualified</div><div class="val mono green">33</div><div class="sub">23.4% of total</div></div>
+    <div class="mk-card kpi"><div class="lab">Median response</div><div class="val mono">47s</div><div class="sub">form fill → first contact</div></div>
+    <div class="mk-card kpi"><div class="lab">Meetings booked</div><div class="val mono">11</div><div class="sub">from 33 qualified</div></div>
+  </div>
+
+  @if (filtered().length === 0) {
+    <mk-empty-state icon="search-outline" title="No leads match that" subtitle="Try clearing the filter."></mk-empty-state>
+  } @else {
+    <div class="lead-list mk-stagger">
+      @for (l of filtered(); track l.name) {
+        <div class="mk-card lead-card tappable" (click)="open(l.name)">
+          <div class="top">
+            <div class="who">
+              <b>{{ l.name }}</b>
+              <span class="mini">{{ l.company }}</span>
+            </div>
+            <mk-score-pill [score]="l.score" [tier]="l.tier"></mk-score-pill>
+          </div>
+          <p class="reason">{{ l.reason }}</p>
+          <div class="bottom">
+            <span class="mini mono">{{ l.source }}</span>
+            <span class="mk-tag" [ngClass]="stageTag(l.stage)">{{ l.stage }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</ion-content>

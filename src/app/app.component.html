@@ -1,0 +1,63 @@
+<ion-app>
+  <ion-menu contentId="main-content" type="overlay" menuId="main-menu" class="mk-menu">
+    <ion-header>
+      <ion-toolbar>
+        <div class="brand" slot="start">
+          <div class="mark">J</div>
+          <div class="brandtext">
+            <b>MarketOS<span class="dot">.</span></b>
+            <span class="tag mono">by Jyovix</span>
+          </div>
+        </div>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="menu-content">
+      <button class="tenant" (click)="toast.show('Tenant switcher', 'Prototype — one workspace loaded')">
+        <span class="tdot"></span>
+        <span class="tname">{{ data.workspace() }}</span>
+        <ion-icon name="chevron-down-outline"></ion-icon>
+      </button>
+      <span class="stage-chip mono">◆ {{ data.stage() }}</span>
+
+      @for (group of groups; track group.label) {
+        <div class="navlabel">{{ group.label }}</div>
+        <ion-list lines="none" class="navlist">
+          @for (item of group.items; track item.path) {
+            <ion-item
+              button
+              detail="false"
+              [routerLink]="item.path"
+              routerLinkActive="active-nav"
+              (click)="closeMenu()"
+              class="navitem"
+            >
+              <ion-icon [name]="item.icon" slot="start"></ion-icon>
+              <ion-label>{{ item.label }}</ion-label>
+              @if (item.badge && item.badge()! > 0) {
+                <ion-badge [class.badge-gold]="item.badgeTone === 'gold'" [class.badge-muted]="item.badgeTone === 'muted'" slot="end">
+                  {{ item.badge!() }}
+                </ion-badge>
+              }
+            </ion-item>
+          }
+        </ion-list>
+      }
+    </ion-content>
+
+    <ion-footer class="menu-footer">
+      <div class="foot-row">
+        <span class="credits mono">{{ data.credits() }}</span>
+        <div class="avatar">SK</div>
+      </div>
+      <ion-button expand="block" fill="outline" color="danger" size="small" (click)="confirmPauseAll()">
+        <ion-icon name="power-outline" slot="start"></ion-icon>
+        Pause everything
+      </ion-button>
+    </ion-footer>
+  </ion-menu>
+
+  <div class="ion-page" id="main-content">
+    <ion-router-outlet></ion-router-outlet>
+  </div>
+</ion-app>

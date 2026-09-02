@@ -1,0 +1,220 @@
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/* ==========================================================================
+   MarketOS global styles, typography & motion system
+   ========================================================================== */
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body,
+ion-content {
+  font-family: var(--mk-font-body);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--mk-font-display);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--mk-text);
+}
+
+.mono {
+  font-family: var(--mk-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+ion-toolbar {
+  --border-color: var(--mk-line);
+}
+
+ion-header {
+  &::after {
+    display: none;
+  }
+  box-shadow: none;
+  border-bottom: 1px solid var(--mk-line);
+}
+
+ion-content {
+  --padding-top: 6px;
+  --padding-bottom: 96px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  touch-action: pan-y;
+}
+
+ion-content::part(scroll) {
+  overflow-y: scroll !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
+  pointer-events: auto;
+}
+
+/* ---------------- cards & primitives ---------------- */
+
+.mk-card {
+  background: var(--mk-surf);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-radius);
+  padding: 16px;
+  transition: border-color var(--mk-speed) var(--mk-ease), transform var(--mk-speed) var(--mk-ease),
+    box-shadow var(--mk-speed) var(--mk-ease), background-color var(--mk-speed) var(--mk-ease);
+}
+
+.mk-card.tappable:active {
+  transform: scale(0.98);
+}
+
+.mk-grid {
+  display: grid;
+  gap: 12px;
+}
+.mk-grid.cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.mk-section-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mk-dim);
+  padding: 6px 2px;
+}
+
+.mk-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.mk-tag.pend { background: rgba(184, 122, 30, 0.14); color: var(--mk-amber); }
+.mk-tag.ok { background: rgba(31, 143, 95, 0.14); color: var(--mk-green); }
+.mk-tag.no { background: rgba(194, 63, 44, 0.14); color: var(--mk-red); }
+.mk-tag.live { background: rgba(42, 111, 168, 0.14); color: var(--mk-blue); }
+.mk-tag.neu { background: var(--mk-surf-3); color: var(--mk-muted); }
+.mk-tag.gold { background: var(--mk-gold-fade); color: var(--mk-gold); }
+
+.mk-divider {
+  height: 1px;
+  background: var(--mk-line);
+  margin: 14px 0;
+  border: 0;
+}
+
+.mk-muted {
+  color: var(--mk-muted);
+}
+.mk-dim {
+  color: var(--mk-dim);
+}
+
+/* ---------------- motion system ---------------- */
+
+@keyframes mkFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mkFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes mkPopIn {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes mkShimmer {
+  0% { background-position: -300px 0; }
+  100% { background-position: 300px 0; }
+}
+
+@keyframes mkPulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 164, 56, 0.35); }
+  50% { box-shadow: 0 0 0 6px rgba(212, 164, 56, 0); }
+}
+
+@keyframes mkSpin {
+  to { transform: rotate(360deg); }
+}
+
+.mk-anim-in {
+  animation: mkFadeUp var(--mk-speed-slow) var(--mk-ease) both;
+}
+
+/* stagger helper — apply .mk-stagger to a container, children get incremental delay */
+.mk-stagger > * {
+  animation: mkFadeUp var(--mk-speed-slow) var(--mk-ease) both;
+}
+@for $i from 1 through 24 {
+  .mk-stagger > *:nth-child(#{$i}) {
+    animation-delay: #{$i * 45}ms;
+  }
+}
+
+.mk-glow-pulse {
+  animation: mkPulseGlow 2.2s ease-in-out infinite;
+}
+
+.mk-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--mk-surf-2) 25%,
+    var(--mk-surf-3) 37%,
+    var(--mk-surf-2) 63%
+  );
+  background-size: 400% 100%;
+  animation: mkShimmer 1.4s ease infinite;
+  border-radius: 8px;
+}
+
+/* page enter transition hook (applied by BasePage via ionViewWillEnter) */
+.page-enter {
+  animation: mkFadeIn var(--mk-speed) var(--mk-ease) both;
+}
+
+/* count-up target */
+.mk-countup {
+  display: inline-block;
+}
+
+ion-fab-button {
+  --box-shadow: var(--mk-shadow-lg);
+}
+
+ion-item {
+  --background: var(--mk-surf);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--mk-line-2);
+  border-radius: 4px;
+}

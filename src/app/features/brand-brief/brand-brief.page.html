@@ -1,0 +1,104 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Brand brief</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <mk-section-header title="Brand brief" subtitle="Everything the system produces for you is grounded in this document. Approve it once, edit it whenever your business changes.">
+    <span class="mk-tag neu">v3 · approved 12 Aug</span>
+  </mk-section-header>
+
+  <div class="steps mk-anim-in">
+    @for (s of steps; track s.key) {
+      <div class="step" [class.on]="s.state === 'on'" [class.ok]="s.state === 'ok'">
+        <span class="k mono">{{ s.key }} @if (s.state === 'ok') { <ion-icon name="checkmark-outline"></ion-icon> }</span>
+        <b>{{ s.label }}</b>
+      </div>
+    }
+  </div>
+
+  <div class="mk-card mk-anim-in" style="margin-bottom:14px">
+    <h3>What we found on our own</h3>
+    <div class="rowb"><span class="mini">Legal entity (from GST)</span><b>Sri Lakshmi Industries Pvt Ltd</b></div>
+    <div class="rowb"><span class="mini">Sector</span><b>Precision engineering · MSME</b></div>
+    <div class="rowb">
+      <span class="mini">Palette pulled from site</span>
+      <span class="swatches">
+        <i style="background:#1B4D8F"></i>
+        <i style="background:#E8A33D"></i>
+        <i style="background:#2C2C2C"></i>
+      </span>
+    </div>
+    <div class="rowb"><span class="mini">Instagram, last 90 days</span><b class="mono">34 posts · 2.1% eng.</b></div>
+    <div class="rowb"><span class="mini">Competitors advertising now</span><b class="mono">7 found</b></div>
+    <hr class="mk-divider" />
+    <ion-button size="small" fill="outline" (click)="showAdLib = true">See what competitors are running</ion-button>
+  </div>
+
+  <div class="mk-card mk-anim-in">
+    <h3>What only you could tell us</h3>
+
+    <div class="field">
+      <label>Who actually buys from you</label>
+      <ion-textarea class="inp" [(ngModel)]="buyer" autoGrow="true"></ion-textarea>
+    </div>
+    <div class="field">
+      <label>Who wastes your time</label>
+      <ion-textarea class="inp" [(ngModel)]="timeWasters" autoGrow="true"></ion-textarea>
+    </div>
+    <div class="field">
+      <label>Never say</label>
+      <ion-textarea class="inp" [(ngModel)]="neverSay" autoGrow="true"></ion-textarea>
+    </div>
+
+    <div class="row-actions">
+      <ion-button color="primary" (click)="saveBrief()">Save as v4</ion-button>
+      <ion-button fill="outline" (click)="showInterview = true">Reopen the interview</ion-button>
+    </div>
+  </div>
+
+  <ion-modal [isOpen]="showAdLib" (didDismiss)="showAdLib = false" [breakpoints]="[0, 0.75]" [initialBreakpoint]="0.75">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>What your competitors are running</ion-title>
+          <ion-buttons slot="end"><ion-button (click)="showAdLib = false">Close</ion-button></ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <p class="mini" style="margin-bottom:14px">Pulled from the public Meta Ad Library. No login needed, and they can see yours too.</p>
+        @for (c of competitors; track c.name) {
+          <div class="rowb">
+            <div><b>{{ c.name }}</b><div class="mini">{{ c.detail }}</div></div>
+            <span class="mk-tag neu">{{ c.days }}</span>
+          </div>
+        }
+        <p class="mini" style="margin-top:14px;line-height:1.6">Nobody in your sector is advertising on delivery reliability. That's the gap your brief already points at.</p>
+        <ion-button expand="block" color="primary" style="margin-top:16px" (click)="useAngle()">Use this angle</ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal [isOpen]="showInterview" (didDismiss)="showInterview = false" [breakpoints]="[0, 0.5]" [initialBreakpoint]="0.5">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Reopen the interview</ion-title>
+          <ion-buttons slot="end"><ion-button (click)="showInterview = false">Close</ion-button></ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <p class="mini" style="margin-bottom:16px">We'll only ask what's changed. Roughly four minutes.</p>
+        <div class="field">
+          <label>What's different since August?</label>
+          <ion-textarea class="inp" [(ngModel)]="interviewAnswer" placeholder="New product line, new city, price change, a competitor..." autoGrow="true"></ion-textarea>
+        </div>
+        <ion-button expand="block" color="primary" (click)="startInterview()">Start</ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

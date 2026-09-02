@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Campaigns</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <mk-section-header title="Campaigns" subtitle="Spend caps are set on the ad account itself, not just here — so they hold even if this app goes down.">
+    <ion-button size="small" fill="outline" (click)="showCaps.set(true)">Edit spend caps</ion-button>
+  </mk-section-header>
+
+  <div class="mk-grid mk-stagger" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+    <div class="mk-card kpi"><div class="lab">Active</div><div class="val mono">4</div><div class="sub">3 Meta · 1 Google</div></div>
+    <div class="mk-card kpi"><div class="lab">Daily cap</div><div class="val mono">₹3,000</div><div class="sub">Set on the ad account</div></div>
+    <div class="mk-card kpi"><div class="lab">Breaker</div><div class="val mono armed">Armed</div><div class="sub">Auto-pause at 2.5×</div></div>
+  </div>
+
+  <div class="camp-list mk-stagger">
+    @for (c of data.campaigns(); track c.name) {
+      <div class="mk-card camp-row">
+        <div class="info">
+          <b class="name">{{ c.name }}</b>
+          <span class="mini">{{ c.channel }}</span>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="k">Spend</span><span class="v mono">{{ c.spend }}</span></div>
+          <div class="stat"><span class="k">Qual.</span><span class="v mono">{{ c.qualified }}</span></div>
+          <div class="stat"><span class="k">Cost/qual.</span><span class="v mono">{{ c.costPerQualified }}</span></div>
+        </div>
+        <div class="foot">
+          <span class="mk-tag" [ngClass]="c.status === 'live' ? 'live' : 'neu'">{{ c.status === 'live' ? 'Live' : 'Paused' }}</span>
+          <ion-button size="small" fill="outline" (click)="toggle(c.name)">{{ c.status === 'live' ? 'Pause' : 'Resume' }}</ion-button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <ion-modal [isOpen]="showCaps()" (didDismiss)="showCaps.set(false)" [breakpoints]="[0, 0.6]" [initialBreakpoint]="0.6">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Spend caps</ion-title>
+          <ion-buttons slot="end"><ion-button (click)="showCaps.set(false)">Close</ion-button></ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <div class="field">
+          <label>Daily cap — set on the ad account itself</label>
+          <ion-input class="inp mono" [(ngModel)]="dailyCap"></ion-input>
+        </div>
+        <div class="field">
+          <label>Monthly ceiling</label>
+          <ion-input class="inp mono" [(ngModel)]="monthlyCeiling"></ion-input>
+        </div>
+        <div class="field">
+          <label>Circuit breaker — auto-pause when cost per result exceeds</label>
+          <ion-select class="inp" interface="popover" [(ngModel)]="breaker">
+            <ion-select-option>2.5× trailing average</ion-select-option>
+            <ion-select-option>2× trailing average</ion-select-option>
+            <ion-select-option>3× trailing average</ion-select-option>
+          </ion-select>
+        </div>
+        <p class="mini" style="line-height:1.6">Pausing spend is the only thing this system does without asking you first. Everything else waits.</p>
+        <ion-button expand="block" color="primary" style="margin-top:16px" (click)="saveCaps()">Save caps</ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
