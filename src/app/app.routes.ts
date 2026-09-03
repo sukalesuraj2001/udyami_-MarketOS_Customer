@@ -50,6 +50,11 @@ export const routes: Routes = [
         title: 'Reports · MarketOS',
       },
       {
+        path: 'storage',
+        loadComponent: () => import('./features/storage/storage.page').then((m) => m.StoragePage),
+        title: 'Storage · MarketOS',
+      },
+      {
         path: 'profile',
         loadComponent: () => import('./features/profile/profile.page').then((m) => m.ProfilePage),
         title: 'Profile · MarketOS',

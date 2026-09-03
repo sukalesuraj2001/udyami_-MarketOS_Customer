@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Storage</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <main class="storage-shell">
+    <section class="storage-intro">
+      <div>
+        <p class="eyebrow">CAMPAIGN LIBRARY</p>
+        <h1>Finished work, ready to reuse.</h1>
+        <p class="intro-copy">Every approved image and video from your completed campaigns, in one place.</p>
+      </div>
+      <div class="asset-count"><strong>{{ filteredMedia().length }}</strong><span>assets shown</span></div>
+    </section>
+
+    <section class="filters" aria-label="Filter campaign media">
+      <div class="filter-heading"><span>Filter by</span><span class="filter-result">{{ filteredMedia().length }} results</span></div>
+      <div class="filter-row" role="group" aria-label="Media type">
+        <button [class.active]="filter() === 'all'" (click)="setFilter('all')">All media</button>
+        <button [class.active]="filter() === 'image'" (click)="setFilter('image')"><ion-icon name="image-outline"></ion-icon> Images</button>
+        <button [class.active]="filter() === 'video'" (click)="setFilter('video')"><ion-icon name="play-circle-outline"></ion-icon> Videos</button>
+      </div>
+      <ion-select label="Campaign" label-placement="stacked" interface="popover" [value]="campaign()" (ionChange)="campaign.set($event.detail.value)">
+        @for (name of campaigns; track name) {
+          <ion-select-option [value]="name">{{ name }}</ion-select-option>
+        }
+      </ion-select>
+    </section>
+
+    <section class="media-grid" aria-label="Completed campaign assets">
+      @for (item of filteredMedia(); track item.title) {
+        <article class="media-card">
+          <div class="preview" [style.--accent]="item.accent">
+            <img [src]="item.preview" [alt]="item.title" loading="lazy">
+            <span class="type-badge"><ion-icon [name]="item.type === 'video' ? 'play' : 'image-outline'"></ion-icon>{{ item.type }}</span>
+            @if (item.type === 'video') { <span class="play-mark"><ion-icon name="play"></ion-icon></span> }
+          </div>
+          <div class="media-copy">
+            <div class="media-title"><h2>{{ item.title }}</h2><button aria-label="More options"><ion-icon name="ellipsis-horizontal"></ion-icon></button></div>
+            <p>{{ item.campaign }}</p>
+            <div class="media-meta"><span>{{ item.date }}</span><span>{{ item.size }}</span></div>
+          </div>
+        </article>
+      } @empty {
+        <div class="empty-state"><ion-icon name="file-tray-outline"></ion-icon><h2>No matching media</h2><p>Try another campaign or media type.</p></div>
+      }
+    </section>
+  </main>
+</ion-content>
