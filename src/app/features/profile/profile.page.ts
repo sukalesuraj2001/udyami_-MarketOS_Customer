@@ -70,6 +70,12 @@ export class ProfilePage {
   }
   options: ProfileOption[] = [
     { label: 'Settings', detail: 'Appearance, accounts and approval rules', icon: 'settings-outline', path: '/tabs/settings' },
+    {
+      label: 'Storage',
+      detail: 'Manage images, reels and media files',
+      icon: 'images-outline',
+      path: '/tabs/storage'
+    },
     { label: 'Approvals', detail: `${this.data.openApprovalsCount()} items waiting for you`, icon: 'checkmark-circle-outline', path: '/tabs/approvals' },
     { label: 'Brand brief', detail: 'Your positioning and content guardrails', icon: 'diamond-outline', path: '/tabs/brand-brief' },
     { label: 'Reports', detail: 'Performance and campaign insights', icon: 'bar-chart-outline', path: '/tabs/reports' },

@@ -1,5 +1,3 @@
-// src/app/core/constants/endpoints.ts
-
 export const API_ENDPOINTS = {
     AUTH: {
         LOGIN: '/auth/loginUser',
@@ -8,7 +6,8 @@ export const API_ENDPOINTS = {
     },
 
     USER: {
-        GET_USER_BY_ID: (userId: string) => `/auth/getUserById/${userId}`,
+        GET_USER_BY_ID: (userId: string) =>
+            `/auth/getUserById/${userId}`,
     },
 
     PROFILE: {
@@ -22,8 +21,20 @@ export const API_ENDPOINTS = {
         GET_BY_USER_ID: (userId: string) =>
             `/aicalender/getMarketingCalendar/${userId}`,
     },
+
     WALLET: {
         GET_WALLET_DATA: (userId: string) =>
             `/wallet/getWalletData/${userId}`,
+    },
+
+    GENERATED_CONTENT: {
+        GET_BY_USER_ID: (userId: string) =>
+            `/create-content/getGeneratedContent/${userId}`,
+
+        REGENERATE: (contentId: string) =>
+            `/create-content/regenerateContent/${contentId}`,
+
+        REJECT: (contentId: string) =>
+            `/create-content/rejectContent/${contentId}`,
     },
 };
