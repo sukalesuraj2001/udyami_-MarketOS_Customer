@@ -22,4 +22,8 @@ export const API_ENDPOINTS = {
         GET_BY_USER_ID: (userId: string) =>
             `/aicalender/getMarketingCalendar/${userId}`,
     },
+    WALLET: {
+        GET_WALLET_DATA: (userId: string) =>
+            `/wallet/getWalletData/${userId}`,
+    },
 };

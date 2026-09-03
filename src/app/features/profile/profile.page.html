@@ -10,9 +10,9 @@
 <ion-content>
   <section class="profile-hero mk-anim-in">
     @if (profileImage(); as image) {
-      <img class="avatar" [src]="image" [alt]="profileName()" />
+    <img class="avatar" [src]="image" [alt]="profileName()" />
     } @else {
-      <div class="avatar">{{ profileInitials() }}</div>
+    <div class="avatar">{{ profileInitials() }}</div>
     }
     <div class="identity">
       <span class="eyebrow mono">WORKSPACE OWNER</span>
@@ -27,9 +27,9 @@
   <div class="status-row mk-anim-in">
     <div>
       <span class="status-dot"></span>
-      <b>Supervised mode</b>
+      <b>Available Coins </b>
     </div>
-    <span class="credits mono">{{ data.credits() }}</span>
+    <span class="credits mono">₹{{ walletBalance() }} Coins</span>
   </div>
 
   <div class="section-title">
@@ -39,14 +39,14 @@
 
   <div class="option-list mk-anim-in">
     @for (option of options; track option.label) {
-      <button type="button" (click)="openOption(option)" class="option-row">
-        <span class="option-icon" slot="start"><ion-icon [name]="option.icon"></ion-icon></span>
-        <span class="option-copy">
-          <b>{{ option.label }}</b>
-          <p>{{ option.detail }}</p>
-        </span>
-        <ion-icon name="chevron-forward-outline" class="option-chevron"></ion-icon>
-      </button>
+    <button type="button" (click)="openOption(option)" class="option-row">
+      <span class="option-icon" slot="start"><ion-icon [name]="option.icon"></ion-icon></span>
+      <span class="option-copy">
+        <b>{{ option.label }}</b>
+        <p>{{ option.detail }}</p>
+      </span>
+      <ion-icon name="chevron-forward-outline" class="option-chevron"></ion-icon>
+    </button>
     }
   </div>
 

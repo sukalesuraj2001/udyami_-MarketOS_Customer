@@ -1,57 +1,52 @@
 <ion-content [fullscreen]="true" class="login-content">
   <main class="login-layout">
-    <!-- <section class="login-intro" aria-label="MarketOS">
-      <div class="brand-mark">M</div>
-      <p class="eyebrow">MarketOS</p>
-      <h1>Make every market move count.</h1>
-      <p class="intro-copy">Your command center for campaigns, approvals, and the relationships that keep business moving.</p>
-      <div class="intro-rule" aria-hidden="true"></div>
-      <p class="intro-meta">Built for focused teams<br />Ready when you are</p>
-    </section> -->
 
     <section class="login-panel" aria-labelledby="login-title">
+
       <div class="panel-heading">
         <p class="eyebrow">Welcome back</p>
-        <h2 id="login-title">Sign in to your workspace</h2>
-        <p>Use your MarketOS account credentials to continue.</p>
+        <h2 id="login-title">Sign in to your MarketOS</h2>
+        <p>
+          Sign in using your existing Udyami Circle member account to access your
+          digital marketing workspace.
+        </p>
       </div>
 
       <form (ngSubmit)="submit()" #loginForm="ngForm">
+
+        <!-- Email -->
         <ion-item lines="none" class="field-item">
-          <ion-input
-            name="email"
-            type="email"
-            label="Email address"
-            labelPlacement="stacked"
-            placeholder="you@company.com"
-            autocomplete="email"
-            [(ngModel)]="email"
-            required
-          ></ion-input>
+          <ion-input name="email" type="email" label="Email address" labelPlacement="floating"
+            placeholder="you@company.com" autocomplete="email" [(ngModel)]="email" required></ion-input>
         </ion-item>
 
+        <!-- Password -->
         <ion-item lines="none" class="field-item">
-          <ion-input
-            name="password"
-            type="password"
-            label="Password"
-            labelPlacement="stacked"
-            placeholder="Enter your password"
-            autocomplete="current-password"
-            [(ngModel)]="password"
-            required
-          ></ion-input>
+          <ion-input name="password" type="password" label="Password" labelPlacement="floating"
+            placeholder="Enter your password" autocomplete="current-password" [(ngModel)]="password"
+            required></ion-input>
         </ion-item>
 
-        <p class="error-message" role="alert" *ngIf="errorMessage">{{ errorMessage }}</p>
+        <p class="error-message" role="alert" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </p>
 
         <ion-button type="submit" expand="block" class="submit-button" [disabled]="loginForm.invalid || submitting">
           {{ submitting ? 'Signing in...' : 'Sign in' }}
+
           <ion-spinner *ngIf="submitting" name="crescent"></ion-spinner>
         </ion-button>
+
       </form>
 
-      <p class="secure-note"><ion-icon name="shield-checkmark-outline"></ion-icon> Your session is securely protected</p>
+      <p class="secure-note">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+        Only existing Udyami Circle members can sign in.
+        If you are not a member yet, please register on the
+        Udyami Circle App first.
+      </p>
+
     </section>
+
   </main>
 </ion-content>
