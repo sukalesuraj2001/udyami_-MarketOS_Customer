@@ -56,9 +56,7 @@ export class ProfilePage {
   getUserWalletData() {
     this.profileService.getUserWalletData().subscribe({
       next: (response) => {
-        console.log('Wallet API Response:', response);
 
-        console.log('Balance Coins:', response.balanceCoins);
 
         this.walletBalance.set(response.balanceCoins);
       },

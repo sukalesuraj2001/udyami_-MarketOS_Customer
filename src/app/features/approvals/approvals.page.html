@@ -57,7 +57,7 @@
   <!-- EMPTY STATE -->
   <!-- ========================================= -->
 
-  @else if (generatedContents().length === 0) {
+  @else if (visibleContents().length === 0) {
 
   <mk-empty-state icon="checkmark-done-outline" title="Nothing waiting"
     subtitle="No generated marketing content is available for approval.">
@@ -75,7 +75,7 @@
   <div class="mk-stagger">
 
     @for (
-    content of generatedContents();
+    content of visibleContents();
     track content.id
     ) {
 
@@ -96,25 +96,52 @@
       <!-- ================================= -->
 
       @if (
-      content.contentType === 'IMAGE' &&
+      getMediaUrl(content) ||
       content.generatedContent
       ) {
 
+      <!-- ...existing code... -->
+
+      @if (getMediaUrl(content)) {
+
       <div class="prev image-preview">
 
-        <img [src]="getImageUrl(content)" [alt]="
-                  content.productName ||
-                  'Marketing Image'
-                " loading="lazy" />
+        @if (getMediaType(content) === 'image') {
+
+        <img [src]="getMediaUrl(content)" [alt]="content.productName || 'Marketing Image'" loading="lazy" />
+
+        } @else if (getMediaType(content) === 'video') {
+
+        <video [src]="getMediaUrl(content)" controls preload="metadata" playsinline
+          style="width: 100%; height: auto; display: block;">
+          Your browser does not support the video tag.
+        </video>
+
+        } @else {
+
+        <div class="prev" style="display:flex; align-items:center; justify-content:center;">
+          <ion-icon [name]="getContentTypeIcon(content.contentType)"
+            style="font-size: 32px; opacity: 0.6;"></ion-icon>
+          <span class="artlbl">
+            {{ content.contentType || 'CONTENT' }}
+          </span>
+        </div>
+
+        }
 
       </div>
 
       }
 
+      <!-- ...existing code... -->
+
+      }
+
       @else {
 
-      <div class="prev">
+      <div class="prev" style="display:flex; align-items:center; justify-content:center;">
 
+        <ion-icon [name]="getContentTypeIcon(content.contentType)" style="font-size: 32px; opacity: 0.6;"></ion-icon>
         <span class="artlbl">
           {{ content.contentType || 'CONTENT' }}
         </span>
@@ -566,12 +593,8 @@
   <!-- EDIT MODAL -->
   <!-- ========================================= -->
 
- <ion-modal
-  [isOpen]="!!editTarget()"
-  (didDismiss)="editTarget.set(null)"
-  [breakpoints]="[0, 0.6]"
-  [initialBreakpoint]="0.6"
->
+  <ion-modal [isOpen]="!!editTarget()" (didDismiss)="editTarget.set(null)" [breakpoints]="[0, 0.6]"
+    [initialBreakpoint]="0.6">
 
     <ng-template>
 
