@@ -1,7 +1,7 @@
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal, } from '@angular/core';
+import { Component, inject, signal, computed, } from '@angular/core';
 import { ToastService } from '@core/services/toast.service';
 import { ApprovalService } from '@app/core/services/approval';
 import { MockDataService } from '@core/services/mock-data.service';
@@ -41,6 +41,11 @@ export class ApprovalsPage {
 
   generatedContents = signal<any[]>([]);
 
+  // Only show content that has a media URL
+  visibleContents = computed(() =>
+    this.generatedContents().filter((content) => !!content?.mediaUrl)
+  );
+
   isLoading = signal(false);
 
   // ============================================
@@ -71,38 +76,22 @@ export class ApprovalsPage {
   // ============================================
 
   getGeneratedContent(): void {
-
     this.isLoading.set(true);
-
     this.approvalService
       .getGeneratedContent()
       .subscribe({
-
         next: (response) => {
-
-          console.log(
-            'Generated Content:',
-            response
-          );
-
-          this.generatedContents.set(
-            response?.data ?? []
-          );
-
+          const contents = response?.data ?? [];
+          contents.forEach((content: any, index: number) => {
+          });
+          this.generatedContents.set(contents);
           this.isLoading.set(false);
+
         },
 
         error: (error) => {
-
-          console.error(
-            'Error fetching generated content:',
-            error
-          );
-
           this.generatedContents.set([]);
-
           this.isLoading.set(false);
-
           this.toast.show(
             'Error',
             'Failed to load generated content'
@@ -116,13 +105,68 @@ export class ApprovalsPage {
   // BASE64 IMAGE URL
   // ============================================
 
-  getImageUrl(content: any): string {
-    if (!content?.generatedContent) {
-      return '';
+  getMediaUrl(content: any): string {
+    const mediaUrl = content?.mediaUrl?.trim() || '';
+    return mediaUrl;
+  }
+
+  getMediaType(content: any): 'image' | 'video' | null {
+    const mediaType = String(
+      content?.mediaType || ''
+    ).toLowerCase();
+
+
+    // Supports:
+    // image
+    // image/png
+    // image/jpeg
+    // image/webp
+    if (mediaType === 'image' || mediaType.startsWith('image/')) {
+
+      return 'image';
     }
 
-    return content.generatedContent;
+    // Supports:
+    // video
+    // video/mp4
+    // video/webm
+    // video/quicktime
+    if (mediaType === 'video' || mediaType.startsWith('video/')) {
+      return 'video';
+    }
+    return null;
   }
+
+  // ============================================
+  // CONTENT TYPE ICON (fallback when no media)
+  // ============================================
+
+  getContentTypeIcon(contentType: string | null | undefined): string {
+    switch ((contentType || '').toUpperCase()) {
+
+      case 'IMAGE':
+        return 'image-outline';
+
+      case 'VIDEO':
+        return 'videocam-outline';
+
+      case 'REEL':
+        return 'film-outline';
+
+      case 'STORY':
+        return 'albums-outline';
+
+      case 'CAROUSEL':
+        return 'images-outline';
+
+      case 'TEXT':
+        return 'document-text-outline';
+
+      default:
+        return 'document-outline';
+    }
+  }
+
   // ============================================
   // GET HEADLINE
   // ============================================
