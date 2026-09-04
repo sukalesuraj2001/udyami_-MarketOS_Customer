@@ -117,17 +117,12 @@ export class ApprovalsPage {
   // ============================================
 
   getImageUrl(content: any): string {
-
     if (!content?.generatedContent) {
       return '';
     }
 
-    const mediaType =
-      content.mediaType || 'image/png';
-
-    return `data:${mediaType};base64,${content.generatedContent}`;
+    return content.generatedContent;
   }
-
   // ============================================
   // GET HEADLINE
   // ============================================
@@ -309,56 +304,56 @@ export class ApprovalsPage {
   // SAVE EDIT
   // ============================================
 
-saveEdit(): void {
-  const a = this.editTarget();
+  saveEdit(): void {
+    const a = this.editTarget();
 
-  if (!a) {
-    return;
+    if (!a) {
+      return;
+    }
+
+    if (!this.editText.trim()) {
+      this.toast.show(
+        'Requirement required',
+        'Please enter a requirement before continuing.',
+        'no'
+      );
+      return;
+    }
+
+    this.approvalService
+      .regenerateContent(a.id, this.editText.trim())
+      .subscribe({
+        next: () => {
+
+          // Close modal
+          this.editTarget.set(null);
+
+          // Clear input
+          this.editText = '';
+
+          this.toast.show(
+            'Regenerating content',
+            'Your content is being regenerated. We’ll notify you once it’s ready.',
+            'ok'
+          );
+
+          this.getGeneratedContent();
+        },
+
+        error: (error) => {
+          console.error(
+            'Failed to regenerate content:',
+            error
+          );
+
+          this.toast.show(
+            'Error',
+            'Failed to regenerate content. Please try again.',
+            'no'
+          );
+        },
+      });
   }
-
-  if (!this.editText.trim()) {
-    this.toast.show(
-      'Requirement required',
-      'Please enter a requirement before continuing.',
-      'no'
-    );
-    return;
-  }
-
-  this.approvalService
-    .regenerateContent(a.id, this.editText.trim())
-    .subscribe({
-      next: () => {
-
-        // Close modal
-        this.editTarget.set(null);
-
-        // Clear input
-        this.editText = '';
-
-        this.toast.show(
-          'Regenerating content',
-          'Your content is being regenerated. We’ll notify you once it’s ready.',
-          'ok'
-        );
-
-        this.getGeneratedContent();
-      },
-
-      error: (error) => {
-        console.error(
-          'Failed to regenerate content:',
-          error
-        );
-
-        this.toast.show(
-          'Error',
-          'Failed to regenerate content. Please try again.',
-          'no'
-        );
-      },
-    });
-}
 
   // ============================================
   // OPEN REJECT
