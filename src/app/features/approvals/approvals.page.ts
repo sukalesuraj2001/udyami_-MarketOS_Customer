@@ -6,6 +6,7 @@ import { ToastService } from '@core/services/toast.service';
 import { ApprovalService } from '@app/core/services/approval';
 import { MockDataService } from '@core/services/mock-data.service';
 import { Approval, ContentApproval, SpendApproval, } from '@core/models/models';
+import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interface';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
@@ -308,27 +309,34 @@ export class ApprovalsPage {
   // APPROVE
   // ============================================
 
-  approve(
-    id: string,
-    isSpend = false
-  ): void {
+  approve(content: GeneratedContentItem): void {
+    this.approvalService.publishContent(content).subscribe({
+      next: (response: any) => {
+        if (response?.success === false) {
+          this.toast.show(
+            'Error',
+            response.message || 'Failed to publish content. Please try again.',
+            'no'
+          );
+          return;
+        }
 
-    const a = this.data.decide(
-      id,
-      true
-    );
-
-    if (!a) {
-      return;
-    }
-
-    this.toast.show(
-      'Approved',
-      isSpend
-        ? 'Change pushed to the ad platform'
-        : `Scheduled for ${(a as ContentApproval).when}`,
-      'ok'
-    );
+        this.toast.show(
+          'Published successfully',
+          'Your content was published successfully. It may take some time to show on social media.',
+          'ok'
+        );
+        this.getGeneratedContent();
+      },
+      error: (error) => {
+        console.error('Failed to publish content:', error);
+        this.toast.show(
+          'Error',
+          'Failed to publish content. Please try again.',
+          'no'
+        );
+      },
+    });
   }
 
   // ============================================

@@ -36,5 +36,7 @@ export const API_ENDPOINTS = {
 
         REJECT: (contentId: string) =>
             `/create-content/rejectContent/${contentId}`,
+
+        PUBLISH: '/create-content/publishContent',
     },
 };
