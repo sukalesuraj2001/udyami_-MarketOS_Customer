@@ -12,6 +12,22 @@ import {
   SpendApproval,
 } from '@core/models/models';
 
+export interface SupportTopic {
+  id: string;
+  label: string;
+  description: string;
+  icon: string;
+  accent: string;
+}
+
+export interface SupportArticle {
+  id: string;
+  topicId: string;
+  question: string;
+  answer: string;
+  popular?: boolean;
+}
+
 /**
  * All UI state lives here as signals. This is a pure front-end mock —
  * there is no HTTP layer. Swap the seed data / add real calls later
@@ -25,6 +41,79 @@ export class MockDataService {
   readonly stage = signal('Stage 3 · Supervised');
   readonly credits = signal('₹12,400 credits');
   readonly ownerName = signal('Suresh');
+
+  readonly supportTopics = signal<SupportTopic[]>([
+    {
+      id: 'getting-started',
+      label: 'Getting started',
+      description: 'Set up your workspace and start creating.',
+      icon: 'rocket-outline',
+      accent: 'coral',
+    },
+    {
+      id: 'content',
+      label: 'Content studio',
+      description: 'Create, review and publish on-brand content.',
+      icon: 'sparkles-outline',
+      accent: 'gold',
+    },
+    {
+      id: 'connections',
+      label: 'Accounts & connections',
+      description: 'Keep your social and ad accounts in sync.',
+      icon: 'git-network-outline',
+      accent: 'blue',
+    },
+    {
+      id: 'billing',
+      label: 'Wallet & billing',
+      description: 'Understand credits, usage and payments.',
+      icon: 'wallet-outline',
+      accent: 'green',
+    },
+  ]);
+
+  readonly supportArticles = signal<SupportArticle[]>([
+    {
+      id: 'first-campaign',
+      topicId: 'getting-started',
+      question: 'How do I get my first campaign live?',
+      answer: 'Complete your brand brief, connect at least one channel, and open Campaigns from the workspace. MarketOS will guide you through audience, budget and approval settings before anything is published.',
+      popular: true,
+    },
+    {
+      id: 'brand-brief',
+      topicId: 'getting-started',
+      question: 'What should I add to my brand brief?',
+      answer: 'Add your business story, ideal customers, differentiators, tone and words to avoid. The more specific your brief, the more useful your generated content becomes.',
+    },
+    {
+      id: 'approval-flow',
+      topicId: 'content',
+      question: 'How does the approval flow work?',
+      answer: 'New content appears in Approvals before it is published. Review the caption and media, make edits when needed, then approve or reject the item. Your approval rules keep the final decision with you.',
+      popular: true,
+    },
+    {
+      id: 'regenerate',
+      topicId: 'content',
+      question: 'Can I regenerate content I do not like?',
+      answer: 'Yes. Open the item in Approvals, choose Regenerate, and describe what should change. Include a useful direction such as “make it more direct” or “focus on delivery reliability”.',
+    },
+    {
+      id: 'connect-instagram',
+      topicId: 'connections',
+      question: 'Why is my social account showing as disconnected?',
+      answer: 'Connections can expire when a platform changes its permissions or a password is updated. Open Settings, choose the affected account, and reconnect it to refresh access.',
+      popular: true,
+    },
+    {
+      id: 'wallet-credits',
+      topicId: 'billing',
+      question: 'How are wallet credits used?',
+      answer: 'Credits are used for AI-assisted actions such as content generation and campaign recommendations. Your current balance is always visible in Profile and the wallet activity is available in Settings.',
+    },
+  ]);
 
   readonly kpis = signal<Kpi[]>([
     { label: 'Cost / qualified lead', value: '₹412', sub: 'vs your baseline ₹624', trend: 'up', trendLabel: '▼ 34%' },

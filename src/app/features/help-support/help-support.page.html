@@ -1,0 +1,125 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Help & support</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <main class="support-shell">
+    <section class="support-hero mk-anim-in">
+      <div class="hero-orbit orbit-one"></div>
+      <div class="hero-orbit orbit-two"></div>
+      <div class="hero-copy">
+        <span class="eyebrow mono">MARKETOS CARE DESK</span>
+        <h1>Make progress.<br /><em>We’ll help with the rest.</em></h1>
+        <p>Practical answers for your workspace, content and campaigns, all in one calm place.</p>
+      </div>
+      <div class="hero-signal">
+        <span class="signal-dot"></span>
+        <span><b>Support is online</b><small>Typical reply in under 2 hours</small></span>
+      </div>
+    </section>
+
+    <section class="search-wrap mk-anim-in" aria-label="Search support">
+      <ion-icon name="search-outline"></ion-icon>
+      <ion-input
+        [value]="searchTerm()"
+        (ionInput)="searchTerm.set($any($event).detail.value || '')"
+        placeholder="Search guides and answers"
+        aria-label="Search guides and answers">
+      </ion-input>
+      @if (searchTerm()) {
+        <button type="button" class="clear-search" aria-label="Clear search" (click)="clearSearch()">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </button>
+      }
+    </section>
+
+    <section class="topic-section mk-anim-in">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow mono">EXPLORE BY TOPIC</span>
+          <h2>What can we help you solve?</h2>
+        </div>
+        <span class="result-count mono">{{ filteredArticles().length }} ANSWERS</span>
+      </div>
+      <div class="topic-grid">
+        <button type="button" class="topic-card all-topic" [class.active]="selectedTopic() === 'all'" (click)="selectTopic('all')">
+          <span class="topic-icon"><ion-icon name="grid-outline"></ion-icon></span>
+          <span><b>All topics</b><small>Browse the full desk</small></span>
+        </button>
+        @for (topic of data.supportTopics(); track topic.id) {
+          <button type="button" class="topic-card" [class.active]="selectedTopic() === topic.id" [ngClass]="topic.accent" (click)="selectTopic(topic.id)">
+            <span class="topic-icon"><ion-icon [name]="topic.icon"></ion-icon></span>
+            <span><b>{{ topic.label }}</b><small>{{ topic.description }}</small></span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <div class="content-grid">
+      <section class="faq-section mk-anim-in">
+        <div class="section-heading compact-heading">
+          <div>
+            <span class="eyebrow mono">ANSWERS, WITHOUT THE WAIT</span>
+            <h2>{{ selectedTopic() === 'all' ? 'Popular questions' : topicLabel(selectedTopic()) }}</h2>
+          </div>
+        </div>
+
+        @if (filteredArticles().length) {
+          <div class="faq-list">
+            @for (article of filteredArticles(); track article.id; let index = $index) {
+              <article class="faq-item" [class.expanded]="expandedArticle() === article.id" [style.--item-index]="index">
+                <button type="button" class="faq-question" [attr.aria-expanded]="expandedArticle() === article.id" (click)="toggleArticle(article)">
+                  <span class="question-mark">0{{ index + 1 }}</span>
+                  <span class="question-copy"><b>{{ article.question }}</b><small>{{ topicLabel(article.topicId) }}</small></span>
+                  <ion-icon [name]="expandedArticle() === article.id ? 'remove-outline' : 'add-outline'"></ion-icon>
+                </button>
+                @if (expandedArticle() === article.id) {
+                  <div class="faq-answer"><p>{{ article.answer }}</p><button type="button" class="answer-link" (click)="contactSupport('chat')">Still need a hand? <ion-icon name="arrow-forward-outline"></ion-icon></button></div>
+                }
+              </article>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <ion-icon name="search-outline"></ion-icon>
+            <h3>No answer found yet</h3>
+            <p>Try a shorter search, or connect with the MarketOS support desk.</p>
+            <ion-button size="small" fill="outline" (click)="contactSupport('chat')">Contact support</ion-button>
+          </div>
+        }
+      </section>
+
+      <aside class="contact-column">
+        <section class="contact-card live-card mk-anim-in">
+          <span class="contact-kicker mono">NEED A HUMAN?</span>
+          <div class="contact-icon"><ion-icon name="chatbubbles-outline"></ion-icon></div>
+          <h2>Let’s work it out together.</h2>
+          <p>Tell us what is blocking your next move. Our team knows the workspace inside out.</p>
+          <button type="button" class="primary-action" (click)="contactSupport('chat')"><span>Start a conversation</span><ion-icon name="arrow-up-outline"></ion-icon></button>
+        </section>
+
+        <section class="contact-card channels-card mk-anim-in">
+          <span class="contact-kicker mono">OTHER WAYS TO REACH US</span>
+          <button type="button" class="channel-row" (click)="contactSupport('email')">
+            <span class="channel-icon"><ion-icon name="mail-outline"></ion-icon></span>
+            <span><b>Email support</b><small>care@marketos.in</small></span>
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+          </button>
+          <div class="channel-row static-row">
+            <span class="channel-icon"><ion-icon name="time-outline"></ion-icon></span>
+            <span><b>Support hours</b><small>Mon–Fri · 9:00–18:00 IST</small></span>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+  </main>
+</ion-content>

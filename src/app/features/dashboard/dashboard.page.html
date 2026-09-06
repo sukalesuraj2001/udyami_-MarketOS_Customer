@@ -12,6 +12,25 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
+  @if (membership.loaded() && !membership.membershipActive()) {
+  <div class="membership-renewal-card mk-anim-in">
+    <div class="membership-renewal-icon">
+      <ion-icon name="sparkles-outline"></ion-icon>
+    </div>
+    <div class="membership-renewal-copy">
+      <span class="membership-renewal-label mono">Membership renewal</span>
+      <h3>Keep your marketing moving</h3>
+      <p>
+        Your membership needs attention. Renew to publish and regenerate content again.
+      </p>
+    </div>
+    <ion-button size="small" fill="outline" color="primary" (click)="renewMembership()">
+      Renew now
+      <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+    </ion-button>
+  </div>
+  }
+
   <mk-section-header [title]="getGreeting() + ', ' + ownerName + ' 👋'"
     subtitle="Five items are waiting for your approval. Nothing publishes and nothing spends until you say so.">
     <ion-button color="primary" (click)="goApprovals()">
@@ -20,7 +39,7 @@
     </ion-button>
   </mk-section-header>
 
-  @if (data.loading()) {
+  @if (data.loading() || isLoadingApprovalCounts()) {
   <div class="mk-grid cols-2" style="margin-bottom:16px">
     @for (s of skeletonRows; track $index) {
     <div class="mk-card">
@@ -32,13 +51,13 @@
   </div>
   } @else {
   <div class="mk-grid cols-2 mk-stagger" style="margin-bottom:16px">
-    @for (kpi of data.kpis(); track kpi.label) {
+    @for (kpi of approvalKpis(); track kpi.label) {
     <mk-kpi-card [kpi]="kpi"></mk-kpi-card>
     }
   </div>
   }
 
-  <div class="mk-card mk-anim-in" style="margin-bottom:14px">
+  <!-- <div class="mk-card mk-anim-in" style="margin-bottom:14px">
     <div class="card-title">
       <h3>Last night's brief</h3>
       <p class="mini">Generated 06:00 · reviewed 41 metrics across Meta, Google and your CRM</p>
@@ -62,7 +81,7 @@
       </ion-button>
       <ion-button size="small" fill="clear" routerLink="/reports">See full report</ion-button>
     </div>
-  </div>
+  </div> -->
 
   <div class="mk-card mk-anim-in">
     <div class="card-title">

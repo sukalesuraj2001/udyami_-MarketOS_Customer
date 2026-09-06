@@ -12,31 +12,90 @@
     <ion-button size="small" fill="outline" (click)="showCaps.set(true)">Edit spend caps</ion-button>
   </mk-section-header>
 
-  <div class="mk-grid mk-stagger" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+  <section class="published-stage mk-anim-in" aria-labelledby="published-title">
+    <div class="published-heading">
+      <div>
+        <span class="eyebrow">Live distribution</span>
+        <h1 id="published-title">Published campaigns</h1>
+        <p>Every piece of content that has reached a connected channel.</p>
+      </div>
+      <ion-button class="refresh-button" fill="clear" aria-label="Refresh published campaigns" (click)="loadPublishedContent()">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="platform-grid mk-stagger">
+      <div class="platform-card instagram">
+        <div class="platform-icon"><ion-icon name="logo-instagram"></ion-icon></div>
+        <div class="platform-copy"><span>Instagram</span><strong>{{ platformCounts().instagram }}</strong><small>published posts</small></div>
+        <div class="platform-spark"></div>
+      </div>
+      <div class="platform-card meta">
+        <div class="platform-icon"><ion-icon name="logo-facebook"></ion-icon></div>
+        <div class="platform-copy"><span>Meta Ads</span><strong>{{ platformCounts().meta }}</strong><small>published campaigns</small></div>
+        <div class="platform-spark"></div>
+      </div>
+      <div class="platform-card google">
+        <div class="platform-icon"><ion-icon name="logo-google"></ion-icon></div>
+        <div class="platform-copy"><span>Google Ads</span><strong>{{ platformCounts().google }}</strong><small>published campaigns</small></div>
+        <div class="platform-spark"></div>
+      </div>
+      <div class="platform-card linkedin">
+        <div class="platform-icon"><ion-icon name="logo-linkedin"></ion-icon></div>
+        <div class="platform-copy"><span>LinkedIn</span><strong>{{ platformCounts().linkedin }}</strong><small>published posts</small></div>
+        <div class="platform-spark"></div>
+      </div>
+    </div>
+
+    @if (isLoadingPublished()) {
+      <div class="published-grid loading-grid" aria-label="Loading published campaigns">
+        @for (item of [1, 2, 3]; track item) {
+          <div class="published-card skeleton-card"><div></div><div></div><div></div></div>
+        }
+      </div>
+    } @else if (publishedError()) {
+      <div class="empty-published mk-card">
+        <ion-icon name="cloud-offline-outline"></ion-icon>
+        <strong>Published campaigns are unavailable</strong>
+        <span>Refresh to try loading the latest content.</span>
+        <ion-button size="small" fill="outline" (click)="loadPublishedContent()">Try again</ion-button>
+      </div>
+    } @else if (!publishedContents().length) {
+      <div class="empty-published mk-card">
+        <ion-icon name="rocket-outline"></ion-icon>
+        <strong>No published campaigns yet</strong>
+        <span>Approved content will appear here after publishing.</span>
+      </div>
+    } @else {
+      <div class="published-grid mk-stagger">
+        @for (content of publishedContents(); track content.id) {
+          <article class="published-card mk-card">
+            <div class="media-frame">
+              @if (content.mediaUrl && (content.mediaType || '').toLowerCase().startsWith('video')) {
+                <video [src]="content.mediaUrl" muted playsinline preload="metadata"></video>
+              } @else if (content.mediaUrl) {
+                <img [src]="content.mediaUrl" [alt]="getPublishedHeadline(content)" loading="lazy">
+              } @else {
+                <div class="media-placeholder"><ion-icon name="megaphone-outline"></ion-icon></div>
+              }
+              <span class="published-badge"><ion-icon name="checkmark-circle"></ion-icon> Published</span>
+            </div>
+            <div class="published-body">
+              <div class="content-meta"><span><ion-icon [name]="getPlatformIcon(content.platform)"></ion-icon>{{ getPlatformLabel(content.platform) }}</span><time>{{ getPublishedDate(content) }}</time></div>
+              <h2>{{ getPublishedHeadline(content) }}</h2>
+              <p>{{ getPublishedCaption(content) }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- <div class="mk-grid mk-stagger" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
     <div class="mk-card kpi"><div class="lab">Active</div><div class="val mono">4</div><div class="sub">3 Meta · 1 Google</div></div>
     <div class="mk-card kpi"><div class="lab">Daily cap</div><div class="val mono">₹3,000</div><div class="sub">Set on the ad account</div></div>
     <div class="mk-card kpi"><div class="lab">Breaker</div><div class="val mono armed">Armed</div><div class="sub">Auto-pause at 2.5×</div></div>
-  </div>
-
-  <div class="camp-list mk-stagger">
-    @for (c of data.campaigns(); track c.name) {
-      <div class="mk-card camp-row">
-        <div class="info">
-          <b class="name">{{ c.name }}</b>
-          <span class="mini">{{ c.channel }}</span>
-        </div>
-        <div class="stats">
-          <div class="stat"><span class="k">Spend</span><span class="v mono">{{ c.spend }}</span></div>
-          <div class="stat"><span class="k">Qual.</span><span class="v mono">{{ c.qualified }}</span></div>
-          <div class="stat"><span class="k">Cost/qual.</span><span class="v mono">{{ c.costPerQualified }}</span></div>
-        </div>
-        <div class="foot">
-          <span class="mk-tag" [ngClass]="c.status === 'live' ? 'live' : 'neu'">{{ c.status === 'live' ? 'Live' : 'Paused' }}</span>
-          <ion-button size="small" fill="outline" (click)="toggle(c.name)">{{ c.status === 'live' ? 'Pause' : 'Resume' }}</ion-button>
-        </div>
-      </div>
-    }
-  </div>
+  </div> -->
 
   <ion-modal [isOpen]="showCaps()" (didDismiss)="showCaps.set(false)" [breakpoints]="[0, 0.6]" [initialBreakpoint]="0.6">
     <ng-template>

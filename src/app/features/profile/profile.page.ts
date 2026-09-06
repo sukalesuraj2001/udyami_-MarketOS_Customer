@@ -4,7 +4,6 @@ import { IonicModule, NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
 import { MockDataService } from '@core/services/mock-data.service';
-import { ToastService } from '@core/services/toast.service';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
 import { Profile, UserProfile } from '@app/core/services/profileService/profile';
 
@@ -26,7 +25,6 @@ interface ProfileOption {
 export class ProfilePage {
   data = inject(MockDataService);
   private router = inject(Router);
-  private toast = inject(ToastService);
   private navCtrl = inject(NavController);
   private profileService = inject(Profile);
   readonly profile = signal<UserProfile | null>(null);
@@ -75,9 +73,9 @@ export class ProfilePage {
       path: '/tabs/storage'
     },
     { label: 'Approvals', detail: `${this.data.openApprovalsCount()} items waiting for you`, icon: 'checkmark-circle-outline', path: '/tabs/approvals' },
-    { label: 'Brand brief', detail: 'Your positioning and content guardrails', icon: 'diamond-outline', path: '/tabs/brand-brief' },
+    // { label: 'Brand brief', detail: 'Your positioning and content guardrails', icon: 'diamond-outline', path: '/tabs/brand-brief' },
     { label: 'Reports', detail: 'Performance and campaign insights', icon: 'bar-chart-outline', path: '/tabs/reports' },
-    { label: 'Help & support', detail: 'Talk to the MarketOS team', icon: 'chatbubble-ellipses-outline', action: () => this.contactSupport() },
+    // { label: 'Help & support', detail: 'Guides, answers and the MarketOS team', icon: 'chatbubble-ellipses-outline', path: '/tabs/help-support' },
     {
       label: 'Log Out',
       detail: 'Sign out of your MarketOS account',
@@ -87,7 +85,7 @@ export class ProfilePage {
   ];
 
   contactSupport(): void {
-    this.toast.show('Support request started', 'We will get back to you shortly', 'ok');
+    this.router.navigateByUrl('/tabs/help-support');
   }
 
   openOption(option: ProfileOption): void {

@@ -18,6 +18,10 @@ export interface PublishContentPayload {
   caption: string;
 }
 
+export interface DownloadReportPayload {
+  html: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -93,6 +97,14 @@ export class ApprovalService {
       .split(/[·|/-]/, 1)[0]
       .trim()
       .toLowerCase();
+    const marketingContent = content.aiResponse?.marketingContent ?? {};
+    const caption = String(marketingContent.caption || '').trim();
+    const hashtags = Array.isArray(marketingContent.hashtags)
+      ? marketingContent.hashtags
+        .map((hashtag: unknown) => String(hashtag).trim())
+        .filter(Boolean)
+        .join(' ')
+      : '';
 
     const payload: PublishContentPayload = {
       userId: this.getUserId(),
@@ -101,12 +113,20 @@ export class ApprovalService {
       media_type: mediaType,
       format: mediaType === 'video' ? 'reel' : 'feed',
       media: [{ url: content.mediaUrl || '' }],
-      caption: content.aiResponse?.marketingContent?.caption || '',
+      caption: [caption, hashtags].filter(Boolean).join('\n\n'),
     };
 
     return this.http.post(
       `${environment.apiUrl}${API_ENDPOINTS.GENERATED_CONTENT.PUBLISH}`,
       payload
+    );
+  }
+
+  downloadReport(payload: DownloadReportPayload): Observable<Blob> {
+    return this.http.post(
+      `${environment.apiUrl}${API_ENDPOINTS.GENERATED_CONTENT.DOWNLOAD_REPORT}`,
+      payload,
+      { responseType: 'blob' },
     );
   }
 }

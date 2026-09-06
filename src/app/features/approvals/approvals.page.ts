@@ -11,6 +11,7 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
 import { AlertController } from '@ionic/angular/standalone';
+import { MembershipService } from '@core/services/membership.service';
 
 @Component({
   selector: 'app-approvals',
@@ -35,12 +36,39 @@ export class ApprovalsPage {
   // Services
   private toast = inject(ToastService);
   private approvalService = inject(ApprovalService);
+  private membership = inject(MembershipService);
 
   // ============================================
   // GENERATED CONTENT
   // ============================================
 
   generatedContents = signal<any[]>([]);
+  generatedStartDate = signal<string | null>(null);
+  generatedEndDate = signal<string | null>(null);
+
+  approvalSubtitle = computed(() => {
+    const startDate = this.generatedStartDate();
+    const endDate = this.generatedEndDate();
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+
+    if (
+      !start ||
+      !end ||
+      Number.isNaN(start.getTime()) ||
+      Number.isNaN(end.getTime())
+    ) {
+      return 'Review your AI-generated marketing content before publishing.';
+    }
+
+    const dateFormatter = new Intl.DateTimeFormat('en-IN', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+
+    return `Your 7 days content generated. Publish it before ${dateFormatter.format(end)}.`;
+  });
 
   // Only show content that has a media URL
   visibleContents = computed(() =>
@@ -83,8 +111,8 @@ export class ApprovalsPage {
       .subscribe({
         next: (response) => {
           const contents = response?.data ?? [];
-          contents.forEach((content: any, index: number) => {
-          });
+          this.generatedStartDate.set(response?.startDate ?? null);
+          this.generatedEndDate.set(response?.endDate ?? null);
           this.generatedContents.set(contents);
           this.isLoading.set(false);
 
@@ -92,6 +120,8 @@ export class ApprovalsPage {
 
         error: (error) => {
           this.generatedContents.set([]);
+          this.generatedStartDate.set(null);
+          this.generatedEndDate.set(null);
           this.isLoading.set(false);
           this.toast.show(
             'Error',
@@ -309,7 +339,11 @@ export class ApprovalsPage {
   // APPROVE
   // ============================================
 
-  approve(content: GeneratedContentItem): void {
+  async approve(content: GeneratedContentItem): Promise<void> {
+    if (!await this.membership.requireActiveMembership()) {
+      return;
+    }
+
     this.approvalService.publishContent(content).subscribe({
       next: (response: any) => {
         if (response?.success === false) {
@@ -343,9 +377,12 @@ export class ApprovalsPage {
   // OPEN EDIT
   // ============================================
 
-  openEdit(
+  async openEdit(
     a: ContentApproval
-  ): void {
+  ): Promise<void> {
+    if (!await this.membership.requireActiveMembership()) {
+      return;
+    }
 
     this.editTarget.set(a);
 
@@ -356,7 +393,11 @@ export class ApprovalsPage {
   // SAVE EDIT
   // ============================================
 
-  saveEdit(): void {
+  async saveEdit(): Promise<void> {
+    if (!await this.membership.requireActiveMembership()) {
+      return;
+    }
+
     const a = this.editTarget();
 
     if (!a) {
@@ -412,6 +453,10 @@ export class ApprovalsPage {
   // ============================================
 
   async openReject(a: any): Promise<void> {
+    if (!await this.membership.requireActiveMembership()) {
+      return;
+    }
+
     const alert = await this.alertController.create({
       header: 'Reject Content',
       message: 'Are you sure you want to reject this content?',

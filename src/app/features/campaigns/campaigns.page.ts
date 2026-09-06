@@ -1,12 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
-import { MockDataService } from '@core/services/mock-data.service';
 import { ToastService } from '@core/services/toast.service';
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { ApprovalService } from '@core/services/approval';
+import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interface';
 
 @Component({
   selector: 'app-campaigns',
@@ -16,18 +17,111 @@ import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-togg
   styleUrls: ['./campaigns.page.scss'],
 })
 export class CampaignsPage {
-  data = inject(MockDataService);
   private toast = inject(ToastService);
+  private approvalService = inject(ApprovalService);
+
+  publishedContents = signal<GeneratedContentItem[]>([]);
+  isLoadingPublished = signal(false);
+  publishedError = signal(false);
+
+  platformCounts = computed(() => {
+    const counts = { instagram: 0, meta: 0, google: 0, linkedin: 0, other: 0 };
+
+    for (const content of this.publishedContents()) {
+      counts[this.getPlatformKey(content.platform)] += 1;
+    }
+
+    return counts;
+  });
 
   showCaps = signal(false);
   dailyCap = '₹3,000';
   monthlyCeiling = '₹90,000';
   breaker = '2.5× trailing average';
 
-  toggle(name: string): void {
-    const c = this.data.toggleCampaign(name);
-    if (!c) return;
-    this.toast.show(c.status === 'live' ? 'Campaign resumed' : 'Campaign paused', c.name, c.status === 'live' ? 'ok' : 'no');
+  ionViewWillEnter(): void {
+    this.loadPublishedContent();
+  }
+
+  loadPublishedContent(): void {
+    this.isLoadingPublished.set(true);
+    this.publishedError.set(false);
+
+    this.approvalService.getGeneratedContent().subscribe({
+      next: (response) => {
+        this.publishedContents.set(
+          (response?.data ?? []).filter((content) => this.isPublished(content))
+        );
+        this.isLoadingPublished.set(false);
+      },
+      error: () => {
+        this.publishedContents.set([]);
+        this.publishedError.set(true);
+        this.isLoadingPublished.set(false);
+      },
+    });
+  }
+
+  getPlatformKey(platform: string | null): 'instagram' | 'meta' | 'google' | 'linkedin' | 'other' {
+    const normalized = String(platform || '').toLowerCase();
+
+    if (normalized.includes('instagram')) return 'instagram';
+    if (normalized.includes('meta') || normalized.includes('facebook')) return 'meta';
+    if (normalized.includes('google')) return 'google';
+    if (normalized.includes('linkedin')) return 'linkedin';
+
+    return 'other';
+  }
+
+  private isPublished(content: GeneratedContentItem): boolean {
+    return String(content.status || '').toUpperCase() === 'PUBLISHED'
+      || Boolean(content.publishedAt);
+  }
+
+  getPlatformLabel(platform: string | null): string {
+    const key = this.getPlatformKey(platform);
+
+    return {
+      instagram: 'Instagram',
+      meta: 'Meta Ads',
+      google: 'Google Ads',
+      linkedin: 'LinkedIn',
+      other: platform || 'Other channel',
+    }[key];
+  }
+
+  getPlatformIcon(platform: string | null): string {
+    const key = this.getPlatformKey(platform);
+
+    return {
+      instagram: 'logo-instagram',
+      meta: 'logo-facebook',
+      google: 'logo-google',
+      linkedin: 'logo-linkedin',
+      other: 'megaphone-outline',
+    }[key];
+  }
+
+  getPublishedHeadline(content: GeneratedContentItem): string {
+    return content.aiResponse?.marketingContent?.headline
+      || content.productName
+      || 'Published campaign content';
+  }
+
+  getPublishedCaption(content: GeneratedContentItem): string {
+    return content.aiResponse?.marketingContent?.caption || '';
+  }
+
+  getPublishedDate(content: GeneratedContentItem): string {
+    const date = new Date(content.publishedAt || content.updatedAt || content.createdAt);
+
+    if (Number.isNaN(date.getTime())) return 'Published recently';
+
+    return new Intl.DateTimeFormat('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(date);
   }
 
   saveCaps(): void {

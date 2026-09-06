@@ -1,3 +1,76 @@
+.membership-renewal-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  color: var(--mk-text);
+  background: linear-gradient(115deg, var(--mk-surf) 0%, var(--mk-surf-2) 72%, var(--mk-gold-fade) 100%);
+  border: 1px solid var(--mk-line-2);
+  border-left: 3px solid var(--mk-gold);
+  border-radius: var(--mk-radius-sm);
+  box-shadow: 0 5px 16px rgba(27, 36, 48, 0.07);
+  animation: membership-pulse 4.8s ease-in-out infinite;
+
+  .membership-renewal-icon {
+    display: grid;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    color: var(--mk-gold);
+    font-size: 17px;
+    background: var(--mk-gold-fade);
+    border-radius: 50%;
+  }
+
+  .membership-renewal-copy {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .membership-renewal-label {
+    color: var(--mk-gold);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    margin: 1px 0 2px;
+    font-size: 13px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--mk-muted);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+}
+
+@keyframes membership-pulse {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 5px 16px rgba(27, 36, 48, 0.07);
+  }
+  50% {
+    transform: translateY(-1px);
+    box-shadow: 0 7px 20px rgba(27, 36, 48, 0.11);
+  }
+}
+
+@media (max-width: 520px) {
+  .membership-renewal-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+
+    ion-button {
+      margin: 0 0 0 42px;
+    }
+  }
+}
+
 .card-title {
   margin-bottom: 12px;
   h3 {

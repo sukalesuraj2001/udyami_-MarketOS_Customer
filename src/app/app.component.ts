@@ -6,6 +6,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MockDataService } from '@core/services/mock-data.service';
 import { ToastService } from '@core/services/toast.service';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { MembershipService } from '@core/services/membership.service';
 
 interface NavItem {
   path: string;
@@ -31,7 +32,12 @@ export class AppComponent {
   data = inject(MockDataService);
   private alertCtrl = inject(AlertController);
   private menuCtrl = inject(MenuController);
+  private membership = inject(MembershipService);
   toast = inject(ToastService);
+
+  constructor() {
+    this.membership.load();
+  }
 
   groups: NavGroup[] = [
     {

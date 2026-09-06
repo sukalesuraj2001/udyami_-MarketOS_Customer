@@ -8,6 +8,8 @@ export const API_ENDPOINTS = {
     USER: {
         GET_USER_BY_ID: (userId: string) =>
             `/auth/getUserById/${userId}`,
+        GET_DIGITAL_USER_DATA: (userId: string) =>
+            `/auth/getDigitalUserdataBy/${userId}`,
     },
 
     PROFILE: {
@@ -38,5 +40,7 @@ export const API_ENDPOINTS = {
             `/create-content/rejectContent/${contentId}`,
 
         PUBLISH: '/create-content/publishContent',
+
+        DOWNLOAD_REPORT: '/create-content/download-report',
     },
 };

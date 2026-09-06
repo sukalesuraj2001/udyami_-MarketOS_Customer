@@ -210,6 +210,14 @@ ion-item {
   --background: var(--mk-surf);
 }
 
+ion-alert.mk-alert {
+  --background: var(--mk-surf);
+  --color: var(--mk-text);
+  --ion-text-color: var(--mk-text);
+  --button-color: var(--mk-gold);
+  --backdrop-opacity: 0.58;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

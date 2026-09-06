@@ -64,6 +64,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/settings/settings.page').then((m) => m.SettingsPage),
         title: 'Settings · MarketOS',
       },
+      {
+        path: 'help-support',
+        loadComponent: () => import('./features/help-support/help-support.page').then((m) => m.HelpSupportPage),
+        title: 'Help & support · MarketOS',
+      },
     ],
   },
   {
@@ -99,6 +104,11 @@ export const routes: Routes = [
   {
     path: 'reports',
     redirectTo: 'tabs/reports',
+    pathMatch: 'full',
+  },
+  {
+    path: 'help-support',
+    redirectTo: 'tabs/help-support',
     pathMatch: 'full',
   },
   {

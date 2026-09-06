@@ -203,9 +203,8 @@ export class SettingsPage {
                     )
                   );
 
-                  // Reusable success message
                   this.toast.success(
-                    `${name} connected successfully.`
+                    `${name} connected successfully. An Admin will review and activate your social media account within 1-2 working days.`
                   );
                 },
 

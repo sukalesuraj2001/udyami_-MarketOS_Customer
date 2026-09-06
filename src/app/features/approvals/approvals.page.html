@@ -14,7 +14,7 @@
   <!-- PAGE HEADER -->
   <!-- ========================================= -->
 
-  <mk-section-header title="Approvals" subtitle="Review your AI-generated marketing content before publishing.">
+  <mk-section-header title="Approvals" [subtitle]="approvalSubtitle()">
     <ion-button size="small" fill="outline" (click)="getGeneratedContent()">
       <ion-icon name="refresh-outline" slot="start"></ion-icon>
       Refresh

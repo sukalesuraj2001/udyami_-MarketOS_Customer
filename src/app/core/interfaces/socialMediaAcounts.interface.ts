@@ -41,6 +41,7 @@ export interface GeneratedContentItem {
   storagePath: string | null;
   aiResponse: any;
   status: string;
+  isActive?: boolean;
   errorMessage: string | null;
   retryCount: number;
   approvedBy: string | null;
@@ -54,5 +55,7 @@ export interface GeneratedContentItem {
 export interface GeneratedContentResponse {
   userId: string;
   total: number;
+  startDate?: string;
+  endDate?: string;
   data: GeneratedContentItem[];
 }
