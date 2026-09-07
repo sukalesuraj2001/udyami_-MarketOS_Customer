@@ -87,6 +87,28 @@ export class ApprovalService {
     );
   }
 
+  private getMarketingContent(content: GeneratedContentItem): any {
+    const aiResponse = content.aiResponse;
+
+    if (aiResponse?.marketingContent) {
+      return aiResponse.marketingContent;
+    }
+
+    if (aiResponse?.response) {
+      return aiResponse.response;
+    }
+
+    if (typeof content.generatedContent === 'string') {
+      try {
+        return JSON.parse(content.generatedContent);
+      } catch {
+        return {};
+      }
+    }
+
+    return {};
+  }
+
   publishContent(content: GeneratedContentItem) {
     const mediaTypeValue = String(content.mediaType || '').toLowerCase();
     const mediaType = mediaTypeValue.startsWith('video/')
@@ -97,7 +119,7 @@ export class ApprovalService {
       .split(/[·|/-]/, 1)[0]
       .trim()
       .toLowerCase();
-    const marketingContent = content.aiResponse?.marketingContent ?? {};
+    const marketingContent = this.getMarketingContent(content);
     const caption = String(marketingContent.caption || '').trim();
     const hashtags = Array.isArray(marketingContent.hashtags)
       ? marketingContent.hashtags

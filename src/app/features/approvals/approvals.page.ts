@@ -202,17 +202,32 @@ export class ApprovalsPage {
   // GET HEADLINE
   // ============================================
 
-  getHeadline(content: any): string {
+  private getMarketingContent(content: any): any {
+    const aiResponse = content?.aiResponse;
 
-    return (
-      content?.aiResponse
-        ?.marketingContent
-        ?.headline
-      ||
-      content?.productName
-      ||
-      'Marketing Content'
-    );
+    if (aiResponse?.marketingContent) {
+      return aiResponse.marketingContent;
+    }
+
+    if (aiResponse?.response) {
+      return aiResponse.response;
+    }
+
+    if (typeof content?.generatedContent === 'string') {
+      try {
+        return JSON.parse(content.generatedContent);
+      } catch {
+        return null;
+      }
+    }
+
+    return null;
+  }
+
+  getHeadline(content: any): string {
+    return this.getMarketingContent(content)?.headline
+      || content?.productName
+      || 'Marketing Content';
   }
 
   // ============================================
@@ -220,13 +235,7 @@ export class ApprovalsPage {
   // ============================================
 
   getCaption(content: any): string {
-
-    return (
-      content?.aiResponse
-        ?.marketingContent
-        ?.caption
-      || ''
-    );
+    return this.getMarketingContent(content)?.caption || '';
   }
 
   // ============================================
@@ -234,13 +243,7 @@ export class ApprovalsPage {
   // ============================================
 
   getDescription(content: any): string {
-
-    return (
-      content?.aiResponse
-        ?.marketingContent
-        ?.description
-      || ''
-    );
+    return this.getMarketingContent(content)?.description || '';
   }
 
   // ============================================
@@ -248,13 +251,7 @@ export class ApprovalsPage {
   // ============================================
 
   getCallToAction(content: any): string {
-
-    return (
-      content?.aiResponse
-        ?.marketingContent
-        ?.callToAction
-      || ''
-    );
+    return this.getMarketingContent(content)?.callToAction || '';
   }
 
   // ============================================
@@ -262,13 +259,22 @@ export class ApprovalsPage {
   // ============================================
 
   getHashtags(content: any): string[] {
+    const hashtags = this.getMarketingContent(content)?.hashtags;
 
-    return (
-      content?.aiResponse
-        ?.marketingContent
-        ?.hashtags
-      || []
-    );
+    if (Array.isArray(hashtags)) {
+      return hashtags
+        .map((hashtag: unknown) => String(hashtag).trim())
+        .filter(Boolean);
+    }
+
+    if (typeof hashtags === 'string') {
+      return hashtags
+        .split(/[\s,]+/)
+        .map((hashtag) => hashtag.trim())
+        .filter(Boolean);
+    }
+
+    return [];
   }
 
   // ============================================
