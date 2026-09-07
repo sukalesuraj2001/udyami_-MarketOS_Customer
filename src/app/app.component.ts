@@ -62,13 +62,13 @@ export class AppComponent {
       ],
     },
     {
-      label: 'Pipeline',
+      label: 'Operations',
       items: [
         {
-          path: '/leads',
-          icon: 'people-outline',
-          label: 'Leads',
-          badge: () => this.data.hotLeadsCount(),
+          path: '/incidents',
+          icon: 'warning-outline',
+          label: 'Incidents',
+          badge: () => 0,
           badgeTone: 'muted',
         },
         { path: '/reports', icon: 'bar-chart-outline', label: 'Reports' },

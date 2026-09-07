@@ -71,8 +71,8 @@
         @for (content of publishedContents(); track content.id) {
           <article class="published-card mk-card">
             <div class="media-frame">
-              @if (content.mediaUrl && (content.mediaType || '').toLowerCase().startsWith('video')) {
-                <video [src]="content.mediaUrl" muted playsinline preload="metadata"></video>
+              @if (content.mediaUrl && isVideoContent(content)) {
+                <video [src]="content.mediaUrl" controls muted playsinline preload="metadata"></video>
               } @else if (content.mediaUrl) {
                 <img [src]="content.mediaUrl" [alt]="getPublishedHeadline(content)" loading="lazy">
               } @else {

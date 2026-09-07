@@ -43,4 +43,10 @@ export const API_ENDPOINTS = {
 
         DOWNLOAD_REPORT: '/create-content/download-report',
     },
+
+    INCIDENTS: {
+        CREATE: '/incidents/createIncidents',
+        GET_BY_USER_ID: (userId: string) =>
+            `/incidents/getIncidentsByUserId/${userId}`,
+    },
 };

@@ -112,6 +112,20 @@ export class CampaignsPage {
     return content.aiResponse?.marketingContent?.caption || '';
   }
 
+  isVideoContent(content: GeneratedContentItem): boolean {
+    const mediaType = String(content.mediaType || '').toLowerCase();
+    const contentType = String(content.contentType || '').toLowerCase();
+    const activityType = String(content.activityType || '').toLowerCase();
+    const mediaUrl = String(content.mediaUrl || '').toLowerCase().split('?')[0];
+
+    return mediaType.startsWith('video')
+      || contentType.includes('video')
+      || contentType.includes('reel')
+      || activityType.includes('video')
+      || activityType.includes('reel')
+      || /\.(mp4|webm|mov|m4v|avi)$/.test(mediaUrl);
+  }
+
   getPublishedDate(content: GeneratedContentItem): string {
     const date = new Date(content.publishedAt || content.updatedAt || content.createdAt);
 
