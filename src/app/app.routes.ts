@@ -40,9 +40,9 @@ export const routes: Routes = [
         title: 'Campaigns · MarketOS',
       },
       {
-        path: 'leads',
-        loadComponent: () => import('./features/leads/leads.page').then((m) => m.LeadsPage),
-        title: 'Leads · MarketOS',
+        path: 'incidents',
+        loadComponent: () => import('./features/incidents/incidents.page').then((m) => m.IncidentsPage),
+        title: 'Incidents · MarketOS',
       },
       {
         path: 'reports',
@@ -97,8 +97,8 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'leads',
-    redirectTo: 'tabs/leads',
+    path: 'incidents',
+    redirectTo: 'tabs/incidents',
     pathMatch: 'full',
   },
   {

@@ -1,0 +1,101 @@
+<ion-header class="incident-header">
+  <ion-toolbar>
+    <ion-title>Incidents</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <section class="hero-panel">
+      <div class="hero-orbit orbit-one"></div>
+      <div class="hero-orbit orbit-two"></div>
+      <div class="hero-copy">
+        <span class="eyebrow"><ion-icon name="pulse-outline"></ion-icon> Operations desk</span>
+        <h1>Keep every issue<br /><em>moving forward.</em></h1>
+        <p>Report blockers, follow progress, and keep your marketing engine healthy.</p>
+      </div>
+      <button class="create-fab" type="button" (click)="showCreate.set(true)">
+        <ion-icon name="add-outline"></ion-icon>
+        <span>New incident</span>
+      </button>
+    </section>
+
+    <div class="metrics-row" aria-label="Incident summary">
+      <div class="metric-card open-metric"><span class="metric-dot"></span><strong>{{ openCount() }}</strong><span>Open</span></div>
+      <div class="metric-card"><ion-icon name="checkmark-done-outline"></ion-icon><strong>{{ resolvedCount() }}</strong><span>Resolved</span></div>
+      <div class="metric-card"><ion-icon name="list-outline"></ion-icon><strong>{{ incidents().length }}</strong><span>Total</span></div>
+    </div>
+
+    <div class="section-heading">
+      <div><span class="eyebrow dark">Your queue</span><h2>Incidents</h2></div>
+      <button class="refresh-button" type="button" aria-label="Refresh incidents" (click)="loadIncidents()" [disabled]="isLoading()">
+        <ion-icon name="refresh-outline" [class.spinning]="isLoading()"></ion-icon>
+      </button>
+    </div>
+
+    <div class="filter-bar" role="tablist" aria-label="Filter incidents">
+      <button type="button" [class.active]="filter() === 'ALL'" (click)="setFilter('ALL')">All <span>{{ incidents().length }}</span></button>
+      <button type="button" [class.active]="filter() === 'OPEN'" (click)="setFilter('OPEN')">Open <span>{{ openCount() }}</span></button>
+      <button type="button" [class.active]="filter() === 'RESOLVED'" (click)="setFilter('RESOLVED')">Resolved <span>{{ resolvedCount() }}</span></button>
+    </div>
+
+    @if (isLoading()) {
+      <div class="loading-state"><ion-spinner name="crescent"></ion-spinner><span>Syncing your incident queue...</span></div>
+    } @else if (error()) {
+      <div class="notice error-notice"><ion-icon name="cloud-offline-outline"></ion-icon><span>{{ error() }}</span></div>
+    } @else if (visibleIncidents().length === 0) {
+      <mk-empty-state icon="sparkles-outline" title="A clear queue" subtitle="No incidents match this view. When something needs attention, report it here."></mk-empty-state>
+    } @else {
+      <div class="incident-list">
+        @for (incident of visibleIncidents(); track incident.id) {
+          <article class="incident-card" [class.resolved-card]="incident.status === 'RESOLVED'">
+            <div class="card-accent" [ngClass]="severityClass(incident.severity)"></div>
+            <div class="incident-card-top">
+              <div class="incident-icon" [ngClass]="severityClass(incident.severity)"><ion-icon name="warning-outline"></ion-icon></div>
+              <div class="incident-heading"><span class="incident-type">{{ incident.incidentType.replace('_', ' ') }}</span><h3>{{ incident.title }}</h3></div>
+              <span class="status-pill" [class.resolved]="incident.status === 'RESOLVED'"><span></span>{{ incident.status }}</span>
+            </div>
+            <p class="incident-message">{{ incident.message }}</p>
+            @if (incident.errorMessage) { <div class="error-code"><ion-icon name="code-slash-outline"></ion-icon>{{ incident.errorMessage }}</div> }
+            <div class="incident-footer"><span><ion-icon name="flash-outline"></ion-icon>{{ incident.activityType.replace('_', ' ') }}</span><span>{{ formatDate(incident.createdAt) }}</span><b [ngClass]="severityClass(incident.severity)">{{ incident.severity }}</b></div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+
+  <ion-modal [isOpen]="showCreate()" (didDismiss)="showCreate.set(false)" class="incident-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar><ion-title>Report incident</ion-title><ion-buttons slot="end"><ion-button fill="clear" (click)="showCreate.set(false)"><ion-icon name="close-outline"></ion-icon></ion-button></ion-buttons></ion-toolbar>
+      </ion-header>
+      <ion-content class="form-content">
+        <div class="form-intro"><div class="form-icon"><ion-icon name="megaphone-outline"></ion-icon></div><div><span class="eyebrow dark">New report</span><h2>What happened?</h2></div></div>
+        <p class="form-hint">Share enough context for the team to reproduce and resolve it quickly.</p>
+        <form (ngSubmit)="createIncident()">
+          <ion-input label="Title" labelPlacement="stacked" fill="outline" name="title" placeholder="e.g. Image generation failed" [(ngModel)]="form.title" required></ion-input>
+          <ion-textarea label="What went wrong?" labelPlacement="stacked" fill="outline" name="message" placeholder="Describe the impact or behavior..." [autoGrow]="true" [(ngModel)]="form.message" required></ion-textarea>
+          <div class="form-grid">
+            <ion-select label="Activity" labelPlacement="stacked" fill="outline" name="activityType" [(ngModel)]="form.activityType" required><ion-select-option value="SOCIAL_POST">Social post</ion-select-option><ion-select-option value="REEL">Reel</ion-select-option><ion-select-option value="CAMPAIGN">Campaign</ion-select-option><ion-select-option value="OTHER">Other</ion-select-option></ion-select>
+            <ion-select label="Severity" labelPlacement="stacked" fill="outline" name="severity" [(ngModel)]="form.severity" required><ion-select-option value="LOW">Low</ion-select-option><ion-select-option value="MEDIUM">Medium</ion-select-option><ion-select-option value="HIGH">High</ion-select-option><ion-select-option value="CRITICAL">Critical</ion-select-option></ion-select>
+          </div>
+          <ion-select label="Incident type" labelPlacement="stacked" fill="outline" name="incidentType" placeholder="Select incident type" [(ngModel)]="form.incidentType" required>
+            @for (incidentType of incidentTypes; track incidentType) {
+              <ion-select-option [value]="incidentType">{{ incidentType }}</ion-select-option>
+            }
+          </ion-select>
+          <ion-input label="Error message" labelPlacement="stacked" fill="outline" name="errorMessage" placeholder="Technical error or provider response" [(ngModel)]="form.errorMessage" required></ion-input>
+          <ion-select label="Generated content" labelPlacement="stacked" fill="outline" name="generatedContentId" [disabled]="isLoadingContent()" [placeholder]="isLoadingContent() ? 'Loading content...' : 'Select generated content'" [(ngModel)]="form.generatedContentId" (ionChange)="selectGeneratedContent($event.detail.value)" required>
+            @for (content of generatedContents(); track content.id) {
+              <ion-select-option [value]="content.id">{{ content.productName || content.contentType || content.activityType || 'Generated content' }} · {{ content.createdAt | date: 'dd MMM, hh:mm a' }}</ion-select-option>
+            }
+          </ion-select>
+          <ion-button class="submit-button" expand="block" type="submit" [disabled]="isCreating()"><ion-spinner *ngIf="isCreating()" name="crescent"></ion-spinner><ion-icon *ngIf="!isCreating()" name="paper-plane-outline" slot="start"></ion-icon>{{ isCreating() ? 'Reporting...' : 'Report incident' }}</ion-button>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
