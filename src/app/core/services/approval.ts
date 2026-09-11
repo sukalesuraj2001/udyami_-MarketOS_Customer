@@ -22,6 +22,31 @@ export interface DownloadReportPayload {
   html: string;
 }
 
+export interface PlatformAnalytics {
+  id: string;
+  userId: string;
+  platform: string;
+  periodDays: number;
+  postsMeasured: number;
+  totalReach: number;
+  totalLikes: number;
+  totalComments: number;
+  totalShares: number;
+  totalEngagement: number;
+  averageEngagementRate: number;
+  bestPost: string | null;
+  summary: string;
+  metricsWarning?: string | null;
+  collectedAt: string;
+  createdAt: string;
+}
+
+export interface PlatformAnalyticsResponse {
+  success: boolean;
+  message: string;
+  data: PlatformAnalytics;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -67,6 +92,12 @@ export class ApprovalService {
 
     return this.http.get<GeneratedContentResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.GENERATED_CONTENT.GET_BY_USER_ID(userId)}`
+    );
+  }
+
+  getPlatformAnalytics(platform: string): Observable<PlatformAnalyticsResponse> {
+    return this.http.get<PlatformAnalyticsResponse>(
+      `${environment.apiUrl}${API_ENDPOINTS.GENERATED_CONTENT.ANALYTICS(this.getUserId(), platform)}`,
     );
   }
 
