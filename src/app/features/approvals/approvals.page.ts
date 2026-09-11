@@ -70,9 +70,11 @@ export class ApprovalsPage {
     return `Your 7 days content generated. Publish it before ${dateFormatter.format(end)}.`;
   });
 
-  // Only show content that has a media URL
+  // Show only publishable ad creatives with media.
   visibleContents = computed(() =>
-    this.generatedContents().filter((content) => !!content?.mediaUrl)
+    this.generatedContents().filter((content) =>
+      !!content?.mediaUrl && this.isAdPlatform(content)
+    )
   );
 
   isLoading = signal(false);
@@ -199,17 +201,19 @@ export class ApprovalsPage {
   }
 
   isMetaAd(content: GeneratedContentItem): boolean {
-    const values = [
-      content?.platform,
-      content?.contentType,
-      content?.activityType,
-      content?.aiResponse?.activity?.platform,
-    ];
+    return this.adPlatforms(content).includes('METAADS');
+  }
 
-    return values.some((value) => {
-      const normalized = String(value || '').replace(/[\s_-]/g, '').toUpperCase();
-      return normalized === 'METAAD' || normalized === 'METAADS';
-    });
+  private isAdPlatform(content: GeneratedContentItem): boolean {
+    const platforms = this.adPlatforms(content);
+    return platforms.includes('METAADS') || platforms.includes('GOOGLEADS');
+  }
+
+  private adPlatforms(content: GeneratedContentItem): string[] {
+    return [
+      content?.platform,
+      content?.aiResponse?.activity?.platform,
+    ].map((value) => String(value || '').replace(/[\s_-]/g, '').toUpperCase());
   }
 
   // ============================================
