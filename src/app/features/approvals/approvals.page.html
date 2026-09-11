@@ -487,6 +487,7 @@
 
         <div class="acts">
 
+          @if (!isMetaAd(content)) {
 
           <!-- APPROVED / PUBLISHED -->
 
@@ -556,6 +557,7 @@
 
           </ion-button>
 
+          }
           }
 
         </div>
@@ -645,7 +647,5 @@
     </ng-template>
 
   </ion-modal>
-
-
 
 </ion-content>

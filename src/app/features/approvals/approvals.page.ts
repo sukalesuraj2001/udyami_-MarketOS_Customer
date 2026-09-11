@@ -198,6 +198,20 @@ export class ApprovalsPage {
     }
   }
 
+  isMetaAd(content: GeneratedContentItem): boolean {
+    const values = [
+      content?.platform,
+      content?.contentType,
+      content?.activityType,
+      content?.aiResponse?.activity?.platform,
+    ];
+
+    return values.some((value) => {
+      const normalized = String(value || '').replace(/[\s_-]/g, '').toUpperCase();
+      return normalized === 'METAAD' || normalized === 'METAADS';
+    });
+  }
+
   // ============================================
   // GET HEADLINE
   // ============================================
