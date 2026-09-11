@@ -66,3 +66,81 @@ h3 {
 .diag {
   opacity: 0.85;
 }
+
+.post-analytics {
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid var(--mk-line);
+  border-radius: calc(var(--mk-radius) + 4px);
+  background: var(--mk-surf);
+  box-shadow: 0 12px 32px rgba(27, 36, 48, 0.08);
+}
+
+.analytics-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 16px 16px;
+  color: #fff;
+  background: linear-gradient(128deg, #18253c 0%, #33426e 52%, #8d3a72 145%);
+}
+
+.hero-orb { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(1px); }
+.orb-one { width: 140px; height: 140px; right: -42px; top: -70px; background: rgba(239, 160, 89, 0.23); }
+.orb-two { width: 88px; height: 88px; right: 65px; bottom: -55px; border: 1px solid rgba(255, 255, 255, 0.18); }
+
+.analytics-heading { position: relative; z-index: 1; }
+.analytics-eyebrow { display: flex; align-items: center; gap: 6px; color: #eab96d; font-size: 9px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+.analytics-eyebrow span { width: 6px; height: 6px; border-radius: 50%; background: #85dfb3; box-shadow: 0 0 0 4px rgba(133, 223, 179, .15); animation: livePulse 2s infinite; }
+.analytics-heading h2 { margin: 7px 0 5px; color: #fff; font-size: 23px; }
+.analytics-heading p { max-width: 290px; margin: 0; color: rgba(255, 255, 255, .72); font-size: 11.5px; line-height: 1.55; }
+
+.platform-switch { position: relative; z-index: 1; display: flex; gap: 6px; margin-top: 17px; }
+.platform-switch button {
+  display: inline-flex; align-items: center; gap: 5px; padding: 7px 10px; border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 9px; color: rgba(255,255,255,.76); font: 700 11px var(--mk-font-body); background: rgba(255,255,255,.08);
+  transition: all 220ms var(--mk-ease);
+  ion-icon { font-size: 14px; }
+  &.active { color: #27304e; border-color: #fff; background: #fff; box-shadow: 0 5px 12px rgba(0,0,0,.17); }
+  &:active { transform: scale(.96); }
+}
+
+.analytics-summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--mk-line); border-bottom: 1px solid var(--mk-line); }
+.summary-stat { position: relative; min-height: 78px; padding: 12px; overflow: hidden; background: var(--mk-surf); }
+.summary-stat span { display: block; max-width: 105px; color: var(--mk-dim); font-size: 10px; line-height: 1.25; }
+.summary-stat strong { display: block; margin-top: 5px; color: var(--mk-text); font: 800 21px var(--mk-font-display); letter-spacing: -.03em; }
+.summary-stat ion-icon { position: absolute; right: 10px; bottom: 11px; color: var(--mk-gold); opacity: .24; font-size: 24px; }
+
+.post-list-header { display: flex; justify-content: space-between; align-items: end; gap: 10px; padding: 17px 16px 11px; }
+.section-kicker { display: block; margin-bottom: 3px; color: var(--mk-gold); font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.post-list-header h3 { margin: 0; font-size: 16px; }
+.updated-note { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 2px; color: var(--mk-dim); font-size: 9.5px; white-space: nowrap; }
+.updated-note i { width: 5px; height: 5px; border-radius: 50%; background: var(--mk-green); box-shadow: 0 0 0 3px rgba(31,143,95,.12); }
+
+.platform-total { margin: 0 10px 11px; overflow: hidden; border: 1px solid var(--mk-line); border-radius: 13px; background: linear-gradient(135deg, var(--mk-surf) 0%, var(--mk-surf-2) 160%); }
+.total-brand { display: flex; align-items: center; gap: 10px; padding: 13px; border-bottom: 1px solid var(--mk-line); }
+.total-brand span:not(.channel-icon) { display: block; color: var(--mk-dim); font-size: 9.5px; }
+.total-brand b { display: block; margin-top: 2px; color: var(--mk-text); font-size: 13px; }
+.total-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--mk-line); }
+.total-metrics > div { padding: 12px 5px; text-align: center; background: var(--mk-surf); }
+.total-metrics ion-icon { display: block; margin: 0 auto 4px; color: var(--mk-gold); font-size: 14px; }
+.total-metrics span { display: block; color: var(--mk-dim); font-size: 8.5px; white-space: nowrap; }
+.total-metrics b { display: block; margin-top: 3px; color: var(--mk-text); font: 800 15px var(--mk-font-mono); }
+.platform-rate { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; padding: 12px 13px; color: var(--mk-dim); font-size: 9.5px; }
+.platform-rate b { color: var(--mk-text); font: 700 10px var(--mk-font-mono); }
+.analytics-summary-copy { margin: 0; padding: 0 13px 12px; color: var(--mk-muted); font-size: 10.5px; line-height: 1.5; }
+.metrics-warning { display: flex; gap: 5px; margin: 0; padding: 9px 12px; color: var(--mk-amber); border-top: 1px solid rgba(184, 122, 30, .18); background: rgba(184, 122, 30, .07); font-size: 9.5px; line-height: 1.4; }
+.metrics-warning ion-icon { flex: none; margin-top: 1px; font-size: 13px; }
+.analytics-loading { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
+.analytics-loading .mk-skeleton { height: 105px; }
+.channel-icon { display: grid; flex: none; width: 31px; height: 31px; place-items: center; color: #fff; border-radius: 10px; font-size: 17px; background: radial-gradient(circle at 70% 90%, #ffcb59, #e34371 48%, #603aa9); box-shadow: 0 4px 10px rgba(188, 63, 124, .24); }
+.channel-icon.facebook { background: #2374e1; box-shadow: 0 4px 10px rgba(35,116,225,.24); }
+.rate-meter { height: 5px; overflow: hidden; border-radius: 20px; background: var(--mk-surf-3); }
+.rate-meter div { height: 100%; min-width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--mk-gold), #e97075); transition: width 800ms var(--mk-ease); }
+
+.analytics-empty { padding: 22px 16px 28px; text-align: center; }
+.empty-icon { display: grid; width: 42px; height: 42px; margin: 0 auto 10px; place-items: center; color: var(--mk-blue); border-radius: 14px; background: rgba(42,111,168,.1); font-size: 22px; }
+.analytics-empty h3 { margin: 0 0 5px; font-size: 14px; }
+.analytics-empty p { max-width: 230px; margin: auto; color: var(--mk-dim); font-size: 11px; line-height: 1.5; }
+
+@keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@media (min-width: 480px) { .analytics-summary { grid-template-columns: repeat(4, 1fr); } }

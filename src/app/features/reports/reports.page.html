@@ -50,6 +50,79 @@
     }
   </div>
 
+  <section class="post-analytics mk-anim-in" aria-labelledby="post-analytics-title">
+    <div class="analytics-hero">
+      <div class="hero-orb orb-one"></div>
+      <div class="hero-orb orb-two"></div>
+      <div class="analytics-heading">
+        <div class="analytics-eyebrow"><span></span> Live post intelligence</div>
+        <h2 id="post-analytics-title">Post analytics</h2>
+        <p>See exactly how every published post is performing across your connected channels.</p>
+      </div>
+      <div class="platform-switch" role="tablist" aria-label="Choose social platform">
+        @for (platform of ['instagram', 'facebook']; track platform) {
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="selectedPlatform() === platform"
+            [class.active]="selectedPlatform() === platform"
+            (click)="selectPlatform(platform === 'instagram' ? 'instagram' : 'facebook')">
+            <ion-icon [name]="platform === 'instagram' ? 'logo-instagram' : 'logo-facebook'"></ion-icon>
+            {{ platform === 'instagram' ? 'Instagram' : 'Facebook' }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="analytics-summary mk-stagger">
+      <div class="summary-stat"><span>Published posts</span><strong>{{ platformSummary().posts }}</strong><ion-icon name="document-text-outline"></ion-icon></div>
+      <div class="summary-stat"><span>Total engagement</span><strong>{{ platformSummary().engagement }}</strong><ion-icon name="pulse-outline"></ion-icon></div>
+      <div class="summary-stat"><span>Total reach</span><strong>{{ platformSummary().reach }}</strong><ion-icon name="eye-outline"></ion-icon></div>
+      <div class="summary-stat"><span>Avg. engagement rate</span><strong>{{ platformSummary().averageRate | number:'1.0-1' }}%</strong><ion-icon name="trending-up-outline"></ion-icon></div>
+    </div>
+
+    <div class="post-list-header">
+      <div>
+        <span class="section-kicker">Platform performance</span>
+        <h3>{{ platformLabel(selectedPlatform()) }} overview</h3>
+      </div>
+      <span class="updated-note"><i></i> {{ analyticsUpdatedAt() }}</span>
+    </div>
+
+    @if (isAnalyticsLoading() && !selectedAnalytics()) {
+      <div class="analytics-loading">
+        <div class="mk-skeleton"></div><div class="mk-skeleton"></div><div class="mk-skeleton"></div>
+      </div>
+    } @else if (selectedAnalytics()) {
+      <div class="platform-total mk-stagger">
+        <div class="total-brand">
+          <span class="channel-icon" [class.facebook]="selectedPlatform() === 'facebook'">
+            <ion-icon [name]="selectedPlatform() === 'instagram' ? 'logo-instagram' : 'logo-facebook'"></ion-icon>
+          </span>
+          <div><span>Connected account</span><b>{{ platformLabel(selectedPlatform()) }}</b></div>
+        </div>
+        <div class="total-metrics">
+          <div><ion-icon name="heart"></ion-icon><span>Total likes</span><b>{{ platformSummary().likes }}</b></div>
+          <div><ion-icon name="chatbubble"></ion-icon><span>Total comments</span><b>{{ platformSummary().comments }}</b></div>
+          <div><ion-icon name="arrow-redo"></ion-icon><span>Total shares</span><b>{{ platformSummary().shares }}</b></div>
+        </div>
+        <div class="platform-rate"><span>Overall engagement rate</span><div class="rate-meter"><div [style.width.%]="platformSummary().averageRate"></div></div><b>{{ platformSummary().averageRate | number:'1.0-1' }}%</b></div>
+        @if (selectedAnalytics()?.summary) {
+          <p class="analytics-summary-copy">{{ selectedAnalytics()?.summary }}</p>
+        }
+        @if (selectedAnalytics()?.metricsWarning) {
+          <p class="metrics-warning"><ion-icon name="information-circle-outline"></ion-icon>{{ selectedAnalytics()?.metricsWarning }}</p>
+        }
+      </div>
+    } @else {
+      <div class="analytics-empty">
+        <span class="empty-icon"><ion-icon [name]="selectedPlatform() === 'facebook' ? 'logo-facebook' : 'analytics-outline'"></ion-icon></span>
+        <h3>No {{ platformLabel(selectedPlatform()) }} posts yet</h3>
+        <p>Post performance will appear here as soon as your account starts publishing.</p>
+      </div>
+    }
+  </section>
+
   <div class="mk-card mk-anim-in" style="margin-bottom:16px">
     <h3>Weekly summary</h3>
     @for (metric of optimizationMetrics(); track metric.label) {

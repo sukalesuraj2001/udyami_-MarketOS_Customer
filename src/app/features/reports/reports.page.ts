@@ -1,11 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
-import { ApprovalService } from '@core/services/approval';
+import { ApprovalService, PlatformAnalytics } from '@core/services/approval';
 import { Profile } from '@core/services/profileService/profile';
 import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interface';
 
@@ -19,6 +19,8 @@ interface ReportMetric {
   label: string;
   value: string;
 }
+
+type SocialPlatform = 'instagram' | 'facebook';
 
 @Component({
   selector: 'app-reports',
@@ -38,6 +40,22 @@ export class ReportsPage {
   readonly optimizationMetrics = signal<ReportMetric[]>([]);
   readonly diagnostics = signal<ReportMetric[]>([]);
   readonly isGenerating = signal(false);
+  readonly selectedPlatform = signal<SocialPlatform>('instagram');
+  readonly analyticsByPlatform = signal<Partial<Record<SocialPlatform, PlatformAnalytics>>>({});
+  readonly isAnalyticsLoading = signal(false);
+  readonly selectedAnalytics = computed(() => this.analyticsByPlatform()[this.selectedPlatform()] ?? null);
+  readonly platformSummary = computed(() => {
+    const analytics = this.selectedAnalytics();
+    return {
+      posts: analytics?.postsMeasured ?? 0,
+      engagement: analytics?.totalEngagement ?? 0,
+      reach: analytics?.totalReach ?? 0,
+      likes: analytics?.totalLikes ?? 0,
+      comments: analytics?.totalComments ?? 0,
+      shares: analytics?.totalShares ?? 0,
+      averageRate: analytics?.averageEngagementRate ?? 0,
+    };
+  });
 
   ionViewWillEnter(): void {
     this.loadReport();
@@ -62,12 +80,49 @@ export class ReportsPage {
         this.isLoading.set(false);
       },
     });
+
+    this.loadPlatformAnalytics('instagram');
   }
 
   barColor(pct: number): string {
     if (pct > 50) return 'var(--mk-green)';
     if (pct > 25) return 'var(--mk-gold)';
     return 'var(--mk-gold)';
+  }
+
+  selectPlatform(platform: SocialPlatform): void {
+    this.selectedPlatform.set(platform);
+    if (!this.analyticsByPlatform()[platform]) {
+      this.loadPlatformAnalytics(platform);
+    }
+  }
+
+  platformLabel(platform: SocialPlatform): string {
+    return platform === 'instagram' ? 'Instagram' : 'Facebook';
+  }
+
+  analyticsUpdatedAt(): string {
+    const collectedAt = this.selectedAnalytics()?.collectedAt;
+    if (!collectedAt) return 'Awaiting data';
+
+    return `Updated ${new Intl.DateTimeFormat('en-IN', {
+      day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit',
+    }).format(new Date(collectedAt))}`;
+  }
+
+  private loadPlatformAnalytics(platform: SocialPlatform): void {
+    this.isAnalyticsLoading.set(true);
+    this.approvalService.getPlatformAnalytics(platform)
+      .pipe(catchError((error) => {
+        console.error(`Failed to load ${platform} analytics:`, error);
+        return of(null);
+      }))
+      .subscribe((response) => {
+        if (response?.success && response.data) {
+          this.analyticsByPlatform.update((analytics) => ({ ...analytics, [platform]: response.data }));
+        }
+        this.isAnalyticsLoading.set(false);
+      });
   }
 
   generate(): void {

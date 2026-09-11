@@ -42,6 +42,9 @@ export const API_ENDPOINTS = {
         PUBLISH: '/create-content/publishContent',
 
         DOWNLOAD_REPORT: '/create-content/download-report',
+
+        ANALYTICS: (userId: string, platform: string) =>
+            `/create-content/analytics/${userId}/${platform.toUpperCase()}`,
     },
 
     INCIDENTS: {
