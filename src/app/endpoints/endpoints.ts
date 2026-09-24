@@ -18,6 +18,15 @@ export const API_ENDPOINTS = {
             `/setting/getUserSocialAccountDetails/${userId}`,
     },
 
+    FACEBOOK: {
+        OAUTH_CONNECT: '/facebook/oauth/connect',
+        PAGES: '/facebook/pages',
+        SELECT_PAGE: '/facebook/pages/select',
+        AD_ACCOUNTS: '/facebook/ad-accounts',
+        SELECT_AD_ACCOUNT: '/facebook/ad-accounts/select',
+        DISCONNECT: '/facebook/disconnect',
+    },
+
     AI_CALENDAR: {
         CREATE: '/aicalender/createMarketingCalendar',
         GET_BY_USER_ID: (userId: string) =>

@@ -30,10 +30,196 @@
     </ion-segment>
   </div>
 
-  <div class="mk-card mk-anim-in" style="margin-bottom:14px">
-    <h3>Connected accounts</h3>
+  <!-- Facebook & Instagram — Meta OAuth -->
+  <div class="mk-card mk-anim-in meta-card" style="margin-bottom:14px">
+    <h3>Social Accounts</h3>
+
+    @if (!statusLoaded()) {
+    <div class="meta-loading"><ion-spinner name="dots"></ion-spinner></div>
+    } @else if (!facebookConnected() || metaAuth() === 'notConnected') {
+    <!-- Not connected -->
+    <div class="meta-connect">
+      <div class="meta-logos">
+        <ion-icon name="logo-facebook" class="fb"></ion-icon>
+        <ion-icon name="logo-instagram" class="ig"></ion-icon>
+      </div>
+      <p class="mini">Connect your Facebook Page, Instagram Business account and Meta ad account. You sign in on
+        Facebook — we never see your Facebook password.</p>
+
+      @if (connectError()) {
+      <div class="meta-banner error">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>{{ connectError() }}</span>
+      </div>
+      }
+
+      <ion-button expand="block" class="fb-btn" [disabled]="connecting()" (click)="connectFacebook()">
+        @if (connecting()) {
+        <ion-spinner name="crescent" slot="start"></ion-spinner>
+        } @else {
+        <ion-icon name="logo-facebook" slot="start"></ion-icon>
+        }
+        {{ connectError() ? 'Try again' : 'Connect Facebook & Instagram' }}
+      </ion-button>
+    </div>
+    } @else {
+    <!-- Connected -->
+    @if (metaAuth() === 'expired') {
+    <div class="meta-banner warn">
+      <ion-icon name="time-outline"></ion-icon>
+      <span>Facebook login expired. Please reconnect.</span>
+    </div>
+    <ion-button expand="block" class="fb-btn" [disabled]="connecting()" (click)="connectFacebook()"
+      style="margin-bottom:10px">
+      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+      Reconnect Facebook
+    </ion-button>
+    }
+
     <div class="conn-list">
-      @for (c of data.connections(); track c.name) {
+      <div class="rowb">
+        <div class="plat">
+          <ion-icon name="logo-facebook" class="fb"></ion-icon>
+          <div>
+            <b>Facebook Page</b>
+            <div class="mini">{{ selectedPage()?.name || '—' }}</div>
+            @if (pages().length > 1) {
+            <a class="link" (click)="openPagePicker()">Change Page</a>
+            }
+          </div>
+        </div>
+        <span class="mk-tag ok">Connected</span>
+      </div>
+
+      <div class="rowb">
+        <div class="plat">
+          <ion-icon name="logo-instagram" class="ig"></ion-icon>
+          <div>
+            <b>Instagram Business</b>
+            @if (instagramConnected() && selectedPage()?.instagramUsername) {
+            <div class="mini">&#64;{{ selectedPage()?.instagramUsername }}</div>
+            } @else if (!instagramConnected()) {
+            <div class="mini">No Instagram Business account is linked to this Page. Link one in Meta Business
+              Suite, then reconnect.</div>
+            }
+          </div>
+        </div>
+        @if (instagramConnected()) {
+        <span class="mk-tag ok">Connected</span>
+        } @else {
+        <span class="mk-tag neu">Not connected</span>
+        }
+      </div>
+
+      <div class="rowb">
+        <div class="plat">
+          <ion-icon name="megaphone-outline" class="ads"></ion-icon>
+          <div>
+            <b>Meta Ads account</b>
+            @if (selectedAdAccount(); as ad) {
+            <div class="mini">{{ ad.name }} · {{ ad.currency }}</div>
+            } @else if (adAccountsLoaded() && adAccounts().length === 0) {
+            <div class="mini">No ad account shared. Reconnect and select an ad account to enable boosting.</div>
+            }
+            @if (adAccounts().length > 0) {
+            <a class="link" (click)="openAdPicker()">Change ad account</a>
+            }
+          </div>
+        </div>
+        @if (metaAdsConnected() && selectedAdAccount()) {
+        <span class="mk-tag ok">Connected</span>
+        } @else {
+        <span class="mk-tag neu">Not connected</span>
+        }
+      </div>
+    </div>
+
+    <ion-button expand="block" fill="outline" color="danger" size="small" style="margin-top:12px"
+      (click)="disconnectFacebook()">
+      <ion-icon name="unlink-outline" slot="start"></ion-icon>
+      Disconnect
+    </ion-button>
+    }
+  </div>
+
+  <!-- Page picker -->
+  <ion-modal [isOpen]="pagePickerOpen()" (didDismiss)="onPagePickerDismiss()" [initialBreakpoint]="0.75"
+    [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Choose your Facebook Page</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="pagePickerOpen.set(false)">Cancel</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <p class="mini picker-help">Posts and Instagram content will be published to the Page you choose.</p>
+        <ion-radio-group [(ngModel)]="pickedPageId">
+          @for (p of pages(); track p.id) {
+          <ion-item lines="full">
+            <ion-radio [value]="p.id" justify="space-between">
+              <div class="pick-name">{{ p.name }}</div>
+              <div class="mini">
+                @if (p.instagramUsername) { Instagram: &#64;{{ p.instagramUsername }} } @else { No Instagram linked }
+              </div>
+            </ion-radio>
+          </ion-item>
+          }
+        </ion-radio-group>
+        <ion-button expand="block" style="margin-top:16px" [disabled]="!pickedPageId || savingSelection()"
+          (click)="savePage()">
+          Use this Page
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Ad account picker -->
+  <ion-modal [isOpen]="adPickerOpen()" (didDismiss)="adPickerOpen.set(false)" [initialBreakpoint]="0.75"
+    [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Choose your ad account</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="adPickerOpen.set(false)">Cancel</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        @if (adAccounts().length === 0) {
+        <p class="mini picker-help">No ad account shared. Reconnect and select an ad account to enable boosting.</p>
+        } @else {
+        <p class="mini picker-help">Boosted posts will be paid from the ad account you choose.</p>
+        <ion-radio-group [(ngModel)]="pickedAdAccountId">
+          @for (a of adAccounts(); track a.id) {
+          <ion-item lines="full" [disabled]="!a.active"
+            [attr.title]="a.active ? null : 'This ad account is not active in Meta'">
+            <ion-radio [value]="a.id" [disabled]="!a.active" justify="space-between">
+              <div class="pick-name">{{ a.name }}</div>
+              <div class="mini">
+                {{ a.currency }}
+                @if (!a.active) { · This ad account is not active in Meta }
+              </div>
+            </ion-radio>
+          </ion-item>
+          }
+        </ion-radio-group>
+        <ion-button expand="block" style="margin-top:16px" [disabled]="!pickedAdAccountId || savingSelection()"
+          (click)="saveAdAccount()">
+          Use this ad account
+        </ion-button>
+        }
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <div class="mk-card mk-anim-in" style="margin-bottom:14px">
+    <h3>Other connected accounts</h3>
+    <div class="conn-list">
+      @for (c of otherConnections(); track c.name) {
       <div class="rowb">
         <div>
           <b>{{ c.name }}</b>

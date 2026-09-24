@@ -5,6 +5,22 @@ export interface SocialMediaAccount {
   createdAt: string;
   updatedAt: string;
 }
+export interface FacebookPage {
+  id: string;
+  name: string;
+  instagramId: string | null;
+  instagramUsername: string | null;
+  selected: boolean;
+}
+
+export interface MetaAdAccount {
+  id: string;
+  name: string;
+  currency: string;
+  active: boolean;
+  selected: boolean;
+}
+
 export interface WalletData {
   walletId: string;
   user: {
