@@ -17,6 +17,7 @@ import {
   SocialMediaAccount,
 } from '@app/core/interfaces/socialMediaAcounts.interface';
 import { MetaConnectService } from '@app/core/services/meta-connect.service';
+import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 /** Platforms connected through Meta OAuth — never through the manual credentials form. */
 const META_CONNECTION_NAMES = ['Facebook Page', 'Instagram Business', 'Meta Ads account'];
@@ -32,7 +33,7 @@ interface OAuthReturn {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, FormsModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent],
   templateUrl: './settings.page.html',
   styleUrls: ['./settings.page.scss'],
 })

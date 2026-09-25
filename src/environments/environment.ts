@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  appName: 'MarketOS',
+  appName: 'Jyovix Marketing',
   apiUrl: 'https://backend.udyamikutumba.com',
 };

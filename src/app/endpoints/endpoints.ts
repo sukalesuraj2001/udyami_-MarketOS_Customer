@@ -1,6 +1,7 @@
 export const API_ENDPOINTS = {
     AUTH: {
         LOGIN: '/auth/loginUser',
+        REGISTER: '/auth/createUser',
         LOGOUT: '/auth/logout',
         REFRESH_TOKEN: '/auth/refresh-token',
     },
@@ -10,6 +11,10 @@ export const API_ENDPOINTS = {
             `/auth/getUserById/${userId}`,
         GET_DIGITAL_USER_DATA: (userId: string) =>
             `/auth/getDigitalUserdataBy/${userId}`,
+    },
+
+    USER_PROFILE: {
+        CREATE: '/userprofile/createUserProfile',
     },
 
     PROFILE: {
@@ -31,6 +36,10 @@ export const API_ENDPOINTS = {
         CREATE: '/aicalender/createMarketingCalendar',
         GET_BY_USER_ID: (userId: string) =>
             `/aicalender/getMarketingCalendar/${userId}`,
+    },
+
+    MEMBERSHIP: {
+        ACTIVATE_DIGITAL_USER: '/membership-purchase/activate-digital-user',
     },
 
     WALLET: {

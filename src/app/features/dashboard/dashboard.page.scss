@@ -1,3 +1,7 @@
+.business-reminder {
+  margin-bottom: 14px;
+}
+
 .membership-renewal-card {
   display: flex;
   align-items: center;
@@ -65,8 +69,12 @@
     align-items: flex-start;
     flex-wrap: wrap;
 
+    .membership-renewal-copy {
+      flex-basis: calc(100% - 42px);
+    }
+
     ion-button {
-      margin: 0 0 0 42px;
+      margin: 4px 0 0 42px;
     }
   }
 }

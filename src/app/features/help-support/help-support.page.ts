@@ -8,11 +8,12 @@ import {
 } from '@core/services/mock-data.service';
 import { ToastService } from '@core/services/toast.service';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 @Component({
   selector: 'app-help-support',
   standalone: true,
-  imports: [CommonModule, IonicModule, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, IonicModule, ThemeToggleComponent],
   templateUrl: './help-support.page.html',
   styleUrls: ['./help-support.page.scss'],
 })
@@ -51,11 +52,11 @@ export class HelpSupportPage {
   contactSupport(channel: 'chat' | 'email'): void {
     const message = channel === 'chat'
       ? 'A support conversation is ready to start.'
-      : 'Your email app is ready with the MarketOS support address.';
+      : 'Your email app is ready with the Jyovix Marketing support address.';
     this.toast.show('Support desk', message, 'ok');
   }
 
   topicLabel(topicId: string): string {
-    return this.data.supportTopics().find((topic) => topic.id === topicId)?.label || 'MarketOS';
+    return this.data.supportTopics().find((topic) => topic.id === topicId)?.label || 'Jyovix Marketing';
   }
 }

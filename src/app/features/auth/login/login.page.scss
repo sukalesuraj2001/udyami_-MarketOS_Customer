@@ -2,6 +2,13 @@
   display: block;
 }
 
+.floating-back {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top));
+  left: 10px;
+  z-index: 10;
+}
+
 .login-content {
   --background: var(--mk-bg);
 }
@@ -156,6 +163,19 @@ ion-input {
   font: 11px var(--mk-font-mono);
 }
 
+.switch-note {
+  margin: 24px 0 0;
+  text-align: center;
+  color: var(--mk-muted);
+  font: 13px var(--mk-font-body);
+}
+
+.switch-note a {
+  color: var(--mk-gold);
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .secure-note ion-icon {
   color: var(--mk-green);
   font-size: 15px;
@@ -188,6 +208,6 @@ ion-input {
   }
 
   .login-panel {
-    padding: 44px 28px 36px;
+    padding: 68px 28px 36px; // room for the floating back button
   }
 }

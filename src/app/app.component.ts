@@ -7,6 +7,7 @@ import { MockDataService } from '@core/services/mock-data.service';
 import { ToastService } from '@core/services/toast.service';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
 import { MembershipService } from '@core/services/membership.service';
+import { GlobalLoaderComponent } from '@shared/components/global-loader/global-loader.component';
 
 interface NavItem {
   path: string;
@@ -24,7 +25,7 @@ interface NavGroup {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, IonicModule, RouterLink, RouterLinkActive, GlobalLoaderComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
@@ -76,7 +77,10 @@ export class AppComponent {
     },
     {
       label: 'Account',
-      items: [{ path: '/settings', icon: 'settings-outline', label: 'Settings' }],
+      items: [
+        { path: '/membership', icon: 'ribbon-outline', label: 'Membership' },
+        { path: '/settings', icon: 'settings-outline', label: 'Settings' },
+      ],
     },
   ];
 

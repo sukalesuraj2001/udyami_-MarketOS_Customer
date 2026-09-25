@@ -1,5 +1,8 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <mk-back-button defaultHref="/tabs/dashboard"></mk-back-button>
+    </ion-buttons>
     <ion-title>Profile</ion-title>
     <ion-buttons slot="end">
       <mk-theme-toggle></mk-theme-toggle>
@@ -8,7 +11,8 @@
 </ion-header>
 
 <ion-content>
-  <section class="profile-hero mk-anim-in">
+  <section class="profile-hero mk-anim-in" role="button" tabindex="0" aria-label="View profile details"
+    (click)="openDetails()" (keydown.enter)="openDetails()">
     @if (profileImage(); as image) {
     <img class="avatar" [src]="image" [alt]="profileName()" />
     } @else {
@@ -19,10 +23,21 @@
       <h1>{{ profileName() }}</h1>
       <p>{{ profileWorkspace() }}</p>
     </div>
-    <button class="edit-button" aria-label="Edit profile" (click)="contactSupport()">
+    <button class="edit-button" aria-label="Edit profile" (click)="$event.stopPropagation(); openEdit()">
       <ion-icon name="create-outline"></ion-icon>
     </button>
   </section>
+
+  @if (profileLoaded() && !profileComplete()) {
+  <button type="button" class="complete-banner mk-anim-in" (click)="openEdit()">
+    <span class="complete-icon"><ion-icon name="person-add-outline"></ion-icon></span>
+    <span class="complete-copy">
+      <b>Complete your profile</b>
+      <small>Add personal and business details to personalise your workspace.</small>
+    </span>
+    <ion-icon name="chevron-forward-outline" class="option-chevron"></ion-icon>
+  </button>
+  }
 
   <div class="status-row mk-anim-in">
     <div>
@@ -55,5 +70,5 @@
     Back to workspace
   </ion-button>
 
-  <p class="version mono">MARKETOS MOBILE · V1.0.0</p>
+  <p class="version mono">JYOVIX MARKETING MOBILE · V1.0.0</p>
 </ion-content>

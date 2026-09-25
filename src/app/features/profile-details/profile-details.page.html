@@ -1,0 +1,257 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <mk-back-button defaultHref="/tabs/profile"></mk-back-button>
+    </ion-buttons>
+    <ion-title>Profile details</ion-title>
+    <ion-buttons slot="end">
+      @if (hasProfile()) {
+      <ion-button (click)="edit()" aria-label="Edit profile">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+      </ion-button>
+      }
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="details-content">
+
+  <!-- Loading -->
+  @if (loading()) {
+  <div class="skeleton-wrap" aria-busy="true">
+    <div class="sk sk-hero"></div>
+    <div class="sk sk-card"></div>
+    <div class="sk sk-card"></div>
+  </div>
+  }
+
+  <!-- Load error -->
+  @else if (loadError()) {
+  <div class="state-card" role="alert">
+    <ion-icon name="cloud-offline-outline" class="state-icon"></ion-icon>
+    <h3>Couldn't load your profile</h3>
+    <p>{{ loadError() }}</p>
+    <ion-button fill="outline" (click)="load()">
+      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+      Try again
+    </ion-button>
+  </div>
+  }
+
+  <!-- No profile yet -->
+  @else if (!hasProfile()) {
+  <section class="intro mk-anim-in">
+    <span class="intro-icon"><ion-icon name="person-add-outline"></ion-icon></span>
+    <h1>Complete your profile</h1>
+    <p>Add your personal and business details so we can tailor your marketing workspace.</p>
+    <ion-button class="submit-button start-button" (click)="edit()">
+      Start now
+      <ion-icon name="arrow-forward" slot="end"></ion-icon>
+    </ion-button>
+  </section>
+  }
+
+  <!-- Profile details -->
+  @else {
+  <section class="hero mk-anim-in">
+    @if (profileImage(); as image) {
+    <img class="avatar" [src]="image" [alt]="displayName()" />
+    } @else {
+    <div class="avatar">{{ initials() }}</div>
+    }
+    <div class="hero-copy">
+      <span class="eyebrow mono">Workspace owner</span>
+      <h1>{{ displayName() }}</h1>
+      @if (user()?.profile?.username; as username) {
+      <p class="mono">&#64;{{ username }}</p>
+      }
+    </div>
+    @if (completion().hasBusinessDetails) {
+    <span class="verified">
+      <ion-icon name="shield-checkmark"></ion-icon>
+      Complete
+    </span>
+    } @else {
+    <span class="verified pending">
+      <ion-icon name="time-outline"></ion-icon>
+      {{ completion().percent }}%
+    </span>
+    }
+  </section>
+
+  @if (!completion().hasBusinessDetails) {
+  <mk-business-reminder class="reminder-slot" [percent]="completion().percent"
+    (action)="edit('business')"></mk-business-reminder>
+  }
+
+  <div class="sections mk-stagger">
+
+    <!-- Brand banner -->
+    @if (brand().name) {
+    <section class="brand-card">
+      @if (brand().logo) {
+      <img class="brand-logo" [src]="brand().logo" [alt]="brand().name + ' logo'" />
+      } @else {
+      <span class="brand-logo placeholder"><ion-icon name="storefront-outline"></ion-icon></span>
+      }
+      <div class="brand-copy">
+        <h2>{{ brand().name }}</h2>
+        @if (brand().tagline) {
+        <p class="tagline">“{{ brand().tagline }}”</p>
+        }
+        @if (brand().type) {
+        <span class="brand-type">{{ brand().type }}</span>
+        }
+      </div>
+    </section>
+    }
+
+    @for (section of sections(); track section.title) {
+    <section class="detail-card">
+      <header>
+        <span class="card-icon"><ion-icon [name]="section.icon"></ion-icon></span>
+        <h2>{{ section.title }}</h2>
+      </header>
+
+      @if (section.rows.length) {
+      <dl>
+        @for (row of section.rows; track row.label) {
+        <div class="row">
+          <dt>{{ row.label }}</dt>
+          <dd>
+            @if (row.href) {
+            <a [href]="row.href" target="_blank" rel="noopener">{{ row.value }}</a>
+            } @else {
+            {{ row.value }}
+            }
+          </dd>
+        </div>
+        }
+      </dl>
+      }
+
+      @for (chip of section.chips ?? []; track chip.label) {
+      <div class="chip-group">
+        <span class="chip-label">{{ chip.label }}</span>
+        <div class="chips">
+          @for (value of chip.values; track value) {
+          <span class="chip">{{ value }}</span>
+          }
+        </div>
+      </div>
+      }
+    </section>
+    }
+
+    <!-- Products -->
+    @if (completion().hasBusinessDetails) {
+    <section class="detail-card">
+      <header>
+        <span class="card-icon"><ion-icon name="pricetags-outline"></ion-icon></span>
+        <h2>Products & services</h2>
+        <button type="button" class="card-action" (click)="edit('products')">
+          {{ products().length ? 'Edit' : 'Add' }}
+        </button>
+      </header>
+
+      @for (product of products(); track $index) {
+      <article class="product">
+        @if (product.images.length) {
+        <img class="product-image" [src]="product.images[0]" [alt]="product.name" />
+        } @else {
+        <span class="product-image placeholder"><ion-icon name="cube-outline"></ion-icon></span>
+        }
+        <div class="product-copy">
+          <b>{{ product.name }}</b>
+          @if (product.category) {
+          <small>{{ product.category }}</small>
+          }
+          @if (product.description) {
+          <p>{{ product.description }}</p>
+          }
+        </div>
+        @if (product.price) {
+        <span class="product-price mono">{{ product.price }}</span>
+        }
+      </article>
+      } @empty {
+      <p class="card-empty">Add your products and services so posts and ads can feature them.</p>
+      }
+    </section>
+    }
+
+    <!-- Gallery -->
+    @if (gallery().length) {
+    <section class="detail-card">
+      <header>
+        <span class="card-icon"><ion-icon name="images-outline"></ion-icon></span>
+        <h2>Business photos</h2>
+      </header>
+      <div class="gallery">
+        @for (url of gallery(); track url) {
+        <img [src]="url" alt="Business photo" />
+        }
+      </div>
+    </section>
+    }
+
+    <!-- Event -->
+    @if (event(); as ev) {
+    <section class="event-card">
+      <div class="event-glow" aria-hidden="true"></div>
+      <header>
+        <span class="event-eyebrow mono">Event</span>
+        <button type="button" class="card-action light" (click)="edit('event')">Edit</button>
+      </header>
+      <h2>{{ ev.name }}</h2>
+      @if (ev.localName) {
+      <p class="event-local">{{ ev.localName }}</p>
+      }
+      @if (ev.positioning) {
+      <p class="event-positioning">{{ ev.positioning }}</p>
+      }
+
+      <div class="event-meta">
+        @if (ev.dates) {
+        <span><ion-icon name="calendar-outline"></ion-icon> {{ ev.dates }}</span>
+        }
+        @if (ev.venue) {
+        <span><ion-icon name="location-outline"></ion-icon> {{ ev.venue }}</span>
+        }
+        @if (ev.entryFee) {
+        <span><ion-icon name="ticket-outline"></ion-icon> Entry {{ ev.entryFee }}</span>
+        }
+      </div>
+
+      @if (ev.statistics.length) {
+      <div class="event-stats">
+        @for (stat of ev.statistics; track stat.label) {
+        <div>
+          <b>{{ stat.value }}</b>
+          <small>{{ stat.label }}</small>
+        </div>
+        }
+      </div>
+      }
+
+      @if (ev.counts.length) {
+      <div class="event-counts">
+        @for (item of ev.counts; track item.label) {
+        <span class="mono">{{ item.value }} {{ item.label }}</span>
+        }
+      </div>
+      }
+    </section>
+    }
+  </div>
+
+  <div class="edit-footer">
+    <ion-button expand="block" class="submit-button" (click)="edit()">
+      <ion-icon name="create-outline" slot="start"></ion-icon>
+      Edit profile
+    </ion-button>
+  </div>
+  }
+
+</ion-content>

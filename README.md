@@ -1,4 +1,4 @@
-# MarketOS — Client Panel (Mobile)
+# Jyovix Marketing — Client Panel (Mobile)
 
 A production-ready **Angular 20 + Ionic 8** mobile app, scaffolded from the
 `marketos-client-panel.html` prototype. UI only — no backend / API calls are

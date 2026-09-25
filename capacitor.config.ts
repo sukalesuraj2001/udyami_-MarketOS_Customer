@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.jyovix.marketos',
-  appName: 'MarketOS',
+  appName: 'Jyovix Marketing',
   webDir: 'www',
   backgroundColor: '#0B0F14',
   server: {

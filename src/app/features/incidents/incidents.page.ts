@@ -14,13 +14,14 @@ import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-togg
 import { ToastService } from '@core/services/toast.service';
 import { ApprovalService } from '@core/services/approval';
 import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interface';
+import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 type IncidentFilter = 'ALL' | IncidentStatus;
 
 @Component({
   selector: 'app-incidents',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, EmptyStateComponent, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, FormsModule, IonicModule, EmptyStateComponent, ThemeToggleComponent],
   templateUrl: './incidents.page.html',
   styleUrls: ['./incidents.page.scss'],
 })

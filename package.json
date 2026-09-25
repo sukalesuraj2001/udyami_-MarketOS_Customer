@@ -1,7 +1,7 @@
 {
   "name": "marketos-mobile",
   "version": "1.0.0",
-  "description": "Jyovix MarketOS — Client Panel mobile app (Angular 20 + Ionic 8, Capacitor)",
+  "description": "Jyovix Marketing — Client Panel mobile app (Angular 20 + Ionic 8, Capacitor)",
   "author": "Jyovix",
   "private": true,
   "scripts": {

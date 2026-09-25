@@ -1,0 +1,152 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <mk-back-button defaultHref="/tabs/dashboard"></mk-back-button>
+    </ion-buttons>
+    <ion-title>Membership</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="membership-content">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <span class="eyebrow mono">Jyovix Marketing · Digital membership</span>
+    <h1>Grow on autopilot.<br /><span class="accent">Stay in control.</span></h1>
+    <p>
+      One membership unlocks your AI marketing team: planning, content,
+      publishing and campaigns, with every step waiting on your approval.
+    </p>
+
+    @if (membership.loaded()) {
+      @if (membership.membershipActive()) {
+        <span class="status-chip active">
+          <span class="status-dot"></span>
+          Membership active · {{ formatInr(membership.walletCoins()) }} coins
+        </span>
+      } @else {
+        <span class="status-chip inactive">
+          <span class="status-dot"></span>
+          Membership inactive
+        </span>
+      }
+    }
+  </section>
+
+  <!-- Plan card -->
+  <section class="plan-wrap" aria-labelledby="plan-title">
+    <div class="plan-border" aria-hidden="true"></div>
+
+    <article class="plan-card">
+      <div class="plan-orb orb-1" aria-hidden="true"></div>
+      <div class="plan-orb orb-2" aria-hidden="true"></div>
+      <div class="plan-shine" aria-hidden="true"></div>
+
+      <div class="plan-top">
+        <div class="plan-badge">
+          <ion-icon name="diamond-outline"></ion-icon>
+        </div>
+        <span class="plan-ribbon mono">
+          <ion-icon name="star"></ion-icon>
+          Premium
+        </span>
+      </div>
+
+      <h2 id="plan-title">Digital Marketing Membership</h2>
+      <p class="plan-sub">Everything you need to run your brand's marketing from one app.</p>
+
+      <div class="price" aria-live="polite">
+        <span class="currency">₹</span>
+        <span class="amount">{{ formatInr(displayAmount()) }}</span>
+      </div>
+      <p class="price-note mono">Digital membership fee</p>
+
+      <div class="divider" aria-hidden="true"></div>
+
+      <ul class="features">
+        @for (feature of features; track feature.title; let i = $index) {
+          <li [style.animation-delay.ms]="300 + i * 70">
+            <span class="feature-icon">
+              <ion-icon [name]="feature.icon"></ion-icon>
+            </span>
+            <span class="feature-copy">
+              <b>{{ feature.title }}</b>
+              <small>{{ feature.detail }}</small>
+            </span>
+            <ion-icon name="checkmark-circle" class="feature-check"></ion-icon>
+          </li>
+        }
+      </ul>
+
+      @if (errorMessage()) {
+        <p class="plan-error" role="alert">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          {{ errorMessage() }}
+        </p>
+      }
+
+      @if (membership.membershipActive()) {
+        <button class="cta cta-active" type="button" disabled>
+          <ion-icon name="shield-checkmark"></ion-icon>
+          Your membership is active
+        </button>
+      } @else {
+        <button class="cta" type="button" [disabled]="activating()" (click)="confirmActivation()">
+          <span class="cta-shine" aria-hidden="true"></span>
+          @if (activating()) {
+            <ion-spinner name="crescent"></ion-spinner>
+            Activating...
+          } @else {
+            Activate membership
+            <ion-icon name="arrow-forward"></ion-icon>
+          }
+        </button>
+      }
+
+      <div class="trust mono">
+        <span><ion-icon name="lock-closed-outline"></ion-icon> Secure activation</span>
+        <span><ion-icon name="flash-outline"></ion-icon> Instant access</span>
+      </div>
+    </article>
+  </section>
+
+  <p class="footnote">
+    Need help choosing? Reach the Jyovix Marketing care desk from Help &amp; support.
+  </p>
+
+  <!-- Success celebration -->
+  @if (activated()) {
+    <div class="success-overlay" role="dialog" aria-modal="true" aria-labelledby="success-title">
+      <div class="confetti" aria-hidden="true">
+        @for (piece of confetti; track $index) {
+          <i
+            [style.left.%]="piece.x"
+            [style.background]="piece.color"
+            [style.animation-delay.ms]="piece.delay"
+            [style.animation-duration.ms]="piece.duration"
+            [style.--spin]="piece.rotate + 'deg'"
+          ></i>
+        }
+      </div>
+
+      <div class="success-card">
+        <svg class="success-check" viewBox="0 0 52 52" aria-hidden="true">
+          <circle cx="26" cy="26" r="24" />
+          <path d="M15 27 l7 7 l15 -16" />
+        </svg>
+        <h2 id="success-title">Membership activated</h2>
+        <p>Welcome aboard. Publishing, regeneration and campaigns are now unlocked across your workspace.</p>
+        <button class="cta" type="button" (click)="continueToDashboard()">
+          <span class="cta-shine" aria-hidden="true"></span>
+          Go to dashboard
+          <ion-icon name="arrow-forward"></ion-icon>
+        </button>
+      </div>
+    </div>
+  }
+
+</ion-content>

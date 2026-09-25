@@ -8,11 +8,12 @@ import { SectionHeaderComponent } from '@shared/components/section-header/sectio
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
 import { ApprovalService } from '@core/services/approval';
 import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interface';
+import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 @Component({
   selector: 'app-campaigns',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, FormsModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent],
   templateUrl: './campaigns.page.html',
   styleUrls: ['./campaigns.page.scss'],
 })

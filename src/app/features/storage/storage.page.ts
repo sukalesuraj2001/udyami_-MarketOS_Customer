@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 type MediaType = 'image' | 'video';
 type MediaFilter = 'all' | MediaType;
@@ -20,7 +21,7 @@ interface CampaignMedia {
 @Component({
   selector: 'app-storage',
   standalone: true,
-  imports: [CommonModule, IonicModule, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, IonicModule, ThemeToggleComponent],
   templateUrl: './storage.page.html',
   styleUrls: ['./storage.page.scss'],
 })

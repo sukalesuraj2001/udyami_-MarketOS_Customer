@@ -12,11 +12,13 @@ import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-togg
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
 import { AlertController } from '@ionic/angular/standalone';
 import { MembershipService } from '@core/services/membership.service';
+import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 @Component({
   selector: 'app-approvals',
   standalone: true,
   imports: [
+    BackButtonComponent,
     CommonModule,
     FormsModule,
     IonicModule,

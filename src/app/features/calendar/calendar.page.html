@@ -1,5 +1,8 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <mk-back-button defaultHref="/tabs/dashboard"></mk-back-button>
+    </ion-buttons>
     <ion-title>Calendar</ion-title>
 
     <ion-buttons slot="end">
@@ -55,6 +58,34 @@
     <p>
       Loading your marketing calendar...
     </p>
+
+  </div>
+
+  }
+
+
+  <!-- Calendar creation failed -->
+  @else if (createError()) {
+
+  <div class="calendar-error" role="alert">
+
+    <ion-icon name="alert-circle-outline" class="calendar-error-icon"></ion-icon>
+
+    <h3>Couldn't create your calendar</h3>
+
+    <p>{{ createError() }}</p>
+
+    <div class="calendar-error-actions">
+      <ion-button routerLink="/tabs/settings" class="calendar-error-primary">
+        <ion-icon name="link-outline" slot="start"></ion-icon>
+        Connect accounts
+      </ion-button>
+
+      <ion-button fill="outline" class="calendar-error-retry" (click)="loadMarketingCalendar()">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Try again
+      </ion-button>
+    </div>
 
   </div>
 

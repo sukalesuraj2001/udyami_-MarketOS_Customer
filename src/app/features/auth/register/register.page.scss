@@ -1,0 +1,69 @@
+.login-panel {
+  padding-top: 64px; // room for the floating back button
+  padding-bottom: 24px;
+}
+
+.panel-logo {
+  display: block;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 22px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(212, 164, 56, 0.28);
+}
+
+.panel-heading > p:last-child {
+  margin-bottom: 26px;
+}
+
+.group-label {
+  margin: 18px 0 10px;
+  color: var(--mk-dim);
+  font: 700 10.5px/1.2 var(--mk-font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.toggle-item {
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  color: var(--mk-text);
+  font: 500 14px var(--mk-font-body);
+
+  ion-toggle {
+    --track-background-checked: var(--mk-gold);
+  }
+}
+
+.coords {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.locate-button {
+  --border-color: var(--mk-line-2);
+  --color: var(--mk-text);
+  --border-radius: var(--mk-radius-sm);
+  margin: 0 0 6px;
+  height: 44px;
+  font-weight: 600;
+  text-transform: none;
+
+  ion-icon {
+    color: var(--mk-gold);
+  }
+}
+
+.switch-note {
+  margin: 24px 0 0;
+  text-align: center;
+  color: var(--mk-muted);
+  font: 13px var(--mk-font-body);
+
+  a {
+    color: var(--mk-gold);
+    font-weight: 700;
+    text-decoration: none;
+  }
+}

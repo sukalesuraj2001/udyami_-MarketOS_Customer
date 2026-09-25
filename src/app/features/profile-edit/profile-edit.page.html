@@ -1,0 +1,575 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <mk-back-button defaultHref="/tabs/profile"></mk-back-button>
+    </ion-buttons>
+    <ion-title>{{ isNewProfile() ? 'Complete profile' : 'Edit profile' }}</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+
+  @if (!loading() && !loadError()) {
+  <ion-toolbar class="segment-bar">
+    <ion-segment [value]="segment()" (ionChange)="setSegment($event.detail.value)" scrollable="true">
+      @for (item of segments(); track item.value) {
+      <ion-segment-button [value]="item.value">
+        <ion-icon [name]="item.icon"></ion-icon>
+        <ion-label>{{ item.label }}</ion-label>
+      </ion-segment-button>
+      }
+    </ion-segment>
+  </ion-toolbar>
+  }
+</ion-header>
+
+<ion-content class="edit-content">
+
+  @if (loading()) {
+  <div class="skeleton-wrap" aria-busy="true">
+    <div class="sk sk-card"></div>
+    <div class="sk sk-card"></div>
+  </div>
+  }
+
+  @else if (loadError()) {
+  <div class="state-card" role="alert">
+    <ion-icon name="cloud-offline-outline" class="state-icon"></ion-icon>
+    <h3>Couldn't load your profile</h3>
+    <p>{{ loadError() }}</p>
+    <ion-button fill="outline" (click)="load()">
+      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+      Try again
+    </ion-button>
+  </div>
+  }
+
+  @else {
+  <div class="edit-body">
+
+    @switch (segment()) {
+
+    <!-- ============================== PERSONAL ============================== -->
+    @case ('personal') {
+    <div class="pane">
+      <label class="photo-picker">
+        @if (profileImagePreview || user()?.profile?.profileImage) {
+        <img [src]="profileImagePreview || user()?.profile?.profileImage" alt="Profile photo" />
+        } @else {
+        <span class="photo-placeholder"><ion-icon name="person-outline"></ion-icon></span>
+        }
+        <span class="picker-copy">
+          <b>Profile photo</b>
+          <small>{{ profileImageFile?.name || 'Tap to choose · JPG or PNG' }}</small>
+        </span>
+        <ion-icon name="camera-outline" class="picker-icon"></ion-icon>
+        <input type="file" accept="image/*" (change)="onProfileImage($event)" hidden />
+      </label>
+
+      <fieldset class="form-card">
+        <legend><ion-icon name="person-outline"></ion-icon> About you</legend>
+        <div class="grid-2">
+          <ion-item lines="none" class="field">
+            <ion-input label="Username *" labelPlacement="floating" placeholder="ramesh_k" autocomplete="username"
+              [(ngModel)]="personal.username"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-select label="Gender *" labelPlacement="floating" interface="popover" [(ngModel)]="personal.gender">
+              @for (gender of genders; track gender) {
+              <ion-select-option [value]="gender">{{ gender }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+        </div>
+        <ion-item lines="none" class="field">
+          <ion-input label="Business vertical" labelPlacement="floating" placeholder="Bhoomi Vault"
+            [(ngModel)]="personal.selectedBusinessVertical"></ion-input>
+        </ion-item>
+      </fieldset>
+
+      <fieldset class="form-card">
+        <legend><ion-icon name="call-outline"></ion-icon> Contact</legend>
+        <ion-item lines="none" class="field">
+          <ion-input type="email" label="Email *" labelPlacement="floating" placeholder="you@example.com"
+            autocomplete="email" [(ngModel)]="personal.email"></ion-input>
+        </ion-item>
+        <div class="grid-2">
+          <ion-item lines="none" class="field">
+            <ion-input type="tel" inputmode="numeric" maxlength="10" label="Mobile *" labelPlacement="floating"
+              placeholder="9876543210" [(ngModel)]="personal.mobileNumber"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="tel" inputmode="numeric" maxlength="10" label="Alternate mobile" labelPlacement="floating"
+              placeholder="Optional" [(ngModel)]="personal.alternateMobile"></ion-input>
+          </ion-item>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-card">
+        <legend><ion-icon name="location-outline"></ion-icon> Address & constituency</legend>
+        <ion-item lines="none" class="field">
+          <ion-textarea label="Home address *" labelPlacement="floating" [autoGrow]="true" [rows]="2"
+            placeholder="No. 45, Whitefield Main Road, Bengaluru" [(ngModel)]="personal.homeAddress"></ion-textarea>
+        </ion-item>
+        <ion-item lines="none" class="field">
+          <ion-textarea label="Office address" labelPlacement="floating" [autoGrow]="true" [rows]="2"
+            placeholder="ITPL Tech Park, Whitefield, Bengaluru" [(ngModel)]="personal.officeAddress"></ion-textarea>
+        </ion-item>
+        <div class="grid-2">
+          <ion-item lines="none" class="field">
+            <ion-input label="State *" labelPlacement="floating" placeholder="Karnataka" [(ngModel)]="personal.state"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="District *" labelPlacement="floating" placeholder="Bengaluru Urban"
+              [(ngModel)]="personal.district"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="Assembly" labelPlacement="floating" placeholder="Mahadevapura" [(ngModel)]="personal.assembly"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="Ward" labelPlacement="floating" placeholder="Ward 150" [(ngModel)]="personal.ward"></ion-input>
+          </ion-item>
+        </div>
+        <ion-item lines="none" class="field">
+          <ion-input type="tel" inputmode="numeric" maxlength="6" label="Pincode *" labelPlacement="floating"
+            placeholder="560037" [(ngModel)]="personal.pincode"></ion-input>
+        </ion-item>
+      </fieldset>
+
+      <fieldset class="form-card">
+        <legend><ion-icon name="people-outline"></ion-icon> Family & interests</legend>
+        <div class="grid-2">
+          <ion-item lines="none" class="field">
+            <ion-input type="number" inputmode="numeric" min="0" label="Family members" labelPlacement="floating"
+              placeholder="4" [(ngModel)]="personal.familyCount"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="Children" labelPlacement="floating" placeholder="Ravi, Priya" [(ngModel)]="personal.children"></ion-input>
+          </ion-item>
+        </div>
+        <ion-item lines="none" class="field">
+          <ion-input label="Interests" labelPlacement="floating" placeholder="Business, Social Work"
+            helperText="Separate with commas" [(ngModel)]="personal.interests"></ion-input>
+        </ion-item>
+        <ion-item lines="none" class="field">
+          <ion-input label="Hobbies" labelPlacement="floating" placeholder="Cricket, Reading"
+            helperText="Separate with commas" [(ngModel)]="personal.hobbies"></ion-input>
+        </ion-item>
+      </fieldset>
+
+      <ion-item lines="none" class="field toggle-field">
+        <ion-toggle justify="space-between" [(ngModel)]="personal.hasBusiness" (ionChange)="onHasBusinessChange()">
+          I run a business
+        </ion-toggle>
+      </ion-item>
+      @if (personal.hasBusiness) {
+      <button type="button" class="next-link" (click)="segment.set('business')">
+        Next: business details
+        <ion-icon name="arrow-forward"></ion-icon>
+      </button>
+      }
+    </div>
+    }
+
+    <!-- ============================== BUSINESS ============================== -->
+    @case ('business') {
+    <div class="pane">
+      <fieldset class="form-card">
+        <legend><ion-icon name="ribbon-outline"></ion-icon> Brand</legend>
+
+        <label class="photo-picker logo-picker">
+          @if (logoPreview || business.logo) {
+          <img [src]="logoPreview || business.logo" alt="Business logo" />
+          } @else {
+          <span class="photo-placeholder"><ion-icon name="image-outline"></ion-icon></span>
+          }
+          <span class="picker-copy">
+            <b>Business logo</b>
+            <small>{{ logoFile?.name || (business.logo ? 'Tap to replace' : 'Tap to upload · PNG preferred') }}</small>
+          </span>
+          <ion-icon name="cloud-upload-outline" class="picker-icon"></ion-icon>
+          <input type="file" accept="image/*" (change)="onLogo($event)" hidden />
+        </label>
+
+        <ion-item lines="none" class="field">
+          <ion-input label="Business name *" labelPlacement="floating" placeholder="Udyami Bharat"
+            [(ngModel)]="business.businessName"></ion-input>
+        </ion-item>
+        <ion-item lines="none" class="field">
+          <ion-input label="Tagline" labelPlacement="floating" placeholder="One Home. One Enterprise. One Strong Nation."
+            [(ngModel)]="business.tagline"></ion-input>
+        </ion-item>
+        <div class="grid-2">
+          <ion-item lines="none" class="field">
+            <ion-input label="Sector *" labelPlacement="floating" placeholder="Event Management & Trade Exhibitions"
+              [(ngModel)]="business.sector"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="Business type *" labelPlacement="floating" placeholder="Expo & Business Conclave Organiser"
+              [(ngModel)]="business.businessType"></ion-input>
+          </ion-item>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-card">
+        <legend><ion-icon name="business-outline"></ion-icon> Company</legend>
+        <div class="grid-2">
+          <ion-item lines="none" class="field">
+            <ion-input label="Owner name" labelPlacement="floating" placeholder="Ramesh Kumar" [(ngModel)]="business.ownerName"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="Co-organiser / partner" labelPlacement="floating" placeholder="ICOBS Global Technologies"
+              [(ngModel)]="business.coOrganiser"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="number" inputmode="numeric" label="Established year" labelPlacement="floating"
+              placeholder="2019" [(ngModel)]="business.establishedYear"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="number" inputmode="numeric" min="0" label="Employees" labelPlacement="floating"
+              placeholder="12" [(ngModel)]="business.employees"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="Annual turnover" labelPlacement="floating" placeholder="1.2 Crore"
+              [(ngModel)]="business.annualTurnover"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="GST number" labelPlacement="floating" maxlength="15" placeholder="29ABCDE1234F1Z5"
+              [(ngModel)]="business.gstNumber"></ion-input>
+          </ion-item>
+        </div>
+        <ion-item lines="none" class="field">
+          <ion-input label="Registration no." labelPlacement="floating" placeholder="REG20260001"
+            [(ngModel)]="business.registrationNumber"></ion-input>
+        </ion-item>
+      </fieldset>
+
+      <fieldset class="form-card">
+        <legend><ion-icon name="globe-outline"></ion-icon> Online & contact</legend>
+        <div class="grid-2">
+          <ion-item lines="none" class="field">
+            <ion-input type="email" label="Business email" labelPlacement="floating" placeholder="info@business.in"
+              [(ngModel)]="business.email"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="email" label="PR email" labelPlacement="floating" placeholder="pr@business.in"
+              [(ngModel)]="business.prEmail"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="tel" inputmode="numeric" maxlength="10" label="Business mobile" labelPlacement="floating"
+              placeholder="7899253363" [(ngModel)]="business.businessMobile"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="Mobile app" labelPlacement="floating" placeholder="Udyami Kutumb App"
+              [(ngModel)]="business.mobileApp"></ion-input>
+          </ion-item>
+        </div>
+        <ion-item lines="none" class="field">
+          <ion-input type="url" label="Website" labelPlacement="floating" placeholder="https://www.yourbusiness.com"
+            [(ngModel)]="business.website"></ion-input>
+        </ion-item>
+      </fieldset>
+
+      <fieldset class="form-card">
+        <legend><ion-icon name="map-outline"></ion-icon> Business address</legend>
+        <ion-item lines="none" class="field">
+          <ion-textarea label="Street address" labelPlacement="floating" [autoGrow]="true" [rows]="2"
+            placeholder="No B-4, 4th Floor, Yeshwanthpur Industrial Suburb" [(ngModel)]="business.address"></ion-textarea>
+        </ion-item>
+        <div class="grid-2">
+          <ion-item lines="none" class="field">
+            <ion-input label="City" labelPlacement="floating" placeholder="Bengaluru" [(ngModel)]="business.city"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="District" labelPlacement="floating" placeholder="Bengaluru Urban" [(ngModel)]="business.district"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="State" labelPlacement="floating" placeholder="Karnataka" [(ngModel)]="business.state"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="tel" inputmode="numeric" maxlength="6" label="Pincode" labelPlacement="floating"
+              placeholder="560022" [(ngModel)]="business.pincode"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="number" inputmode="decimal" label="Latitude" labelPlacement="floating" placeholder="12.9784"
+              [(ngModel)]="business.latitude"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="number" inputmode="decimal" label="Longitude" labelPlacement="floating" placeholder="77.6408"
+              [(ngModel)]="business.longitude"></ion-input>
+          </ion-item>
+        </div>
+        <ion-button type="button" fill="outline" expand="block" class="ghost-button" [disabled]="locating()"
+          (click)="detectBusinessLocation()">
+          <ion-icon name="locate-outline" slot="start"></ion-icon>
+          {{ locating() ? 'Detecting location...' : 'Use my current location' }}
+        </ion-button>
+      </fieldset>
+
+      <fieldset class="form-card">
+        <legend><ion-icon name="images-outline"></ion-icon> Business photos</legend>
+        @if (savedGallery().length) {
+        <p class="sub-legend">Saved</p>
+        <div class="thumbs">
+          @for (url of savedGallery(); track url) {
+          <img class="thumb" [src]="url" alt="Saved business photo" />
+          }
+        </div>
+        }
+        @if (galleryPreviews.length) {
+        <p class="sub-legend">To upload</p>
+        <div class="thumbs">
+          @for (url of galleryPreviews; track url; let i = $index) {
+          <span class="thumb-wrap">
+            <img class="thumb" [src]="url" alt="New business photo" />
+            <button type="button" class="thumb-remove" (click)="removeGalleryFile(i)" aria-label="Remove photo">
+              <ion-icon name="close"></ion-icon>
+            </button>
+          </span>
+          }
+        </div>
+        }
+        <label class="file-picker">
+          <ion-icon name="add-circle-outline"></ion-icon>
+          <span>
+            <b>Add photos</b>
+            <small>Shop, office, team, events</small>
+          </span>
+          <input type="file" accept="image/*" multiple (change)="onGallery($event)" hidden />
+        </label>
+      </fieldset>
+
+      <button type="button" class="next-link" (click)="segment.set('products')">
+        Next: products & services
+        <ion-icon name="arrow-forward"></ion-icon>
+      </button>
+    </div>
+    }
+
+    <!-- ============================== PRODUCTS ============================== -->
+    @case ('products') {
+    <div class="pane">
+      <p class="pane-intro">
+        List what you sell or offer. Product names, prices and photos are used to create your posts and ads.
+      </p>
+
+      @for (product of products; track product; let i = $index) {
+      <fieldset class="form-card product-card">
+        <legend>
+          <ion-icon name="pricetag-outline"></ion-icon>
+          {{ product.name || 'Product ' + (i + 1) }}
+          <button type="button" class="icon-danger" (click)="removeProduct(i)" aria-label="Remove product">
+            <ion-icon name="trash-outline"></ion-icon>
+          </button>
+        </legend>
+
+        <ion-item lines="none" class="field">
+          <ion-input label="Product / service name *" labelPlacement="floating" placeholder="Shell Scheme Stall (3x3)"
+            [(ngModel)]="product.name"></ion-input>
+        </ion-item>
+        <div class="grid-2">
+          <ion-item lines="none" class="field">
+            <ion-input label="Category" labelPlacement="floating" placeholder="Exhibition stalls"
+              [(ngModel)]="product.category"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="Unit" labelPlacement="floating" placeholder="Per stall" [(ngModel)]="product.unit"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="number" inputmode="decimal" min="0" label="Price (₹)" labelPlacement="floating"
+              placeholder="99000" [(ngModel)]="product.price"></ion-input>
+          </ion-item>
+        </div>
+        <ion-item lines="none" class="field">
+          <ion-textarea label="Description" labelPlacement="floating" [autoGrow]="true" [rows]="3"
+            placeholder="What's included, who it's for, what makes it special" [(ngModel)]="product.description"></ion-textarea>
+        </ion-item>
+
+        @if (product.images.length || product.previews.length) {
+        <div class="thumbs">
+          @for (url of product.images; track url; let j = $index) {
+          <span class="thumb-wrap">
+            <img class="thumb" [src]="url" alt="Product photo" />
+            <button type="button" class="thumb-remove" (click)="removeProductImage(product, j)" aria-label="Remove photo">
+              <ion-icon name="close"></ion-icon>
+            </button>
+          </span>
+          }
+          @for (url of product.previews; track url; let j = $index) {
+          <span class="thumb-wrap">
+            <img class="thumb new" [src]="url" alt="New product photo" />
+            <button type="button" class="thumb-remove" (click)="removeProductFile(product, j)" aria-label="Remove photo">
+              <ion-icon name="close"></ion-icon>
+            </button>
+          </span>
+          }
+        </div>
+        }
+        <label class="file-picker">
+          <ion-icon name="camera-outline"></ion-icon>
+          <span>
+            <b>Product photos</b>
+            <small>{{ product.files.length ? product.files.length + ' new photo(s) selected' : 'Add one or more photos' }}</small>
+          </span>
+          <input type="file" accept="image/*" multiple (change)="onProductImages(product, $event)" hidden />
+        </label>
+      </fieldset>
+      } @empty {
+      <div class="empty-card">
+        <ion-icon name="cube-outline"></ion-icon>
+        <p>No products or services added yet.</p>
+      </div>
+      }
+
+      <button type="button" class="add-button" (click)="addProduct()">
+        <ion-icon name="add-outline"></ion-icon>
+        Add product or service
+      </button>
+
+      <button type="button" class="next-link" (click)="segment.set('event')">
+        Next: events & expos
+        <ion-icon name="arrow-forward"></ion-icon>
+      </button>
+    </div>
+    }
+
+    <!-- ============================== EVENT ============================== -->
+    @case ('event') {
+    <div class="pane">
+      <ion-item lines="none" class="field toggle-field">
+        <ion-toggle justify="space-between" [(ngModel)]="runsEvents">
+          We organise an event or expo
+        </ion-toggle>
+      </ion-item>
+
+      @if (!runsEvents) {
+      <div class="empty-card">
+        <ion-icon name="calendar-number-outline"></ion-icon>
+        <p>Turn this on if you run an expo, conclave or event, to add venue, zones, packages and schedule.</p>
+      </div>
+      } @else {
+
+      <fieldset class="form-card">
+        <legend><ion-icon name="sparkles-outline"></ion-icon> Event overview</legend>
+        <ion-item lines="none" class="field">
+          <ion-input label="Event name *" labelPlacement="floating" placeholder="Udyami Bharat Expo & Conclave 2026"
+            [(ngModel)]="expo.eventName"></ion-input>
+        </ion-item>
+        <ion-item lines="none" class="field">
+          <ion-input label="Local name" labelPlacement="floating" placeholder="ಸಮಾವೇಶ ಮತ್ತು ಪ್ರದರ್ಶನ 2026"
+            [(ngModel)]="expo.localName"></ion-input>
+        </ion-item>
+        <ion-item lines="none" class="field">
+          <ion-textarea label="Positioning statement" labelPlacement="floating" [autoGrow]="true" [rows]="2"
+            placeholder="When you Rise as Udyami — Jobs are Born…" [(ngModel)]="expo.positioning"></ion-textarea>
+        </ion-item>
+        <div class="grid-2">
+          <ion-item lines="none" class="field">
+            <ion-input type="number" inputmode="numeric" label="Edition" labelPlacement="floating" placeholder="4"
+              [(ngModel)]="expo.edition"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="Entry fee" labelPlacement="floating" placeholder="FREE" [(ngModel)]="expo.entryFee"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="date" label="Start date" labelPlacement="stacked" [(ngModel)]="expo.startDate"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="date" label="End date" labelPlacement="stacked" [(ngModel)]="expo.endDate"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="Currency" labelPlacement="floating" placeholder="INR" [(ngModel)]="expo.currency"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="number" inputmode="decimal" label="GST %" labelPlacement="floating" placeholder="18"
+              [(ngModel)]="expo.gstPercent"></ion-input>
+          </ion-item>
+        </div>
+        @if (eventDays(); as days) {
+        <p class="calc-note"><ion-icon name="time-outline"></ion-icon> {{ days }}-day event</p>
+        }
+        <ion-item lines="none" class="field">
+          <ion-input label="Registration note" labelPlacement="floating" placeholder="On-spot registration is mandatory"
+            [(ngModel)]="expo.registrationNote"></ion-input>
+        </ion-item>
+        <ion-item lines="none" class="field">
+          <ion-input label="Creative note" labelPlacement="floating"
+            placeholder="Creative to be provided by client as per given ratio/size" [(ngModel)]="expo.creativeNote"></ion-input>
+        </ion-item>
+      </fieldset>
+
+      <fieldset class="form-card">
+        <legend><ion-icon name="location-outline"></ion-icon> Venue</legend>
+        <ion-item lines="none" class="field">
+          <ion-input label="Venue name" labelPlacement="floating"
+            placeholder="Bangalore International Exhibition Centre (BIEC)" [(ngModel)]="expo.venueName"></ion-input>
+        </ion-item>
+        <div class="grid-2">
+          <ion-item lines="none" class="field">
+            <ion-input label="City" labelPlacement="floating" placeholder="Bengaluru" [(ngModel)]="expo.venueCity"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="State" labelPlacement="floating" placeholder="Karnataka" [(ngModel)]="expo.venueState"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input type="number" inputmode="numeric" label="Total area (sqm)" labelPlacement="floating"
+              placeholder="40000" [(ngModel)]="expo.venueTotalAreaSqm"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field">
+            <ion-input label="Exhibition hall" labelPlacement="floating" placeholder="Hall 2 — Mega MSME Expo Hall"
+              [(ngModel)]="expo.venueExhibitionHall"></ion-input>
+          </ion-item>
+        </div>
+        <ion-item lines="none" class="field">
+          <ion-textarea label="Venue areas" labelPlacement="floating" [autoGrow]="true" [rows]="3"
+            helperText="One area per line" placeholder="Hall 1 — Mega Expo Hall" [(ngModel)]="expo.venueAreas"></ion-textarea>
+        </ion-item>
+      </fieldset>
+
+      <fieldset class="form-card">
+        <legend><ion-icon name="list-outline"></ion-icon> Highlights & lists</legend>
+        @for (list of expoLists; track list.key) {
+        <ion-item lines="none" class="field">
+          <ion-textarea [label]="list.label" labelPlacement="floating" [autoGrow]="true" [rows]="3"
+            helperText="One item per line" [placeholder]="list.placeholder" [(ngModel)]="$any(expo)[list.key]"></ion-textarea>
+        </ion-item>
+        }
+      </fieldset>
+
+      @for (table of expoTables; track table.key) {
+      <details class="form-card collapsible">
+        <summary>
+          <ion-icon [name]="table.icon"></ion-icon>
+          <span>{{ table.title }}</span>
+          <span class="count mono">{{ expo[table.key].length }}</span>
+          <ion-icon name="chevron-down-outline" class="chev"></ion-icon>
+        </summary>
+        <mk-repeat-list [rows]="expo[table.key]" [columns]="table.columns" [itemLabel]="table.itemLabel"
+          [hint]="table.hint"></mk-repeat-list>
+      </details>
+      }
+      }
+    </div>
+    }
+    }
+  </div>
+  }
+
+</ion-content>
+
+@if (!loading() && !loadError()) {
+<ion-footer class="save-bar">
+  @if (formError()) {
+  <p class="form-error" role="alert">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    {{ formError() }}
+  </p>
+  }
+  <ion-button expand="block" class="submit-button" [disabled]="saving()" (click)="save()">
+    {{ saving() ? 'Saving...' : 'Save profile' }}
+    @if (saving()) {
+    <ion-spinner name="crescent"></ion-spinner>
+    }
+  </ion-button>
+</ion-footer>
+}
