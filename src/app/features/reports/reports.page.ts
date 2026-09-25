@@ -8,6 +8,7 @@ import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-togg
 import { ApprovalService, PlatformAnalytics } from '@core/services/approval';
 import { Profile } from '@core/services/profileService/profile';
 import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interface';
+import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 interface ReportBar {
   label: string;
@@ -25,7 +26,7 @@ type SocialPlatform = 'instagram' | 'facebook';
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [CommonModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent],
   templateUrl: './reports.page.html',
   styleUrls: ['./reports.page.scss'],
 })
@@ -134,7 +135,7 @@ export class ReportsPage {
         const url = URL.createObjectURL(report);
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'marketos-weekly-report.pdf';
+        link.download = 'jyovix-marketing-weekly-report.pdf';
         link.click();
         URL.revokeObjectURL(url);
         this.isGenerating.set(false);
@@ -163,7 +164,7 @@ export class ReportsPage {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MarketOS Weekly Report</title>
+  <title>Jyovix Marketing Weekly Report</title>
   <style>
     @page { size: A4; margin: 0; }
     * { box-sizing: border-box; }
@@ -199,7 +200,7 @@ export class ReportsPage {
 <body>
   <main class="page">
     <header class="hero">
-      <div class="eyebrow">MarketOS / Performance brief</div>
+      <div class="eyebrow">Jyovix Marketing / Performance brief</div>
       <h1>Weekly content report</h1>
       <p>${this.escapeHtml(this.weekLabel())} · Generated ${this.escapeHtml(new Date().toLocaleDateString('en-IN'))}</p>
     </header>
@@ -212,10 +213,10 @@ export class ReportsPage {
       <div class="bars">${bars || '<p>No content activity was recorded in this period.</p>'}</div>
     </section>
     <section class="section">
-      <div class="section-heading"><h2>Account diagnostics</h2><span>Source: MarketOS workspace data</span></div>
+      <div class="section-heading"><h2>Account diagnostics</h2><span>Source: Jyovix Marketing workspace data</span></div>
       <div class="diagnostics">${diagnosticItems}</div>
     </section>
-    <footer class="footer">Prepared by MarketOS · This report reflects the latest content and wallet data available at generation time.</footer>
+    <footer class="footer">Prepared by Jyovix Marketing · This report reflects the latest content and wallet data available at generation time.</footer>
   </main>
 </body>
 </html>`;

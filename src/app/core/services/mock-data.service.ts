@@ -78,7 +78,7 @@ export class MockDataService {
       id: 'first-campaign',
       topicId: 'getting-started',
       question: 'How do I get my first campaign live?',
-      answer: 'Complete your brand brief, connect at least one channel, and open Campaigns from the workspace. MarketOS will guide you through audience, budget and approval settings before anything is published.',
+      answer: 'Complete your brand brief, connect at least one channel, and open Campaigns from the workspace. Jyovix Marketing will guide you through audience, budget and approval settings before anything is published.',
       popular: true,
     },
     {

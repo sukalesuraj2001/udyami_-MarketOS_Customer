@@ -1,0 +1,72 @@
+<ion-content [fullscreen]="true" [scrollY]="false" class="welcome-content">
+  <main class="stage">
+
+    <!-- Background -->
+    <div class="aurora a1" aria-hidden="true"></div>
+    <div class="aurora a2" aria-hidden="true"></div>
+    <div class="aurora a3" aria-hidden="true"></div>
+    <div class="grid-floor" aria-hidden="true"></div>
+    <div class="particles" aria-hidden="true">
+      @for (p of particles; track $index) {
+      <i [style.left.%]="p.x" [style.width.px]="p.size" [style.height.px]="p.size"
+        [style.animation-delay.ms]="p.delay" [style.animation-duration.ms]="p.duration"
+        [style.--drift]="p.drift + 'px'"></i>
+      }
+    </div>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="logo-system" aria-hidden="true">
+        @for (orbit of orbits; track $index) {
+        <div class="orbit" [style.width.px]="orbit.size" [style.height.px]="orbit.size">
+          <div class="orbit-spin" [style.animation-duration.s]="orbit.duration" [style.animation-delay.s]="orbit.delay">
+            <span class="planet" [style.animation-duration.s]="orbit.duration" [style.animation-delay.s]="orbit.delay">
+              <ion-icon [name]="orbit.icon"></ion-icon>
+            </span>
+          </div>
+        </div>
+        }
+        <span class="halo"></span>
+        <span class="halo h2"></span>
+        <div class="logo-core">
+          <img src="assets/icon/icon-512.png" alt="" width="96" height="96" />
+          <span class="sheen"></span>
+        </div>
+      </div>
+
+      <h1 class="brand" aria-label="Jyovix Marketing">
+        <span class="word" aria-hidden="true">
+          @for (letter of letters; track $index; let i = $index) {
+          <span class="letter" [style.animation-delay.ms]="900 + i * 70">{{ letter }}</span>
+          }
+        </span>
+        <span class="sub" aria-hidden="true">Marketing</span>
+      </h1>
+
+      <p class="tagline">Your AI marketing team. You stay in control.</p>
+
+      <div class="ticker" aria-hidden="true">
+        <span class="ticker-label mono">We help you</span>
+        <span class="ticker-window">
+          <span class="ticker-list">
+            @for (word of words; track $index) {
+            <span>{{ word }}</span>
+            }
+          </span>
+        </span>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <footer class="actions">
+      <a class="cta" routerLink="/register">
+        <span class="cta-sheen" aria-hidden="true"></span>
+        Get started
+        <ion-icon name="arrow-forward"></ion-icon>
+      </a>
+      <a class="ghost" routerLink="/login">I already have an account</a>
+      <p class="fine mono">Powered by Jyovix</p>
+    </footer>
+
+  </main>
+</ion-content>

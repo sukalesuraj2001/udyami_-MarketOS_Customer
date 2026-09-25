@@ -7,7 +7,7 @@ import { AuthService } from '@core/services/auth.service';
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const token = inject(AuthService).token;
 
-  if (!token || !request.url.startsWith(environment.apiUrl) || request.url.endsWith('/auth/loginUser')) {
+  if (!token || !request.url.startsWith(environment.apiUrl) || request.url.endsWith('/auth/loginUser') || request.url.endsWith('/auth/createUser')) {
     return next(request);
   }
 

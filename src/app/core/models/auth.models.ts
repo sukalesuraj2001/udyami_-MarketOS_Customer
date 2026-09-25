@@ -19,3 +19,22 @@ export interface LoginResponse {
   user: AuthUser;
   testMode?: boolean;
 }
+
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  mobileNumber: string;
+  homeLocation: string;
+  businessLocation: string;
+  latitude: number;
+  longitude: number;
+  hasBusiness: boolean;
+}
+
+export interface RegisterResponse {
+  success: boolean;
+  message: string;
+  user?: AuthUser;
+  [key: string]: unknown;
+}

@@ -9,6 +9,7 @@ import { SectionHeaderComponent } from '@shared/components/section-header/sectio
 import { ScorePillComponent } from '@shared/components/score-pill/score-pill.component';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 type LeadFilter = 'all' | 'hot' | 'dq';
 
@@ -16,6 +17,7 @@ type LeadFilter = 'all' | 'hot' | 'dq';
   selector: 'app-leads',
   standalone: true,
   imports: [
+    BackButtonComponent,
     CommonModule,
     FormsModule,
     IonicModule,

@@ -1,0 +1,111 @@
+<ion-content [fullscreen]="true" class="login-content">
+  <div class="floating-back">
+    <mk-back-button defaultHref="/login" label="Sign in"></mk-back-button>
+  </div>
+
+  <main class="login-layout">
+
+    <section class="login-panel" aria-labelledby="register-title">
+
+      <div class="panel-heading">
+        <img class="panel-logo" src="assets/icon/icon-192.png" alt="" width="44" height="44" />
+        <p class="eyebrow">Get started</p>
+        <h2 id="register-title">Create your Jyovix Marketing account</h2>
+        <p>
+          Tell us a little about you and your business to set up your digital
+          marketing workspace.
+        </p>
+      </div>
+
+      <form (ngSubmit)="submit()" #registerForm="ngForm" novalidate>
+
+        <p class="group-label">Your details</p>
+
+        <ion-item lines="none" class="field-item">
+          <ion-input name="name" type="text" label="Full name" labelPlacement="floating"
+            placeholder="Ramesh Kumar" autocomplete="name" [(ngModel)]="name" required></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="field-item">
+          <ion-input name="email" type="email" label="Email address" labelPlacement="floating"
+            placeholder="you@company.com" autocomplete="email" [(ngModel)]="email" required></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="field-item">
+          <ion-input name="mobileNumber" type="tel" inputmode="numeric" maxlength="10" label="Mobile number"
+            labelPlacement="floating" placeholder="9876543210" autocomplete="tel-national"
+            [(ngModel)]="mobileNumber" required></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="field-item">
+          <ion-input name="password" type="password" label="Password" labelPlacement="floating"
+            placeholder="At least 6 characters" autocomplete="new-password" [(ngModel)]="password" required>
+            <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="field-item">
+          <ion-input name="confirmPassword" type="password" label="Confirm password" labelPlacement="floating"
+            placeholder="Re-enter your password" autocomplete="new-password" [(ngModel)]="confirmPassword"
+            required></ion-input>
+        </ion-item>
+
+        <p class="group-label">Location</p>
+
+        <ion-item lines="none" class="field-item">
+          <ion-input name="homeLocation" type="text" label="Home location" labelPlacement="floating"
+            placeholder="Hubballi, Karnataka" [(ngModel)]="homeLocation" required></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="field-item toggle-item">
+          <ion-toggle name="hasBusiness" [(ngModel)]="hasBusiness" justify="space-between">
+            I run a business
+          </ion-toggle>
+        </ion-item>
+
+        @if (hasBusiness) {
+          <ion-item lines="none" class="field-item">
+            <ion-input name="businessLocation" type="text" label="Business location" labelPlacement="floating"
+              placeholder="Dharwad, Karnataka" [(ngModel)]="businessLocation" required></ion-input>
+          </ion-item>
+        }
+
+        <div class="coords">
+          <ion-item lines="none" class="field-item">
+            <ion-input name="latitude" type="number" inputmode="decimal" label="Latitude" labelPlacement="floating"
+              placeholder="15.3647" [(ngModel)]="latitude"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="field-item">
+            <ion-input name="longitude" type="number" inputmode="decimal" label="Longitude" labelPlacement="floating"
+              placeholder="75.1240" [(ngModel)]="longitude"></ion-input>
+          </ion-item>
+        </div>
+
+        <ion-button type="button" fill="outline" expand="block" class="locate-button" [disabled]="locating"
+          (click)="detectLocation()">
+          <ion-icon [name]="hasCoordinates ? 'checkmark-circle-outline' : 'locate-outline'" slot="start"></ion-icon>
+          {{ locating ? 'Detecting location...' : hasCoordinates ? 'Update with current location' : 'Use my current location' }}
+        </ion-button>
+
+        @if (errorMessage) {
+          <p class="error-message" role="alert">{{ errorMessage }}</p>
+        }
+
+        <ion-button type="submit" expand="block" class="submit-button" [disabled]="submitting">
+          {{ submitting ? 'Creating account...' : 'Create account' }}
+          @if (submitting) {
+            <ion-spinner name="crescent"></ion-spinner>
+          }
+        </ion-button>
+
+      </form>
+
+      <p class="switch-note">
+        Already have an account?
+        <a routerLink="/login">Sign in</a>
+      </p>
+
+    </section>
+
+  </main>
+</ion-content>

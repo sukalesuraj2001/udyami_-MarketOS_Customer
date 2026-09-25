@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
@@ -12,11 +12,15 @@ import { MembershipService } from '@core/services/membership.service';
 import { ApprovalService } from '@core/services/approval';
 import { FeedItem, Kpi } from '@core/models/models';
 import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interface';
+import { Profile, UserProfile } from '@app/core/services/profileService/profile';
+import { getProfileCompletion } from '@app/core/services/profileService/profile-completion';
+import { BusinessReminderComponent } from '@shared/components/business-reminder/business-reminder.component';
+import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, IonicModule, KpiCardComponent, SectionHeaderComponent, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, IonicModule, KpiCardComponent, SectionHeaderComponent, ThemeToggleComponent, BusinessReminderComponent],
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
 })
@@ -26,6 +30,13 @@ export class DashboardPage {
   private router = inject(Router);
   private approvalService = inject(ApprovalService);
   readonly membership = inject(MembershipService);
+  private profileService = inject(Profile);
+  private readonly userProfile = signal<UserProfile | null>(null);
+  readonly profileCompletion = computed(() => getProfileCompletion(this.userProfile()));
+  /** Saved profile exists but businessDetails is empty. */
+  readonly showBusinessReminder = computed(() =>
+    this.profileCompletion().hasProfile && !this.profileCompletion().hasBusinessDetails
+  );
   readonly approvalKpis = signal<Kpi[]>([
     { label: 'Published', value: '0', sub: 'Content published to social media', accent: 'green' },
     { label: 'Rejected', value: '0', sub: 'Content rejected from approval' },
@@ -38,6 +49,18 @@ export class DashboardPage {
 
   ionViewWillEnter(): void {
     this.loadApprovalCounts();
+    this.loadUserProfile();
+  }
+
+  private loadUserProfile(): void {
+    this.profileService.getUserProfileData().subscribe({
+      next: (response) => this.userProfile.set(response.data ?? null),
+      error: (error) => console.error('Failed to load user profile:', error),
+    });
+  }
+
+  openBusinessDetails(): void {
+    this.router.navigate(['/tabs/profile-edit'], { queryParams: { section: 'business' } });
   }
 
   private loadApprovalCounts(): void {
@@ -129,11 +152,12 @@ export class DashboardPage {
   }
 
   renewMembership(): void {
-    void this.membership.showRenewalPrompt();
+    this.membership.openMembershipPage();
   }
 
   refresh(ev: CustomEvent): void {
     this.loadApprovalCounts();
+    this.loadUserProfile();
     setTimeout(() => (ev.target as HTMLIonRefresherElement).complete(), 700);
   }
 

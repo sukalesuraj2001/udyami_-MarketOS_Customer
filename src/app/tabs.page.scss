@@ -1,8 +1,15 @@
+// Clean floating bar; the selected tab gets a soft pill behind its icon.
 .main-tabs {
   --background: var(--mk-surf);
-  --border: 1px solid var(--mk-line);
-  height: 64px;
-  padding: 5px 4px max(5px, env(safe-area-inset-bottom));
+  --border: 0;
+  height: 62px;
+  margin: 0 12px calc(8px + env(safe-area-inset-bottom));
+  padding: 0 4px;
+  border-radius: 20px;
+  border: 1px solid var(--mk-line);
+  box-shadow:
+    0 12px 28px rgba(27, 36, 48, 0.14),
+    0 2px 6px rgba(27, 36, 48, 0.08);
 }
 
 ion-router-outlet {
@@ -20,13 +27,61 @@ ion-tabs {
 .main-tabs ion-tab-button {
   --color: var(--mk-dim);
   --color-selected: var(--mk-gold);
-  min-height: 54px;
+  --background: transparent;
+  --ripple-color: transparent;
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0;
+  letter-spacing: 0.01em;
+
+  ion-label {
+    margin-top: 3px;
+    transition: color var(--mk-speed) var(--mk-ease), font-weight var(--mk-speed) var(--mk-ease);
+  }
 }
 
-.main-tabs ion-icon {
-  font-size: 21px;
-  margin-bottom: 3px;
+// Pill starts as a small dot-width shape and grows when the tab is selected.
+.icon-pill {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 26px;
+  border-radius: 13px;
+  background: transparent;
+  transition:
+    width var(--mk-speed-slow) var(--mk-ease),
+    background var(--mk-speed) var(--mk-ease);
+
+  ion-icon {
+    font-size: 18px;
+    transition: transform var(--mk-speed) var(--mk-ease);
+  }
+}
+
+.main-tabs ion-tab-button:active .icon-pill ion-icon {
+  transform: scale(0.88);
+}
+
+.main-tabs ion-tab-button.tab-selected {
+  .icon-pill {
+    width: 50px;
+    background: var(--mk-gold-fade);
+    box-shadow: inset 0 0 0 1px rgba(184, 134, 42, 0.18);
+  }
+
+  ion-label {
+    font-weight: 700;
+  }
+}
+
+:host-context(body.theme-dark) .main-tabs {
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-pill,
+  .icon-pill ion-icon {
+    transition: none;
+  }
 }

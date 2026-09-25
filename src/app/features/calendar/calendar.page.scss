@@ -526,3 +526,55 @@
   }
 
 }
+.calendar-error {
+  margin: 16px;
+  padding: 28px 20px 22px;
+  text-align: center;
+  background: var(--mk-surf);
+  border: 1px solid rgba(194, 63, 44, 0.3);
+  border-radius: var(--mk-radius);
+
+  h3 {
+    margin: 0 0 8px;
+    color: var(--mk-text);
+    font: 600 17px/1.3 var(--mk-font-display);
+  }
+
+  p {
+    margin: 0 auto 20px;
+    max-width: 340px;
+    color: var(--mk-muted);
+    font: 14px/1.55 var(--mk-font-body);
+  }
+}
+
+.calendar-error-icon {
+  font-size: 40px;
+  color: var(--mk-red);
+  margin-bottom: 10px;
+}
+
+.calendar-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+
+  ion-button {
+    margin: 0;
+    text-transform: none;
+    font-weight: 600;
+    --border-radius: var(--mk-radius-sm);
+  }
+}
+
+.calendar-error-primary {
+  --background: var(--mk-gold);
+  --background-hover: var(--mk-gold-2);
+  --color: #171008;
+}
+
+.calendar-error-retry {
+  --border-color: var(--mk-line-2);
+  --color: var(--mk-text);
+}

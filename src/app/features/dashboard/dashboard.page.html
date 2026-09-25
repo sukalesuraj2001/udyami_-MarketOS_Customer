@@ -1,6 +1,9 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>MarketOS</ion-title>
+    <ion-buttons slot="start">
+      <mk-back-button defaultHref=""></mk-back-button>
+    </ion-buttons>
+    <ion-title>Jyovix Marketing</ion-title>
     <ion-buttons slot="end">
       <mk-theme-toggle></mk-theme-toggle>
     </ion-buttons>
@@ -29,6 +32,11 @@
       <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
     </ion-button>
   </div>
+  }
+
+  @if (showBusinessReminder()) {
+  <mk-business-reminder class="business-reminder" [percent]="profileCompletion().percent"
+    (action)="openBusinessDetails()"></mk-business-reminder>
   }
 
   <mk-section-header [title]="getGreeting() + ', ' + ownerName + ' 👋'"

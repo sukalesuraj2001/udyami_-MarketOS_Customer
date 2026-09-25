@@ -1,5 +1,7 @@
 
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '@core/services/toast.service';
@@ -8,6 +10,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { MarketingCalendarActivity } from '@app/core/interfaces/ai-calender.interface';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
+import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 type Filter =
   | 'all'
@@ -22,9 +25,11 @@ type Filter =
   selector: 'app-calendar',
   standalone: true,
   imports: [
+    BackButtonComponent,
     CommonModule,
     FormsModule,
     IonicModule,
+    RouterLink,
     SectionHeaderComponent,
     ThemeToggleComponent,
   ],
@@ -35,6 +40,7 @@ export class CalendarPage {
   newDate = '';
   newTopic = '';
   loading = signal(false);
+  createError = signal<string | null>(null);
   showAdd = signal(false);
   filter = signal<Filter>('all');
   newChannel = 'Instagram · Reel';
@@ -56,6 +62,7 @@ export class CalendarPage {
    */
   loadMarketingCalendar(): void {
     this.loading.set(true);
+    this.createError.set(null);
 
     this.aiCalenders.getMarketingCalendar().subscribe({
       next: (response) => {
@@ -106,7 +113,7 @@ export class CalendarPage {
         );
       },
 
-      error: (error) => {
+      error: (error: HttpErrorResponse) => {
         console.error(
           'Failed to create marketing calendar:',
           error
@@ -115,9 +122,10 @@ export class CalendarPage {
         this.calendar.set([]);
         this.loading.set(false);
 
-        this.toast.show(
-          'Calendar creation failed',
-          'Please try again later.'
+        const message = error.error?.message;
+        this.createError.set(
+          (Array.isArray(message) ? message.join(' ') : message) ||
+          'We could not create your marketing calendar. Please try again later.'
         );
       },
     });
