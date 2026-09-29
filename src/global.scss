@@ -41,14 +41,27 @@ h1, h2, h3, h4 {
 
 ion-toolbar {
   --border-color: var(--mk-line);
+  --border-width: 0;
 }
 
+// Rounded bottom edge with a soft drop shadow instead of a flat divider line.
 ion-header {
   &::after {
     display: none;
   }
-  box-shadow: none;
-  border-bottom: 1px solid var(--mk-line);
+  overflow: hidden; // clips the toolbar background to the rounded corners
+  background: var(--mk-surf);
+  border-bottom: 0;
+  border-radius: 0 0 22px 22px;
+  box-shadow:
+    0 10px 24px rgba(27, 36, 48, 0.1),
+    0 2px 6px rgba(27, 36, 48, 0.06);
+}
+
+body.theme-dark ion-header {
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 ion-content {

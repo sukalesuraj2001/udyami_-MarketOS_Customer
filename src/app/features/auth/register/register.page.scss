@@ -1,5 +1,5 @@
 .login-panel {
-  padding-top: 64px; // room for the floating back button
+  padding-top: calc(80px + env(safe-area-inset-top)); // room for the floating back button
   padding-bottom: 24px;
 }
 

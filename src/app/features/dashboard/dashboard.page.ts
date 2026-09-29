@@ -15,12 +15,11 @@ import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interf
 import { Profile, UserProfile } from '@app/core/services/profileService/profile';
 import { getProfileCompletion } from '@app/core/services/profileService/profile-completion';
 import { BusinessReminderComponent } from '@shared/components/business-reminder/business-reminder.component';
-import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [BackButtonComponent, CommonModule, IonicModule, KpiCardComponent, SectionHeaderComponent, ThemeToggleComponent, BusinessReminderComponent],
+  imports: [CommonModule, IonicModule, KpiCardComponent, SectionHeaderComponent, ThemeToggleComponent, BusinessReminderComponent],
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
 })

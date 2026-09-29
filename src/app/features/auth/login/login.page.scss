@@ -208,6 +208,7 @@ ion-input {
   }
 
   .login-panel {
-    padding: 68px 28px 36px; // room for the floating back button
+    // room for the floating back button, which sits below the status bar
+    padding: calc(80px + env(safe-area-inset-top)) 28px 36px;
   }
 }
