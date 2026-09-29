@@ -41,7 +41,7 @@ import { IonRouterOutlet, NavController } from '@ionic/angular';
       }
 
       .mk-back {
-        --size: 38px;
+        --size: 30px;
         position: relative;
         display: inline-flex;
         align-items: center;
@@ -63,7 +63,7 @@ import { IonRouterOutlet, NavController } from '@ionic/angular';
         position: absolute;
         inset: 0;
         border-radius: inherit;
-        padding: 1.5px;
+        padding: 1.2px;
         background: conic-gradient(
           from var(--angle, 0deg),
           var(--mk-gold),
@@ -88,17 +88,17 @@ import { IonRouterOutlet, NavController } from '@ionic/angular';
         height: var(--size);
         border-radius: 50%;
         background: var(--mk-surf-2);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 4px 12px rgba(27, 36, 48, 0.12);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 3px 8px rgba(27, 36, 48, 0.12);
         transition: background var(--mk-speed) var(--mk-ease), transform var(--mk-speed-fast) var(--mk-ease);
       }
 
       .arrow {
-        width: 18px;
-        height: 18px;
+        width: 14px;
+        height: 14px;
         overflow: visible;
         fill: none;
         stroke: currentColor;
-        stroke-width: 2.4;
+        stroke-width: 2.6;
         stroke-linecap: round;
         stroke-linejoin: round;
 
@@ -125,7 +125,7 @@ import { IonRouterOutlet, NavController } from '@ionic/angular';
         overflow: hidden;
         white-space: nowrap;
         opacity: 0;
-        font: 700 13px var(--mk-font-body);
+        font: 700 12px var(--mk-font-body);
         transition: max-width var(--mk-speed-slow) var(--mk-ease), opacity var(--mk-speed) var(--mk-ease),
           padding var(--mk-speed-slow) var(--mk-ease);
       }
