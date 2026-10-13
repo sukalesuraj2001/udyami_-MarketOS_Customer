@@ -32,6 +32,21 @@ export const API_ENDPOINTS = {
         DISCONNECT: '/facebook/disconnect',
     },
 
+    LEADS: {
+        GET_ALL: '/facebook/leads',
+        PULL: '/facebook/leads/pull',
+    },
+
+    GOOGLE: {
+        OAUTH_CONNECT: '/google/oauth/connect',
+        CONNECTIONS: '/google/connections',
+        DISCONNECT: (product: string) => `/google/connections/${product}`,
+        ANALYTICS_PROPERTIES: '/google/analytics/properties',
+        ANALYTICS_SELECT_PROPERTY: '/google/analytics/property',
+        ANALYTICS_REPORT: '/google/analytics/report',
+        YOUTUBE_CHANNEL: '/google/youtube/channel',
+    },
+
     AI_CALENDAR: {
         CREATE: '/aicalender/createMarketingCalendar',
         GET_BY_USER_ID: (userId: string) =>
@@ -63,6 +78,9 @@ export const API_ENDPOINTS = {
 
         ANALYTICS: (userId: string, platform: string) =>
             `/create-content/analytics/${userId}/${platform.toUpperCase()}`,
+
+        POST_METRICS: (userId: string, platform: string) =>
+            `/create-content/post-metrics/${userId}/${platform.toUpperCase()}`,
     },
 
     INCIDENTS: {

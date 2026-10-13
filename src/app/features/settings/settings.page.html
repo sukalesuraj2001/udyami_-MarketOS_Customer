@@ -219,6 +219,202 @@
     </ng-template>
   </ion-modal>
 
+  <!-- Google Analytics 4 & YouTube — Google sign-in -->
+  <div class="mk-card mk-anim-in meta-card" style="margin-bottom:14px">
+    <h3>Google</h3>
+    <p class="mini" style="margin-bottom:12px">You sign in on Google — we never see your Google password. Each one asks
+      only for the permissions it needs.</p>
+
+    @if (!googleLoaded()) {
+    <div class="meta-loading"><ion-spinner name="dots"></ion-spinner></div>
+    } @else {
+    <div class="conn-list">
+      <!-- Google Analytics 4 -->
+      <div class="rowb">
+        <div class="plat">
+          <ion-icon name="logo-google" class="ga"></ion-icon>
+          <div>
+            <b>Google Analytics 4</b>
+            @if (analytics(); as ga) {
+            <div class="mini">{{ ga.resourceName || 'No property chosen yet' }}</div>
+            @if (ga.googleAccountEmail) {
+            <div class="mini">{{ ga.googleAccountEmail }}</div>
+            }
+            @if (ga.status !== 'BROKEN') {
+            <a class="link" (click)="openPropertyPicker()">
+              {{ ga.status === 'NEEDS_SELECTION' ? 'Choose property' : 'Change property' }}
+            </a>
+            }
+            } @else {
+            <div class="mini">Website visits, traffic sources and enquiries in your reports.</div>
+            }
+          </div>
+        </div>
+        @if (analytics(); as ga) {
+        @switch (ga.status) {
+        @case ('CONNECTED') { <span class="mk-tag ok">Connected</span> }
+        @case ('NEEDS_SELECTION') { <span class="mk-tag pend">Choose property</span> }
+        @default { <span class="mk-tag no">Needs attention</span> }
+        }
+        } @else {
+        <ion-button size="small" color="primary" [disabled]="connectingGoogle() !== null"
+          (click)="connectGoogle('ANALYTICS')">
+          @if (connectingGoogle() === 'ANALYTICS') { <ion-spinner name="crescent"></ion-spinner> } @else { Connect }
+        </ion-button>
+        }
+      </div>
+      @if (analytics(); as ga) {
+      @if (ga.status === 'BROKEN') {
+      <div class="meta-banner warn">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>{{ ga.statusReason || 'Google Analytics needs to be reconnected.' }}</span>
+      </div>
+      <ion-button expand="block" size="small" fill="outline" [disabled]="connectingGoogle() !== null"
+        (click)="connectGoogle('ANALYTICS')">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reconnect Google Analytics
+      </ion-button>
+      } @else if (ga.lastSyncError) {
+      <div class="meta-banner warn">
+        <ion-icon name="time-outline"></ion-icon>
+        <span>{{ ga.lastSyncError }}</span>
+      </div>
+      }
+      <a class="link danger-link" (click)="disconnectGoogle('ANALYTICS')">Disconnect Google Analytics</a>
+      }
+
+      <!-- YouTube -->
+      <div class="rowb">
+        <div class="plat">
+          <ion-icon name="logo-youtube" class="yt"></ion-icon>
+          <div>
+            <b>YouTube</b>
+            @if (youtube(); as yt) {
+            <div class="mini">{{ yt.resourceName || 'No channel found' }}</div>
+            @if (yt.googleAccountEmail) {
+            <div class="mini">{{ yt.googleAccountEmail }}</div>
+            }
+            } @else {
+            <div class="mini">Publish approved videos to your channel and see views and watch time.</div>
+            }
+          </div>
+        </div>
+        @if (youtube(); as yt) {
+        @if (yt.status === 'CONNECTED') {
+        <span class="mk-tag ok">Connected</span>
+        } @else {
+        <span class="mk-tag no">Needs attention</span>
+        }
+        } @else {
+        <ion-button size="small" color="primary" [disabled]="connectingGoogle() !== null"
+          (click)="connectGoogle('YOUTUBE')">
+          @if (connectingGoogle() === 'YOUTUBE') { <ion-spinner name="crescent"></ion-spinner> } @else { Connect }
+        </ion-button>
+        }
+      </div>
+      @if (youtube(); as yt) {
+      @if (yt.status !== 'CONNECTED') {
+      <div class="meta-banner warn">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>{{ yt.statusReason || 'YouTube needs to be reconnected.' }}</span>
+      </div>
+      <ion-button expand="block" size="small" fill="outline" [disabled]="connectingGoogle() !== null"
+        (click)="connectGoogle('YOUTUBE')">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reconnect YouTube
+      </ion-button>
+      } @else if (yt.lastSyncError) {
+      <div class="meta-banner warn">
+        <ion-icon name="time-outline"></ion-icon>
+        <span>{{ yt.lastSyncError }}</span>
+      </div>
+      }
+      <a class="link danger-link" (click)="disconnectGoogle('YOUTUBE')">Disconnect YouTube</a>
+      }
+
+      <!-- Google Ads -->
+      <div class="rowb">
+        <div class="plat">
+          <ion-icon name="megaphone-outline" class="ads"></ion-icon>
+          <div>
+            <b>Google Ads</b>
+            @if (googleAds(); as ads) {
+            <div class="mini">{{ ads.googleAccountEmail || 'Account linked' }}</div>
+            } @else {
+            <div class="mini">Our team sets up and manages campaigns once this account is linked.</div>
+            }
+          </div>
+        </div>
+        @if (googleAds(); as ads) {
+        @if (ads.status === 'CONNECTED') {
+        <span class="mk-tag ok">Connected</span>
+        } @else {
+        <span class="mk-tag no">Needs attention</span>
+        }
+        } @else {
+        <ion-button size="small" color="primary" [disabled]="connectingGoogle() !== null"
+          (click)="connectGoogle('ADS')">
+          @if (connectingGoogle() === 'ADS') { <ion-spinner name="crescent"></ion-spinner> } @else { Connect }
+        </ion-button>
+        }
+      </div>
+      @if (googleAds(); as ads) {
+      @if (ads.status !== 'CONNECTED') {
+      <div class="meta-banner warn">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>{{ ads.statusReason || 'Google Ads needs to be reconnected.' }}</span>
+      </div>
+      <ion-button expand="block" size="small" fill="outline" [disabled]="connectingGoogle() !== null"
+        (click)="connectGoogle('ADS')">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reconnect Google Ads
+      </ion-button>
+      }
+      <a class="link danger-link" (click)="disconnectGoogle('ADS')">Disconnect Google Ads</a>
+      }
+    </div>
+    }
+  </div>
+
+  <!-- GA4 property picker -->
+  <ion-modal [isOpen]="propertyPickerOpen()" (didDismiss)="propertyPickerOpen.set(false)" [initialBreakpoint]="0.75"
+    [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Choose your website</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="propertyPickerOpen.set(false)">Cancel</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        @if (propertiesLoading()) {
+        <div class="meta-loading"><ion-spinner name="dots"></ion-spinner></div>
+        } @else if (gaProperties().length === 0) {
+        <p class="mini picker-help">This Google account has no Google Analytics 4 property. Create one in Google
+          Analytics, or connect the account that owns your website's property.</p>
+        } @else {
+        <p class="mini picker-help">Pick the GA4 property for your business website. Reports will show its traffic.</p>
+        <ion-radio-group [(ngModel)]="pickedPropertyId">
+          @for (p of gaProperties(); track p.propertyId) {
+          <ion-item lines="full">
+            <ion-radio [value]="p.propertyId" justify="space-between">
+              <div class="pick-name">{{ p.displayName }}</div>
+              <div class="mini">{{ p.accountName }} · {{ p.propertyId }}</div>
+            </ion-radio>
+          </ion-item>
+          }
+        </ion-radio-group>
+        <ion-button expand="block" style="margin-top:16px" [disabled]="!pickedPropertyId || savingSelection()"
+          (click)="saveProperty()">
+          Use this property
+        </ion-button>
+        }
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
   <div class="mk-card mk-anim-in" style="margin-bottom:14px">
     <h3>Other connected accounts</h3>
     <div class="conn-list">

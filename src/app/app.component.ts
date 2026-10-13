@@ -8,6 +8,7 @@ import { ToastService } from '@core/services/toast.service';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
 import { MembershipService } from '@core/services/membership.service';
 import { GlobalLoaderComponent } from '@shared/components/global-loader/global-loader.component';
+import { DeepLinkService } from '@core/services/deep-link.service';
 
 interface NavItem {
   path: string;
@@ -34,10 +35,13 @@ export class AppComponent {
   private alertCtrl = inject(AlertController);
   private menuCtrl = inject(MenuController);
   private membership = inject(MembershipService);
+  private deepLinks = inject(DeepLinkService);
   toast = inject(ToastService);
 
   constructor() {
     this.membership.load();
+    // Returns from Google sign-in in the system browser.
+    this.deepLinks.init();
   }
 
   groups: NavGroup[] = [

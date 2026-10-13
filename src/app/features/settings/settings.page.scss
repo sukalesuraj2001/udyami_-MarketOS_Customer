@@ -88,6 +88,12 @@ ion-segment-button {
 .fb { color: #1877f2; }
 .ig { color: #e1306c; }
 .ads { color: var(--mk-blue); }
+.ga { color: #f9ab00; }
+.yt { color: #ff0000; }
+.danger-link {
+  color: var(--mk-red);
+  margin: 2px 0 10px;
+}
 .fb-btn {
   --background: #1877f2;
   --background-activated: #166fe0;

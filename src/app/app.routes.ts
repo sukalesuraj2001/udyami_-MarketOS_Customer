@@ -92,6 +92,11 @@ export const routes: Routes = [
         title: 'Settings · Jyovix Marketing',
       },
       {
+        path: 'leads',
+        loadComponent: () => import('./features/leads/leads.page').then((m) => m.LeadsPage),
+        title: 'Leads · Jyovix Marketing',
+      },
+      {
         path: 'help-support',
         loadComponent: () => import('./features/help-support/help-support.page').then((m) => m.HelpSupportPage),
         title: 'Help & support · Jyovix Marketing',
@@ -146,6 +151,11 @@ export const routes: Routes = [
   {
     path: 'settings',
     redirectTo: 'tabs/settings',
+    pathMatch: 'full',
+  },
+  {
+    path: 'leads',
+    redirectTo: 'tabs/leads',
     pathMatch: 'full',
   },
   { path: '**', redirectTo: 'tabs/dashboard' },

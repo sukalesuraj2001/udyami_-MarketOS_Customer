@@ -63,20 +63,82 @@
         <p>See exactly how every published post is performing across your connected channels.</p>
       </div>
       <div class="platform-switch" role="tablist" aria-label="Choose social platform">
-        @for (platform of ['instagram', 'facebook']; track platform) {
+        @for (platform of platformTabs; track platform) {
           <button
             type="button"
             role="tab"
             [attr.aria-selected]="selectedPlatform() === platform"
             [class.active]="selectedPlatform() === platform"
-            (click)="selectPlatform(platform === 'instagram' ? 'instagram' : 'facebook')">
-            <ion-icon [name]="platform === 'instagram' ? 'logo-instagram' : 'logo-facebook'"></ion-icon>
-            {{ platform === 'instagram' ? 'Instagram' : 'Facebook' }}
+            (click)="selectPlatform(platform)">
+            <ion-icon [name]="platformIcon(platform)"></ion-icon>
+            {{ platformLabel(platform) }}
           </button>
         }
       </div>
     </div>
 
+    @if (isGoogleSelected()) {
+      <div class="analytics-summary mk-stagger">
+        <div class="summary-stat"><span>Website visits</span><strong>{{ googleReport()?.totals?.sessions ?? 0 }}</strong><ion-icon name="trail-sign-outline"></ion-icon></div>
+        <div class="summary-stat"><span>New visitors</span><strong>{{ googleReport()?.totals?.newUsers ?? 0 }}</strong><ion-icon name="people-outline"></ion-icon></div>
+        <div class="summary-stat"><span>Pages viewed</span><strong>{{ googleReport()?.totals?.pageViews ?? 0 }}</strong><ion-icon name="eye-outline"></ion-icon></div>
+        <div class="summary-stat"><span>Conversions</span><strong>{{ googleReport()?.totals?.keyEvents ?? 0 }}</strong><ion-icon name="flag-outline"></ion-icon></div>
+      </div>
+
+      <div class="post-list-header">
+        <div>
+          <span class="section-kicker">Website performance</span>
+          <h3>Google Analytics overview</h3>
+        </div>
+        @if (googleConnection()?.lastSyncedAt) {
+          <span class="updated-note"><i></i> Updated {{ googleConnection()!.lastSyncedAt | date:'d MMM, h:mm a' }}</span>
+        }
+      </div>
+
+      @if (isGoogleLoading() && !googleReport()) {
+        <div class="analytics-loading">
+          <div class="mk-skeleton"></div><div class="mk-skeleton"></div><div class="mk-skeleton"></div>
+        </div>
+      } @else if (isGoogleConnected()) {
+        <div class="platform-total mk-stagger">
+          <div class="total-brand">
+            <span class="channel-icon google"><ion-icon name="logo-google"></ion-icon></span>
+            <div><span>Connected property</span><b>{{ googleConnection()?.propertyName || 'Google Analytics 4' }}</b></div>
+          </div>
+          @if (googleReport()?.sources?.length) {
+            <div class="ga-list">
+              <span class="ga-list-title">Where visitors came from</span>
+              @for (source of googleReport()!.sources.slice(0, 5); track source.name) {
+                <div class="rowb"><span>{{ humanizeSource(source.name) }}</span><b class="mono">{{ source.value | number }}</b></div>
+              }
+            </div>
+          }
+          @if (googleReport()?.pages?.length) {
+            <div class="ga-list">
+              <span class="ga-list-title">Most viewed pages</span>
+              @for (page of googleReport()!.pages.slice(0, 5); track page.name) {
+                <div class="rowb"><span>{{ page.name }}</span><b class="mono">{{ page.value | number }}</b></div>
+              }
+            </div>
+          }
+          @if (googleConnection()?.lastSyncError) {
+            <p class="metrics-warning"><ion-icon name="information-circle-outline"></ion-icon>{{ googleConnection()?.lastSyncError }}</p>
+          }
+        </div>
+      } @else {
+        <div class="analytics-empty">
+          <span class="empty-icon"><ion-icon name="logo-google"></ion-icon></span>
+          <h3>Google Analytics isn't connected</h3>
+          <p>
+            @if (googleConnection()?.status === 'BROKEN') {
+              {{ googleConnection()?.statusReason || 'Please reconnect Google Analytics in Settings.' }}
+            } @else {
+              Connect Google Analytics from Settings to see your website traffic here.
+            }
+          </p>
+        </div>
+      }
+    } @else {
     <div class="analytics-summary mk-stagger">
       <div class="summary-stat"><span>Published posts</span><strong>{{ platformSummary().posts }}</strong><ion-icon name="document-text-outline"></ion-icon></div>
       <div class="summary-stat"><span>Total engagement</span><strong>{{ platformSummary().engagement }}</strong><ion-icon name="pulse-outline"></ion-icon></div>
@@ -123,6 +185,74 @@
         <h3>No {{ platformLabel(selectedPlatform()) }} posts yet</h3>
         <p>Post performance will appear here as soon as your account starts publishing.</p>
       </div>
+    }
+
+    @if (selectedPostMetrics().length || isPostMetricsLoading()) {
+      <div class="recent-posts">
+        <button
+          type="button"
+          class="recent-posts-header"
+          [attr.aria-expanded]="recentPostsExpanded()"
+          (click)="canExpandPostMetrics() && toggleRecentPosts()">
+          <div>
+            <span class="section-kicker">Caption, image &amp; engagement</span>
+            <h3>Recent posts <span class="post-count">{{ selectedPostMetrics().length }}</span></h3>
+          </div>
+          @if (canExpandPostMetrics()) {
+            <ion-icon name="chevron-down-outline" class="collapse-chevron" [class.open]="recentPostsExpanded()"></ion-icon>
+          }
+        </button>
+
+        @if (isPostMetricsLoading() && !selectedPostMetrics().length) {
+          <div class="post-card-list">
+            <div class="mk-skeleton post-skeleton"></div>
+            <div class="mk-skeleton post-skeleton"></div>
+          </div>
+        } @else {
+          <div class="post-card-list">
+            @for (post of visiblePostMetrics(); track post.platformPostId) {
+              <article class="post-card">
+                @if (post.mediaUrl && !brokenThumbnails().has(post.platformPostId)) {
+                  <img
+                    class="post-thumb"
+                    [src]="post.mediaUrl"
+                    alt=""
+                    (error)="markThumbnailBroken(post.platformPostId)">
+                } @else {
+                  <div class="post-thumb post-thumb-placeholder">
+                    <ion-icon [name]="post.mediaType?.toLowerCase()?.includes('video') ? 'videocam-outline' : 'image-outline'"></ion-icon>
+                  </div>
+                }
+                <div class="post-body">
+                  <p class="post-caption">{{ postCaption(post) || 'No caption' }}</p>
+                  <div class="post-meta-row">
+                    <span class="post-date">{{ postDate(post) }}</span>
+                    <span class="post-rate">{{ postEngagementRate(post) }}</span>
+                  </div>
+                  <div class="post-stats-row">
+                    <span><ion-icon name="heart"></ion-icon>{{ post.likes }}</span>
+                    <span><ion-icon name="chatbubble"></ion-icon>{{ post.comments }}</span>
+                    @if (post.shares > 0) {
+                      <span><ion-icon name="arrow-redo"></ion-icon>{{ post.shares }}</span>
+                    }
+                    @if (post.reach > 0) {
+                      <span class="post-reach">{{ post.reach | number }} reach</span>
+                    }
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        }
+
+        @if (canExpandPostMetrics()) {
+          <button type="button" class="recent-posts-toggle" (click)="toggleRecentPosts()">
+            {{ recentPostsExpanded() ? 'Show less' : 'Show all ' + selectedPostMetrics().length + ' posts' }}
+            <ion-icon name="chevron-down-outline" [class.open]="recentPostsExpanded()"></ion-icon>
+          </button>
+        }
+      </div>
+    }
     }
   </section>
 

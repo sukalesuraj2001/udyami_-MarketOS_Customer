@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, AlertController } from '@ionic/angular';
@@ -17,10 +18,27 @@ import {
   SocialMediaAccount,
 } from '@app/core/interfaces/socialMediaAcounts.interface';
 import { MetaConnectService } from '@app/core/services/meta-connect.service';
+import { GoogleConnectService } from '@app/core/services/google-connect.service';
+import { Ga4Property, GoogleConnection, GoogleProduct } from '@app/core/interfaces/google.interface';
 import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 /** Platforms connected through Meta OAuth — never through the manual credentials form. */
 const META_CONNECTION_NAMES = ['Facebook Page', 'Instagram Business', 'Meta Ads account'];
+
+/** Connected through Google sign-in (Google card) — also never the manual form. */
+const GOOGLE_CONNECTION_NAMES = ['Google Analytics 4', 'Google Ads'];
+
+/** Which Google product the generic connections list's "Connect" button opens. */
+const GOOGLE_CONNECTION_PRODUCT: Record<string, GoogleProduct> = {
+  'Google Analytics 4': 'ANALYTICS',
+  'Google Ads': 'ADS',
+};
+
+const GOOGLE_LABEL: Record<GoogleProduct, string> = {
+  ANALYTICS: 'Google Analytics',
+  YOUTUBE: 'YouTube',
+  ADS: 'Google Ads',
+};
 
 /** 'expired' = the Meta login behind the Page/ad-account lists expired (401). Not an app-session error. */
 type MetaAuthState = 'ok' | 'expired' | 'notConnected';
@@ -46,6 +64,28 @@ export class SettingsPage {
   private meta = inject(MetaConnectService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private google = inject(GoogleConnectService);
+
+  // ---- Google Analytics 4 & YouTube (Google sign-in) ----
+  readonly googleConnections = signal<GoogleConnection[]>([]);
+  readonly googleLoaded = signal(false);
+  readonly connectingGoogle = signal<GoogleProduct | null>(null);
+  readonly gaProperties = signal<Ga4Property[]>([]);
+  readonly propertiesLoading = signal(false);
+  readonly propertyPickerOpen = signal(false);
+  pickedPropertyId = '';
+
+  readonly analytics = computed(() => this.googleConnection('ANALYTICS'));
+  readonly youtube = computed(() => this.googleConnection('YOUTUBE'));
+  readonly googleAds = computed(() => this.googleConnection('ADS'));
+
+  constructor() {
+    // The phone app comes back from Google through a deep link while this page
+    // may already be open, so watch the query params instead of a snapshot.
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed())
+      .subscribe((params) => this.readGoogleReturn(params));
+  }
 
   // ---- Facebook & Instagram (Meta OAuth) ----
   readonly accounts = signal<SocialMediaAccount[]>([]);
@@ -70,9 +110,11 @@ export class SettingsPage {
   readonly selectedPage = computed(() => this.pages().find((p) => p.selected) ?? null);
   readonly selectedAdAccount = computed(() => this.adAccounts().find((a) => a.selected) ?? null);
 
-  /** Non-Meta platforms still use the manual form. */
+  /** Platforms without an OAuth flow still use the manual form. */
   readonly otherConnections = computed(() =>
-    this.data.connections().filter((c) => !META_CONNECTION_NAMES.includes(c.name))
+    this.data
+      .connections()
+      .filter((c) => !META_CONNECTION_NAMES.includes(c.name) && !GOOGLE_CONNECTION_NAMES.includes(c.name))
   );
 
   threshold = '₹10,000';
@@ -83,6 +125,7 @@ export class SettingsPage {
   ionViewWillEnter() {
     const oauthResult = this.readOAuthReturn();
     this.loadSocialMediaAccounts(oauthResult);
+    this.loadGoogleConnections();
   }
 
 
@@ -390,6 +433,10 @@ export class SettingsPage {
       this.connectFacebook();
       return;
     }
+    if (GOOGLE_CONNECTION_NAMES.includes(name)) {
+      this.connectGoogle(GOOGLE_CONNECTION_PRODUCT[name] ?? 'ANALYTICS');
+      return;
+    }
 
     const alert = await this.alertCtrl.create({
       header: `Connect ${name}`,
@@ -518,6 +565,153 @@ export class SettingsPage {
       ],
     });
 
+    await alert.present();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Google Analytics 4 & YouTube (Google sign-in)
+  // ---------------------------------------------------------------------------
+
+  private googleConnection(product: GoogleProduct): GoogleConnection | null {
+    const connection = this.googleConnections().find((c) => c.product === product);
+    return connection?.connected ? connection : null;
+  }
+
+  loadGoogleConnections(): void {
+    this.google.getConnections().subscribe({
+      next: (connections) => {
+        this.googleConnections.set(connections ?? []);
+        this.googleLoaded.set(true);
+      },
+      error: () => this.googleLoaded.set(true),
+    });
+  }
+
+  async connectGoogle(product: GoogleProduct): Promise<void> {
+    if (this.connectingGoogle()) {
+      return;
+    }
+    this.connectingGoogle.set(product);
+
+    try {
+      await this.google.connect(product);
+    } catch (error) {
+      this.toast.show(
+        'Connection failed',
+        this.errorMessage(error as HttpErrorResponse, `Unable to start ${GOOGLE_LABEL[product]} sign-in. Please try again.`),
+        'no'
+      );
+    } finally {
+      // On the web the page navigates away; on the phone the browser is now open.
+      this.connectingGoogle.set(null);
+    }
+  }
+
+  /**
+   * ?platform=google_analytics|youtube&status=... set by the backend after
+   * Google sign-in; opens the GA4 property picker when one has to be chosen.
+   */
+  private readGoogleReturn(params: ParamMap): void {
+    const platform = params.get('platform');
+    const status = params.get('status');
+    if (!status || !['google_analytics', 'youtube', 'google_ads'].includes(platform ?? '')) {
+      return;
+    }
+
+    const product: GoogleProduct =
+      platform === 'youtube' ? 'YOUTUBE' : platform === 'google_ads' ? 'ADS' : 'ANALYTICS';
+
+    if (status === 'success') {
+      const detail = product === 'YOUTUBE' ? params.get('channel') ?? undefined : undefined;
+      this.toast.show(`${GOOGLE_LABEL[product]} connected`, detail, 'ok');
+      if (product === 'ANALYTICS' && params.get('needsSelection') === '1') {
+        this.openPropertyPicker();
+      }
+    } else {
+      this.toast.show(
+        'Connection failed',
+        params.get('message') || `${GOOGLE_LABEL[product]} connection failed. Please try again.`,
+        'no'
+      );
+    }
+
+    this.loadGoogleConnections();
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
+  }
+
+  openPropertyPicker(): void {
+    this.propertyPickerOpen.set(true);
+    this.propertiesLoading.set(true);
+
+    this.google.getProperties().subscribe({
+      next: (list) => {
+        this.gaProperties.set(list.properties ?? []);
+        this.pickedPropertyId = list.selectedPropertyId ?? '';
+        this.propertiesLoading.set(false);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.propertiesLoading.set(false);
+        this.propertyPickerOpen.set(false);
+        this.toast.show('Google Analytics', this.errorMessage(error, 'Unable to load your GA4 properties.'), 'no');
+        this.loadGoogleConnections();
+      },
+    });
+  }
+
+  saveProperty(): void {
+    if (!this.pickedPropertyId) {
+      return;
+    }
+    const current = this.analytics();
+    if (current?.status === 'CONNECTED' && this.pickedPropertyId === current.resourceId) {
+      this.propertyPickerOpen.set(false);
+      return;
+    }
+
+    this.savingSelection.set(true);
+    this.google.selectProperty(this.pickedPropertyId).subscribe({
+      next: (res) => {
+        this.savingSelection.set(false);
+        this.propertyPickerOpen.set(false);
+        this.toast.show('Property selected', res.displayName, 'ok');
+        this.loadGoogleConnections();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.savingSelection.set(false);
+        this.toast.show('Could not select property', this.errorMessage(error, 'Please try again.'), 'no');
+      },
+    });
+  }
+
+  async disconnectGoogle(product: GoogleProduct): Promise<void> {
+    const label = GOOGLE_LABEL[product];
+    const alert = await this.alertCtrl.create({
+      header: `Disconnect ${label}?`,
+      message:
+        product === 'YOUTUBE'
+          ? 'Approved videos will no longer be published to your YouTube channel.'
+          : product === 'ADS'
+          ? 'Your Google Ads account will no longer be linked. Our team will no longer be able to manage campaigns for it.'
+          : 'Website traffic will stop updating in your reports. Figures already collected are kept.',
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Disconnect',
+          role: 'destructive',
+          handler: () => {
+            this.google.disconnect(product).subscribe({
+              next: () => {
+                this.toast.show(`${label} disconnected`, undefined, 'ok');
+                this.loadGoogleConnections();
+              },
+              error: (error: HttpErrorResponse) => {
+                this.toast.show('Disconnect failed', this.errorMessage(error, 'Please try again.'), 'no');
+              },
+            });
+          },
+        },
+      ],
+    });
     await alert.present();
   }
 
