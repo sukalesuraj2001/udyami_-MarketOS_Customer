@@ -47,6 +47,34 @@ export interface PlatformAnalyticsResponse {
   data: PlatformAnalytics;
 }
 
+export interface PostMetricItem {
+  platformPostId: string;
+  channel: string;
+  postedAt: string | null;
+  reach: number;
+  likes: number;
+  comments: number;
+  shares: number;
+  engagement: number;
+  engagementRate: number;
+  metricsCollectedAt: string | null;
+  id: string | null;
+  contentType: string | null;
+  mediaType: string | null;
+  mediaUrl: string | null;
+  generatedContent: string | null;
+  aiResponse: any;
+  activityType: string | null;
+  status: string | null;
+  publishedAt: string | null;
+}
+
+export interface PostMetricsResponse {
+  success: boolean;
+  message: string;
+  data: PostMetricItem[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -98,6 +126,12 @@ export class ApprovalService {
   getPlatformAnalytics(platform: string): Observable<PlatformAnalyticsResponse> {
     return this.http.get<PlatformAnalyticsResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.GENERATED_CONTENT.ANALYTICS(this.getUserId(), platform)}`,
+    );
+  }
+
+  getPostMetrics(platform: string): Observable<PostMetricsResponse> {
+    return this.http.get<PostMetricsResponse>(
+      `${environment.apiUrl}${API_ENDPOINTS.GENERATED_CONTENT.POST_METRICS(this.getUserId(), platform)}`,
     );
   }
 

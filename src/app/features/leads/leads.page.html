@@ -9,46 +9,92 @@
     </ion-buttons>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-searchbar placeholder="Search name or company" (ionInput)="onSearch($event)" [debounce]="150"></ion-searchbar>
+    <ion-searchbar placeholder="Search name, email or phone" (ionInput)="onSearch($event)" [debounce]="150"></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <mk-section-header title="Leads" subtitle="Every score comes with a reason. If the reason doesn't convince you, the score is wrong — tell us.">
-    <ion-segment [value]="filter()" (ionChange)="onFilterChange($event)" class="seg">
-      <ion-segment-button value="all"><ion-label>All</ion-label></ion-segment-button>
-      <ion-segment-button value="hot"><ion-label>Qualified</ion-label></ion-segment-button>
-      <ion-segment-button value="dq"><ion-label>Disqualified</ion-label></ion-segment-button>
-    </ion-segment>
+  <mk-section-header title="Leads" subtitle="Every lead captured from your connected pages, with the post or ad it came from.">
+    <ion-button size="small" color="primary" [disabled]="isPulling()" (click)="pullLatest()">
+      <ion-icon [name]="isPulling() ? 'sync-outline' : 'cloud-download-outline'" slot="start" [class.spin]="isPulling()"></ion-icon>
+      {{ isPulling() ? 'Checking…' : 'Pull latest' }}
+    </ion-button>
   </mk-section-header>
 
-  <div class="mk-grid cols-2 mk-stagger" style="margin-bottom:16px">
-    <div class="mk-card kpi"><div class="lab">This month</div><div class="val mono">142</div><div class="sub">raw leads captured</div></div>
-    <div class="mk-card kpi"><div class="lab">Qualified</div><div class="val mono green">33</div><div class="sub">23.4% of total</div></div>
-    <div class="mk-card kpi"><div class="lab">Median response</div><div class="val mono">47s</div><div class="sub">form fill → first contact</div></div>
-    <div class="mk-card kpi"><div class="lab">Meetings booked</div><div class="val mono">11</div><div class="sub">from 33 qualified</div></div>
-  </div>
-
-  @if (filtered().length === 0) {
-    <mk-empty-state icon="search-outline" title="No leads match that" subtitle="Try clearing the filter."></mk-empty-state>
-  } @else {
-    <div class="lead-list mk-stagger">
-      @for (l of filtered(); track l.name) {
-        <div class="mk-card lead-card tappable" (click)="open(l.name)">
-          <div class="top">
-            <div class="who">
-              <b>{{ l.name }}</b>
-              <span class="mini">{{ l.company }}</span>
-            </div>
-            <mk-score-pill [score]="l.score" [tier]="l.tier"></mk-score-pill>
-          </div>
-          <p class="reason">{{ l.reason }}</p>
-          <div class="bottom">
-            <span class="mini mono">{{ l.source }}</span>
-            <span class="mk-tag" [ngClass]="stageTag(l.stage)">{{ l.stage }}</span>
-          </div>
-        </div>
-      }
+  @if (isLoading()) {
+    <div class="mk-card mk-anim-in" style="margin-bottom:16px">
+      <div class="mk-skeleton" style="height:12px;width:70%;margin-bottom:14px"></div>
+      <div class="mk-skeleton" style="height:12px;width:90%;margin-bottom:14px"></div>
+      <div class="mk-skeleton" style="height:12px;width:55%"></div>
     </div>
+  } @else if (hasError()) {
+    <div class="mk-card mk-anim-in" style="margin-bottom:16px">
+      <h3>Leads unavailable</h3>
+      <p class="mini">We could not load your leads right now.</p>
+      <ion-button size="small" fill="outline" (click)="loadLeads()">Try again</ion-button>
+    </div>
+  } @else {
+    <section class="lead-hero mk-anim-in" aria-labelledby="leads-title">
+      <div class="hero-orb orb-one"></div>
+      <div class="hero-orb orb-two"></div>
+      <div class="lead-heading">
+        <div class="lead-eyebrow"><span></span> Live lead capture</div>
+        <h2 id="leads-title">Captured leads</h2>
+        <p>Every form submission from your Facebook and Instagram lead ads, as it comes in.</p>
+      </div>
+      <div class="platform-switch" role="tablist" aria-label="Filter by platform">
+        @for (tab of platformTabs; track tab.value) {
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="platform() === tab.value"
+            [class.active]="platform() === tab.value"
+            (click)="selectPlatform(tab.value)">
+            @if (tab.value !== 'all') { <ion-icon [name]="platformIcon(tab.value)"></ion-icon> }
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <div class="mk-grid cols-2 mk-stagger" style="margin-bottom:16px">
+      <div class="mk-card kpi"><div class="lab">Total leads</div><div class="val mono">{{ counts().total }}</div><div class="sub">all time</div></div>
+      <div class="mk-card kpi"><div class="lab">This week</div><div class="val mono green">{{ counts().thisWeek }}</div><div class="sub">new captures</div></div>
+      <div class="mk-card kpi"><div class="lab">Facebook</div><div class="val mono">{{ counts().facebook }}</div><div class="sub">from Facebook forms</div></div>
+      <div class="mk-card kpi"><div class="lab">Instagram</div><div class="val mono">{{ counts().instagram }}</div><div class="sub">from Instagram forms</div></div>
+    </div>
+
+    @if (filtered().length === 0) {
+      <mk-empty-state
+        icon="people-outline"
+        [title]="leads().length === 0 ? 'No leads yet' : 'No leads match that'"
+        [subtitle]="leads().length === 0 ? 'Tap \'Pull latest\' to check your connected pages for leads.' : 'Try a different search or platform.'">
+      </mk-empty-state>
+    } @else {
+      <div class="lead-list mk-stagger">
+        @for (lead of filtered(); track lead.id) {
+          <div class="mk-card lead-card">
+            <div class="top">
+              <div class="who">
+                <span class="channel-icon" [class.facebook]="lead.platform === 'fb'" [class.unknown]="!lead.platform">
+                  <ion-icon [name]="platformIcon(lead.platform)"></ion-icon>
+                </span>
+                <div>
+                  <b>{{ lead.name || 'Unnamed lead' }}</b>
+                  <span class="mini">{{ fieldValue(lead, 'email') || fieldValue(lead, 'phone') || platformLabel(lead.platform) }}</span>
+                </div>
+              </div>
+              <span class="mini mono">{{ timeAgo(lead.createdAt) }}</span>
+            </div>
+            <div class="bottom">
+              <span class="mk-tag neu source-tag"><ion-icon name="navigate-outline"></ion-icon>{{ source(lead) }}</span>
+            </div>
+            @if (lead.fetchError) {
+              <p class="fetch-warning"><ion-icon name="information-circle-outline"></ion-icon>{{ lead.fetchError }}</p>
+            }
+          </div>
+        }
+      </div>
+    }
   }
 </ion-content>

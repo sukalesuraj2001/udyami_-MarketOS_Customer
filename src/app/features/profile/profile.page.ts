@@ -72,6 +72,7 @@ export class ProfilePage {
   options: ProfileOption[] = [
     { label: 'Membership', detail: 'Your plan, status and activation', icon: 'ribbon-outline', path: '/tabs/membership' },
     { label: 'Settings', detail: 'Appearance, accounts and approval rules', icon: 'settings-outline', path: '/tabs/settings' },
+    { label: 'Leads', detail: 'Every captured lead, grouped by platform', icon: 'people-outline', path: '/tabs/leads' },
     {
       label: 'Storage',
       detail: 'Manage images, reels and media files',

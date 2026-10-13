@@ -5,10 +5,12 @@ import { catchError, forkJoin, of } from 'rxjs';
 
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
-import { ApprovalService, PlatformAnalytics } from '@core/services/approval';
+import { ApprovalService, PlatformAnalytics, PostMetricItem } from '@core/services/approval';
 import { Profile } from '@core/services/profileService/profile';
 import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interface';
 import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
+import { GoogleConnectService } from '@core/services/google-connect.service';
+import { GoogleAnalyticsReport } from '@core/interfaces/google.interface';
 
 interface ReportBar {
   label: string;
@@ -22,6 +24,7 @@ interface ReportMetric {
 }
 
 type SocialPlatform = 'instagram' | 'facebook';
+type PlatformTab = SocialPlatform | 'google';
 
 @Component({
   selector: 'app-reports',
@@ -33,6 +36,7 @@ type SocialPlatform = 'instagram' | 'facebook';
 export class ReportsPage {
   private approvalService = inject(ApprovalService);
   private profileService = inject(Profile);
+  private googleService = inject(GoogleConnectService);
 
   readonly isLoading = signal(false);
   readonly hasError = signal(false);
@@ -41,10 +45,42 @@ export class ReportsPage {
   readonly optimizationMetrics = signal<ReportMetric[]>([]);
   readonly diagnostics = signal<ReportMetric[]>([]);
   readonly isGenerating = signal(false);
-  readonly selectedPlatform = signal<SocialPlatform>('instagram');
+  readonly platformTabs: PlatformTab[] = ['instagram', 'facebook', 'google'];
+  readonly selectedPlatform = signal<PlatformTab>('instagram');
+  readonly isGoogleSelected = computed(() => this.selectedPlatform() === 'google');
+  private metaPlatform(): SocialPlatform | null {
+    const platform = this.selectedPlatform();
+    return platform === 'google' ? null : platform;
+  }
+
   readonly analyticsByPlatform = signal<Partial<Record<SocialPlatform, PlatformAnalytics>>>({});
   readonly isAnalyticsLoading = signal(false);
-  readonly selectedAnalytics = computed(() => this.analyticsByPlatform()[this.selectedPlatform()] ?? null);
+  readonly selectedAnalytics = computed(() => {
+    const platform = this.metaPlatform();
+    return platform ? this.analyticsByPlatform()[platform] ?? null : null;
+  });
+
+  readonly googleReport = signal<GoogleAnalyticsReport | null>(null);
+  readonly isGoogleLoading = signal(false);
+  readonly googleConnection = computed(() => this.googleReport()?.connection ?? null);
+  readonly isGoogleConnected = computed(() => this.googleConnection()?.status === 'CONNECTED');
+
+  private static readonly RECENT_POSTS_PREVIEW = 3;
+  readonly postMetricsByPlatform = signal<Partial<Record<SocialPlatform, PostMetricItem[]>>>({});
+  readonly isPostMetricsLoading = signal(false);
+  readonly recentPostsExpanded = signal(false);
+  readonly selectedPostMetrics = computed(() => {
+    const platform = this.metaPlatform();
+    return platform ? this.postMetricsByPlatform()[platform] ?? [] : [];
+  });
+  readonly visiblePostMetrics = computed(() => {
+    const posts = this.selectedPostMetrics();
+    return this.recentPostsExpanded() || posts.length <= ReportsPage.RECENT_POSTS_PREVIEW
+      ? posts
+      : posts.slice(0, ReportsPage.RECENT_POSTS_PREVIEW);
+  });
+  readonly canExpandPostMetrics = computed(() => this.selectedPostMetrics().length > ReportsPage.RECENT_POSTS_PREVIEW);
+  readonly brokenThumbnails = signal<Set<string>>(new Set());
   readonly platformSummary = computed(() => {
     const analytics = this.selectedAnalytics();
     return {
@@ -83,6 +119,7 @@ export class ReportsPage {
     });
 
     this.loadPlatformAnalytics('instagram');
+    this.loadPostMetrics('instagram');
   }
 
   barColor(pct: number): string {
@@ -91,15 +128,100 @@ export class ReportsPage {
     return 'var(--mk-gold)';
   }
 
-  selectPlatform(platform: SocialPlatform): void {
+  selectPlatform(platform: PlatformTab): void {
     this.selectedPlatform.set(platform);
+
+    if (platform === 'google') {
+      if (!this.googleReport()) {
+        this.loadGoogleReport();
+      }
+      return;
+    }
+
     if (!this.analyticsByPlatform()[platform]) {
       this.loadPlatformAnalytics(platform);
     }
+    if (!this.postMetricsByPlatform()[platform]) {
+      this.loadPostMetrics(platform);
+    }
   }
 
-  platformLabel(platform: SocialPlatform): string {
-    return platform === 'instagram' ? 'Instagram' : 'Facebook';
+  toggleRecentPosts(): void {
+    this.recentPostsExpanded.update((expanded) => !expanded);
+  }
+
+  platformLabel(platform: PlatformTab): string {
+    if (platform === 'instagram') return 'Instagram';
+    if (platform === 'facebook') return 'Facebook';
+    return 'Google';
+  }
+
+  platformIcon(platform: PlatformTab): string {
+    if (platform === 'instagram') return 'logo-instagram';
+    if (platform === 'facebook') return 'logo-facebook';
+    return 'logo-google';
+  }
+
+  /**
+   * GA4 reports where a visitor came from as "source / medium" (e.g.
+   * "l.instagram.com / referral", "ig / paid", "(direct) / (none)") — this
+   * turns that analytics jargon into something a business owner can read.
+   */
+  humanizeSource(raw: string): string {
+    const [sourcePart, mediumPart] = raw.split(' / ');
+    const source = (sourcePart || '').toLowerCase().trim();
+    const medium = (mediumPart || '').toLowerCase().trim();
+    const isAd = ['paid', 'cpc', 'ppc', 'display'].includes(medium);
+
+    if (source === '(direct)') {
+      return 'Direct visits (typed your website or used a bookmark)';
+    }
+    if (source.includes('instagram') || source === 'ig') {
+      return isAd ? 'Instagram Ads' : 'Instagram (bio link, story or post)';
+    }
+    if (source.includes('facebook') || source === 'fb') {
+      return isAd ? 'Facebook Ads' : 'Facebook (shared post or link)';
+    }
+    if (source === 'google') {
+      if (medium === 'organic') return 'Google Search';
+      if (isAd) return 'Google Ads';
+      return 'Google';
+    }
+    if (source.includes('google')) {
+      return 'Google (link click)';
+    }
+    if (source.includes('youtube')) {
+      return 'YouTube';
+    }
+    if (source.includes('whatsapp')) {
+      return 'WhatsApp';
+    }
+    if (source.includes('linkedin')) {
+      return 'LinkedIn';
+    }
+    if (source.includes('twitter') || source === 't.co' || source.includes('x.com')) {
+      return 'Twitter / X';
+    }
+    if (medium === 'email' || source.includes('mail')) {
+      return 'Email';
+    }
+    if (medium === 'sms') {
+      return 'SMS';
+    }
+
+    const niceSource = sourcePart ? sourcePart.replace(/^https?:\/\//, '').replace(/^www\./, '') : 'Unknown source';
+    const mediumLabel: Record<string, string> = {
+      referral: 'link click',
+      organic: 'search',
+      cpc: 'ads',
+      ppc: 'ads',
+      paid: 'ads',
+      '(none)': '',
+      '(not set)': '',
+    };
+    const niceMedium = mediumLabel[medium] ?? medium;
+
+    return niceMedium ? `${niceSource} (${niceMedium})` : niceSource;
   }
 
   analyticsUpdatedAt(): string {
@@ -124,6 +246,65 @@ export class ReportsPage {
         }
         this.isAnalyticsLoading.set(false);
       });
+  }
+
+  private loadPostMetrics(platform: SocialPlatform): void {
+    this.isPostMetricsLoading.set(true);
+    this.approvalService.getPostMetrics(platform)
+      .pipe(catchError((error) => {
+        console.error(`Failed to load ${platform} post metrics:`, error);
+        return of(null);
+      }))
+      .subscribe((response) => {
+        if (response?.success && response.data) {
+          this.postMetricsByPlatform.update((metrics) => ({ ...metrics, [platform]: response.data }));
+        }
+        this.isPostMetricsLoading.set(false);
+      });
+  }
+
+  private loadGoogleReport(): void {
+    this.isGoogleLoading.set(true);
+    this.googleService.getAnalyticsReport()
+      .pipe(catchError((error) => {
+        console.error('Failed to load Google Analytics report:', error);
+        return of(null);
+      }))
+      .subscribe((report) => {
+        this.googleReport.set(report);
+        this.isGoogleLoading.set(false);
+      });
+  }
+
+  postCaption(item: PostMetricItem): string {
+    const marketing = item.aiResponse?.marketingContent ?? item.aiResponse?.response;
+    if (marketing?.caption) return String(marketing.caption).trim();
+
+    if (typeof item.generatedContent === 'string') {
+      try {
+        const parsed = JSON.parse(item.generatedContent);
+        if (parsed?.caption) return String(parsed.caption).trim();
+      } catch {
+        return item.generatedContent.trim();
+      }
+    }
+
+    return '';
+  }
+
+  postDate(item: PostMetricItem): string {
+    if (!item.postedAt) return 'Date unavailable';
+    return new Intl.DateTimeFormat('en-IN', {
+      day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit',
+    }).format(new Date(item.postedAt));
+  }
+
+  postEngagementRate(item: PostMetricItem): string {
+    return `${(item.engagementRate * 100).toFixed(1)}%`;
+  }
+
+  markThumbnailBroken(platformPostId: string): void {
+    this.brokenThumbnails.update((ids) => new Set(ids).add(platformPostId));
   }
 
   generate(): void {
