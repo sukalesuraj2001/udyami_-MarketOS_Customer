@@ -54,12 +54,33 @@ export const API_ENDPOINTS = {
     },
 
     MEMBERSHIP: {
+        // Disabled server-side (410 Gone) — manual credits were replaced by
+        // the verified Razorpay purchase flow below. Kept only so nothing
+        // points at a dangling string literal.
         ACTIVATE_DIGITAL_USER: '/membership-purchase/activate-digital-user',
+
+        GET_ALL_PLANS: '/membership-purchase/membershipAllPlans',
+        CREATE_ORDER: '/membership-purchase/create-order',
+        VERIFY_PAYMENT: '/membership-purchase/verify-payment',
+        HISTORY: '/membership-purchase/membership-history',
+        RECEIPT: (paymentId: string) =>
+            `/membership-purchase/receipt/${paymentId}`,
     },
 
     WALLET: {
         GET_WALLET_DATA: (userId: string) =>
             `/wallet/getWalletData/${userId}`,
+        GET_WALLET_HISTORY: (userId: string) =>
+            `/wallet/getWalletHistory/${userId}`,
+    },
+
+    // Separate from WALLET — this is the dedicated ad-spend budget the user
+    // pays into specifically to run/boost ads on Facebook or Google.
+    AD_BUDGET: {
+        CREATE_ORDER: '/ad-budget/create-order',
+        VERIFY_PAYMENT: '/ad-budget/verify-payment',
+        GET_BUDGET: (userId: string) => `/ad-budget/${userId}`,
+        GET_HISTORY: (userId: string) => `/ad-budget/history/${userId}`,
     },
 
     GENERATED_CONTENT: {
@@ -81,6 +102,13 @@ export const API_ENDPOINTS = {
 
         POST_METRICS: (userId: string, platform: string) =>
             `/create-content/post-metrics/${userId}/${platform.toUpperCase()}`,
+
+        USAGE: (userId: string) =>
+            `/create-content/usage/${userId}`,
+    },
+
+    ASK_UB: {
+        CHAT: '/ask-ub/chat',
     },
 
     INCIDENTS: {

@@ -8,6 +8,7 @@ import { Profile, UserProfile } from '@app/core/services/profileService/profile'
 import { getProfileCompletion } from '@app/core/services/profileService/profile-completion';
 import { BusinessReminderComponent } from '@shared/components/business-reminder/business-reminder.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { MenuButtonComponent } from '@shared/components/menu-button/menu-button.component';
 import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 interface DetailRow {
@@ -83,7 +84,7 @@ const humanize = (key: string): string => {
 @Component({
   selector: 'app-profile-details',
   standalone: true,
-  imports: [BackButtonComponent, CommonModule, IonicModule, ThemeToggleComponent, BusinessReminderComponent],
+  imports: [BackButtonComponent, CommonModule, IonicModule, ThemeToggleComponent, BusinessReminderComponent, MenuButtonComponent],
   templateUrl: './profile-details.page.html',
   styleUrls: ['./profile-details.page.scss'],
 })

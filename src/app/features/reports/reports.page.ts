@@ -5,6 +5,7 @@ import { catchError, forkJoin, of } from 'rxjs';
 
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { MenuButtonComponent } from '@shared/components/menu-button/menu-button.component';
 import { ApprovalService, PlatformAnalytics, PostMetricItem } from '@core/services/approval';
 import { Profile } from '@core/services/profileService/profile';
 import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interface';
@@ -29,7 +30,7 @@ type PlatformTab = SocialPlatform | 'google';
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [BackButtonComponent, CommonModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent, MenuButtonComponent],
   templateUrl: './reports.page.html',
   styleUrls: ['./reports.page.scss'],
 })

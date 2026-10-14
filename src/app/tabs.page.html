@@ -3,24 +3,34 @@
 
   <ion-tab-bar slot="bottom" class="main-tabs">
     <ion-tab-button tab="dashboard" routerLink="/tabs/dashboard">
-      <span class="icon-pill"><ion-icon name="grid-outline"></ion-icon></span>
-      <ion-label>Overview</ion-label>
+      <span class="icon-pill"><ion-icon name="home-outline"></ion-icon></span>
+      <ion-label>Home</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="calendar" routerLink="/tabs/calendar">
-      <span class="icon-pill"><ion-icon name="calendar-outline"></ion-icon></span>
-      <ion-label>Calendar</ion-label>
+    <ion-tab-button tab="approvals" routerLink="/tabs/approvals">
+      <span class="icon-pill">
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+        @if (badges.pendingContent() > 0) {
+          <span class="tab-badge">{{ badges.pendingContent() }}</span>
+        }
+      </span>
+      <ion-label>Content</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="campaigns" routerLink="/tabs/campaigns">
-      <span class="icon-pill"><ion-icon name="radio-outline"></ion-icon></span>
-      <ion-label>Campaigns</ion-label>
+    <ion-tab-button tab="ai" routerLink="/tabs/ai">
+      <span class="icon-pill"><ion-icon name="sparkles-outline"></ion-icon></span>
+      <ion-label>AI</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="incidents" routerLink="/tabs/incidents">
-      <span class="icon-pill"><ion-icon name="warning-outline"></ion-icon></span>
-      <ion-label>Incidents</ion-label>
+    <ion-tab-button tab="leads" routerLink="/tabs/leads">
+      <span class="icon-pill">
+        <ion-icon name="file-tray-outline"></ion-icon>
+        @if (badges.newLeads() > 0) {
+          <span class="tab-badge">{{ badges.newLeads() }}</span>
+        }
+      </span>
+      <ion-label>Leads</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="profile" routerLink="/tabs/profile">
-      <span class="icon-pill"><ion-icon name="person-circle-outline"></ion-icon></span>
-      <ion-label>Profile</ion-label>
+    <ion-tab-button tab="membership" routerLink="/tabs/membership">
+      <span class="icon-pill"><ion-icon name="ribbon-outline"></ion-icon></span>
+      <ion-label>Plan</ion-label>
     </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>

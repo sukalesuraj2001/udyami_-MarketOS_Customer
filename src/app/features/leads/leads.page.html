@@ -1,11 +1,15 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <mk-back-button defaultHref="/tabs/dashboard"></mk-back-button>
-    </ion-buttons>
-    <ion-title>Leads</ion-title>
+    <div class="page-heading" slot="start">
+      <h1>Enquiries</h1>
+      <p class="mk-muted">Everyone who contacted you through an ad or a post. Call them fast — the first hour matters most.</p>
+    </div>
     <ion-buttons slot="end">
+      <ion-button fill="clear" [disabled]="isPulling()" (click)="pullLatest()" aria-label="Pull latest leads">
+        <ion-icon [name]="isPulling() ? 'sync-outline' : 'cloud-download-outline'" slot="icon-only" [class.spin]="isPulling()"></ion-icon>
+      </ion-button>
       <mk-theme-toggle></mk-theme-toggle>
+      <mk-menu-button></mk-menu-button>
     </ion-buttons>
   </ion-toolbar>
   <ion-toolbar>
@@ -14,13 +18,6 @@
 </ion-header>
 
 <ion-content>
-  <mk-section-header title="Leads" subtitle="Every lead captured from your connected pages, with the post or ad it came from.">
-    <ion-button size="small" color="primary" [disabled]="isPulling()" (click)="pullLatest()">
-      <ion-icon [name]="isPulling() ? 'sync-outline' : 'cloud-download-outline'" slot="start" [class.spin]="isPulling()"></ion-icon>
-      {{ isPulling() ? 'Checking…' : 'Pull latest' }}
-    </ion-button>
-  </mk-section-header>
-
   @if (isLoading()) {
     <div class="mk-card mk-anim-in" style="margin-bottom:16px">
       <div class="mk-skeleton" style="height:12px;width:70%;margin-bottom:14px"></div>
@@ -29,66 +26,81 @@
     </div>
   } @else if (hasError()) {
     <div class="mk-card mk-anim-in" style="margin-bottom:16px">
-      <h3>Leads unavailable</h3>
-      <p class="mini">We could not load your leads right now.</p>
+      <h3>Enquiries unavailable</h3>
+      <p class="mini">We could not load your enquiries right now.</p>
       <ion-button size="small" fill="outline" (click)="loadLeads()">Try again</ion-button>
     </div>
   } @else {
-    <section class="lead-hero mk-anim-in" aria-labelledby="leads-title">
-      <div class="hero-orb orb-one"></div>
-      <div class="hero-orb orb-two"></div>
-      <div class="lead-heading">
-        <div class="lead-eyebrow"><span></span> Live lead capture</div>
-        <h2 id="leads-title">Captured leads</h2>
-        <p>Every form submission from your Facebook and Instagram lead ads, as it comes in.</p>
+    @if (uncalledCount() > 0) {
+      <div class="notice-card mk-anim-in">
+        <ion-icon name="warning-outline" class="notice-icon"></ion-icon>
+        <div class="notice-copy">
+          <b>{{ uncalledCount() }} enquir{{ uncalledCount() === 1 ? 'y has' : 'ies have' }} not been called yet.</b>
+          <p>Businesses that call within an hour win about three times as often.</p>
+        </div>
       </div>
-      <div class="platform-switch" role="tablist" aria-label="Filter by platform">
-        @for (tab of platformTabs; track tab.value) {
-          <button
-            type="button"
-            role="tab"
-            [attr.aria-selected]="platform() === tab.value"
-            [class.active]="platform() === tab.value"
-            (click)="selectPlatform(tab.value)">
-            @if (tab.value !== 'all') { <ion-icon [name]="platformIcon(tab.value)"></ion-icon> }
-            {{ tab.label }}
-          </button>
-        }
-      </div>
-    </section>
+    }
 
-    <div class="mk-grid cols-2 mk-stagger" style="margin-bottom:16px">
-      <div class="mk-card kpi"><div class="lab">Total leads</div><div class="val mono">{{ counts().total }}</div><div class="sub">all time</div></div>
-      <div class="mk-card kpi"><div class="lab">This week</div><div class="val mono green">{{ counts().thisWeek }}</div><div class="sub">new captures</div></div>
-      <div class="mk-card kpi"><div class="lab">Facebook</div><div class="val mono">{{ counts().facebook }}</div><div class="sub">from Facebook forms</div></div>
-      <div class="mk-card kpi"><div class="lab">Instagram</div><div class="val mono">{{ counts().instagram }}</div><div class="sub">from Instagram forms</div></div>
+    <div class="filter-chips">
+      @for (status of statusFilters; track status) {
+        <button
+          type="button"
+          class="chip-btn"
+          [class.active]="statusFilter() === status"
+          (click)="selectStatus(status)"
+        >
+          {{ status === 'all' ? 'All' : statusLabel[status] }} {{ counts()[status] }}
+        </button>
+      }
     </div>
 
     @if (filtered().length === 0) {
       <mk-empty-state
         icon="people-outline"
-        [title]="leads().length === 0 ? 'No leads yet' : 'No leads match that'"
-        [subtitle]="leads().length === 0 ? 'Tap \'Pull latest\' to check your connected pages for leads.' : 'Try a different search or platform.'">
+        [title]="leads().length === 0 ? 'No enquiries yet' : 'No enquiries match that'"
+        [subtitle]="leads().length === 0 ? 'Tap the download icon to check your connected pages for leads.' : 'Try a different search or status.'">
       </mk-empty-state>
     } @else {
       <div class="lead-list mk-stagger">
         @for (lead of filtered(); track lead.id) {
-          <div class="mk-card lead-card">
-            <div class="top">
-              <div class="who">
-                <span class="channel-icon" [class.facebook]="lead.platform === 'fb'" [class.unknown]="!lead.platform">
-                  <ion-icon [name]="platformIcon(lead.platform)"></ion-icon>
-                </span>
-                <div>
-                  <b>{{ lead.name || 'Unnamed lead' }}</b>
-                  <span class="mini">{{ fieldValue(lead, 'email') || fieldValue(lead, 'phone') || platformLabel(lead.platform) }}</span>
-                </div>
+          <div class="lead-card">
+            <div class="lead-card-head">
+              <span class="mk-avatar">{{ initialsFor(lead) }}</span>
+            </div>
+
+            <div class="kv-row">
+              <span class="kv-label">Name</span>
+              <span class="kv-value">{{ name(lead) }}</span>
+            </div>
+            @if (phone(lead)) {
+              <div class="kv-row">
+                <span class="kv-label">Phone</span>
+                <a class="kv-value kv-link" [href]="'tel:' + phone(lead)">{{ phone(lead) }}</a>
               </div>
-              <span class="mini mono">{{ timeAgo(lead.createdAt) }}</span>
+            }
+            <div class="kv-row">
+              <span class="kv-label">Wants</span>
+              <span class="kv-value">{{ wants(lead) }}</span>
             </div>
-            <div class="bottom">
-              <span class="mk-tag neu source-tag"><ion-icon name="navigate-outline"></ion-icon>{{ source(lead) }}</span>
+            <div class="kv-row">
+              <span class="kv-label">Area</span>
+              <span class="kv-value">{{ area(lead) }}</span>
             </div>
+            <div class="kv-row">
+              <span class="kv-label">Came from</span>
+              <span class="kv-value">{{ source(lead) }}</span>
+            </div>
+            <div class="kv-row">
+              <span class="kv-label">When</span>
+              <span class="kv-value">{{ timeAgo(lead.createdAt) }}</span>
+            </div>
+            <div class="kv-row">
+              <span class="kv-label">Status</span>
+              <button type="button" class="mk-tag status-tag" [class]="statusOf(lead)" (click)="changeStatus(lead)">
+                {{ statusLabel[statusOf(lead)] }}
+              </button>
+            </div>
+
             @if (lead.fetchError) {
               <p class="fetch-warning"><ion-icon name="information-circle-outline"></ion-icon>{{ lead.fetchError }}</p>
             }

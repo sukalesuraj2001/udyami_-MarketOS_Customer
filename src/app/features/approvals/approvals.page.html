@@ -7,6 +7,7 @@
 
     <ion-buttons slot="end">
       <mk-theme-toggle></mk-theme-toggle>
+      <mk-menu-button></mk-menu-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -29,6 +30,22 @@
     </ion-button> -->
   </mk-section-header>
 
+  <!-- ========================================= -->
+  <!-- STATUS FILTERS -->
+  <!-- ========================================= -->
+
+  <div class="filter-chips">
+    @for (chip of filterChips; track chip.id) {
+      <button
+        type="button"
+        class="chip-btn"
+        [class.active]="activeFilter() === chip.id"
+        (click)="setFilter(chip.id)"
+      >
+        {{ chip.label }} {{ filterCounts()[chip.id] }}
+      </button>
+    }
+  </div>
 
   <!-- ========================================= -->
   <!-- LOADING -->
@@ -62,8 +79,8 @@
 
   @else if (visibleContents().length === 0) {
 
-  <mk-empty-state icon="checkmark-done-outline" title="Nothing waiting"
-    subtitle="No generated marketing content is available for approval.">
+  <mk-empty-state icon="checkmark-done-outline" [title]="emptyStateCopy().title"
+    [subtitle]="emptyStateCopy().subtitle">
   </mk-empty-state>
 
   }

@@ -6,6 +6,7 @@ import { IonicModule } from '@ionic/angular';
 import { ToastService } from '@core/services/toast.service';
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { MenuButtonComponent } from '@shared/components/menu-button/menu-button.component';
 import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 interface Step {
@@ -17,7 +18,7 @@ interface Step {
 @Component({
   selector: 'app-brand-brief',
   standalone: true,
-  imports: [BackButtonComponent, CommonModule, FormsModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, FormsModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent, MenuButtonComponent],
   templateUrl: './brand-brief.page.html',
   styleUrls: ['./brand-brief.page.scss'],
 })

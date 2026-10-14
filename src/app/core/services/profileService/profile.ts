@@ -1,6 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { SocialMediaAccount, WalletData } from '@app/core/interfaces/socialMediaAcounts.interface';
+import { Injectable, signal } from '@angular/core';
+import { tap } from 'rxjs';
+import {
+  SocialMediaAccount,
+  WalletData,
+  WalletHistoryResponse,
+} from '@app/core/interfaces/socialMediaAcounts.interface';
 import { API_ENDPOINTS } from '@app/endpoints/endpoints';
 import { environment } from '@env/environment';
 
@@ -137,12 +142,16 @@ export class Profile {
   /**
    * Get user profile
    */
+  /** Last successfully loaded profile — read by anything that wants the business name without an extra round trip (e.g. the menu sheet). */
+  private readonly _cachedProfile = signal<UserProfile | null>(null);
+  readonly cachedProfile = this._cachedProfile.asReadonly();
+
   getUserProfileData() {
     const userId = this.getUserId();
 
     return this.http.get<UserProfileResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.USER.GET_USER_BY_ID(userId)}`
-    );
+    ).pipe(tap((response) => this._cachedProfile.set(response.data ?? null)));
   }
 
   /**
@@ -215,6 +224,15 @@ export class Profile {
 
     return this.http.get<WalletData>(
       `${environment.apiUrl}${API_ENDPOINTS.WALLET.GET_WALLET_DATA(userId)}`
+    );
+  }
+
+  /** Wallet credit/debit history — used to show real spend against the ad budget. */
+  getUserWalletHistory() {
+    const userId = this.getUserId();
+
+    return this.http.get<WalletHistoryResponse>(
+      `${environment.apiUrl}${API_ENDPOINTS.WALLET.GET_WALLET_HISTORY(userId)}`
     );
   }
 }

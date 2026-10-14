@@ -1,6 +1,55 @@
-.business-reminder {
-  margin-bottom: 14px;
+/* ---------------- header ---------------- */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-left: 8px;
 }
+
+// The source file is a square app-icon badge (rounded corners, gold border
+// and glow baked into the image itself) — sized and framed as an icon, never
+// stretched into a wordmark strip.
+.brand-mark {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.brand-word {
+  font-family: var(--mk-font-display);
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+  background: linear-gradient(90deg, var(--mk-gold), var(--mk-gold-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.menu-btn {
+  --color: var(--mk-text);
+}
+
+/* ---------------- greeting ---------------- */
+
+.greeting {
+  padding: 4px 2px 14px;
+
+  h1 {
+    font-size: 21px;
+    margin-bottom: 4px;
+  }
+
+  p {
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+/* ---------------- membership renewal (unchanged) ---------------- */
 
 .membership-renewal-card {
   display: flex;
@@ -79,86 +128,235 @@
   }
 }
 
-.card-title {
+/* ---------------- plan quota upgrade banner ---------------- */
+
+.quota-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 12px;
+  padding: 10px 12px;
+  color: var(--mk-text);
+  background: linear-gradient(115deg, var(--mk-surf) 0%, var(--mk-surf-2) 72%, var(--mk-gold-fade) 100%);
+  border: 1px solid var(--mk-line-2);
+  border-left: 3px solid var(--mk-gold);
+  border-radius: var(--mk-radius-sm);
+  box-shadow: 0 5px 16px rgba(27, 36, 48, 0.07);
+
+  .quota-banner-icon {
+    display: grid;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    color: var(--mk-gold);
+    font-size: 17px;
+    background: var(--mk-gold-fade);
+    border-radius: 50%;
+  }
+
+  .quota-banner-copy {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .quota-banner-label {
+    color: var(--mk-gold);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    margin: 1px 0 2px;
+    font-size: 13px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--mk-muted);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 520px) {
+  .quota-banner {
+    align-items: flex-start;
+    flex-wrap: wrap;
+
+    .quota-banner-copy {
+      flex-basis: calc(100% - 42px);
+    }
+
+    ion-button {
+      margin: 4px 0 0 42px;
+    }
+  }
+}
+
+/* ---------------- profile gate ---------------- */
+
+.gate-card {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border-radius: var(--mk-radius);
+  background:
+    radial-gradient(120% 90% at 0% 0%, var(--mk-gold-fade), transparent 60%),
+    var(--mk-surf);
+  border: 1px solid rgba(212, 164, 56, 0.4);
+}
+
+.gate-icon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--mk-gold);
+  font-size: 19px;
+}
+
+.gate-copy {
+  min-width: 0;
+
+  h3 {
+    margin: 0 0 4px;
+    font-size: 14.5px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--mk-muted);
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+}
+
+.gate-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+
+  .mini {
+    font-size: 12px;
+  }
+}
+
+/* ---------------- shared card heading ---------------- */
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+
   h3 {
     font-size: 15px;
     font-weight: 700;
-    margin-bottom: 3px;
+    margin: 0;
   }
+
   .mini {
     font-size: 11.5px;
     color: var(--mk-dim);
   }
 }
 
-.brief {
-  font-size: 13px;
-  line-height: 1.68;
-  color: var(--mk-muted);
-
-  p {
-    margin-bottom: 10px;
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-  b {
-    color: var(--mk-text);
-  }
+.link-btn {
+  color: var(--mk-gold);
+  font-size: 12.5px;
+  font-weight: 600;
+  background: none;
+  border: 0;
+  cursor: pointer;
 }
 
-.row-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
+.empty-copy {
+  padding: 6px 0;
 }
 
-.feed-row {
+/* ---------------- needs your decision ---------------- */
+
+.decision-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.decision-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
+  width: 100%;
   padding: 10px 0;
   border-bottom: 1px solid var(--mk-line);
+  background: none;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: opacity var(--mk-speed) var(--mk-ease);
 
   &:last-child {
     border-bottom: 0;
     padding-bottom: 0;
   }
 
-  .left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .txt {
-    font-size: 13px;
-    color: var(--mk-text);
-  }
-  .time {
-    font-size: 11px;
-    color: var(--mk-dim);
-    white-space: nowrap;
+  &:active {
+    opacity: 0.7;
   }
 }
 
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  display: block;
-  flex: none;
+.decision-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
 
-  &.ok {
-    background: var(--mk-green);
+.decision-title {
+  overflow: hidden;
+  color: var(--mk-gold-2);
+  font-size: 13.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------------- latest enquiries ---------------- */
+
+.lead-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.lead-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--mk-line);
+
+  &:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
   }
-  &.gold {
-    background: var(--mk-gold);
-    box-shadow: 0 0 0 3px var(--mk-gold-fade);
-  }
-  &.neu {
-    background: var(--mk-dim);
+}
+
+.lead-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+
+  b {
+    overflow: hidden;
+    color: var(--mk-gold-2);
+    font-size: 13.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

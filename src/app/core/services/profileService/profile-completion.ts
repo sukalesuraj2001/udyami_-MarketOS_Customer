@@ -10,6 +10,18 @@ const BUSINESS_FIELDS = [
   'gstNumber', 'address', 'city', 'state', 'pincode', 'email', 'businessMobile',
 ] as const;
 
+/** Human labels for the business fields worth naming in a "still missing" prompt. */
+const BUSINESS_FIELD_LABELS: Partial<Record<typeof BUSINESS_FIELDS[number], string>> = {
+  businessName: 'business name',
+  sector: 'business sector',
+  gstNumber: 'GST number',
+  annualTurnover: 'annual turnover',
+  address: 'business address',
+  city: 'city',
+  pincode: 'PIN code',
+  businessMobile: 'business phone number',
+};
+
 function isFilled(value: unknown): boolean {
   if (Array.isArray(value)) return value.length > 0;
   return value !== null && value !== undefined && String(value).trim() !== '';
@@ -20,6 +32,10 @@ export interface ProfileCompletion {
   percent: number;
   hasProfile: boolean;
   hasBusinessDetails: boolean;
+  /** Count of the tracked personal + business fields still empty. */
+  missingCount: number;
+  /** Human labels for a few of the still-empty business fields, in field order. */
+  missingLabels: string[];
 }
 
 /** How much of the profile (personal + business) is filled in. */
@@ -33,10 +49,19 @@ export function getProfileCompletion(user: UserProfile | null | undefined): Prof
   const personalFilled = PERSONAL_FIELDS.filter((key) => isFilled(profile?.[key])).length;
   const businessFilled = BUSINESS_FIELDS.filter((key) => isFilled(business?.[key])).length;
   const total = PERSONAL_FIELDS.length + BUSINESS_FIELDS.length;
+  const missingCount = total - personalFilled - businessFilled;
+
+  const missingLabels = BUSINESS_FIELDS
+    .filter((key) => !isFilled(business?.[key]))
+    .map((key) => BUSINESS_FIELD_LABELS[key])
+    .filter((label): label is string => !!label)
+    .slice(0, 3);
 
   return {
     percent: Math.round(((personalFilled + businessFilled) / total) * 100),
     hasProfile,
     hasBusinessDetails,
+    missingCount,
+    missingLabels,
   };
 }

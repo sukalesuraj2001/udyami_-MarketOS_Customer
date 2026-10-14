@@ -6,6 +6,7 @@
     <ion-title>Membership</ion-title>
     <ion-buttons slot="end">
       <mk-theme-toggle></mk-theme-toggle>
+      <mk-menu-button></mk-menu-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -15,7 +16,7 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-glow" aria-hidden="true"></div>
-    <span class="eyebrow mono">Jyovix Marketing · Digital membership</span>
+    <span class="eyebrow mono">Jyovix Marketing · Membership</span>
     <h1>Grow on autopilot.<br /><span class="accent">Stay in control.</span></h1>
     <p>
       One membership unlocks your AI marketing team: planning, content,
@@ -23,100 +24,212 @@
     </p>
 
     @if (membership.loaded()) {
-      @if (membership.membershipActive()) {
+      @if (activePlanName(); as planName) {
         <span class="status-chip active">
           <span class="status-dot"></span>
-          Membership active · {{ formatInr(membership.walletCoins()) }} coins
+          {{ planName }} active
+        </span>
+      } @else if (membership.hasAnyMembership()) {
+        <span class="status-chip active">
+          <span class="status-dot"></span>
+          @if (membership.currentPlanType() === 'DIGITAL_MARKETING') {
+            Ad wallet active · {{ formatInr(membership.walletCoins()) }} coins
+          } @else {
+            {{ membership.currentPlanType() }} membership active
+          }
         </span>
       } @else {
         <span class="status-chip inactive">
           <span class="status-dot"></span>
-          Membership inactive
+          No active Jyovix plan
         </span>
       }
     }
   </section>
 
-  <!-- Plan card -->
-  <section class="plan-wrap" aria-labelledby="plan-title">
-    <div class="plan-border" aria-hidden="true"></div>
+  <!-- Plans -->
+  @if (membership.plansLoading() && !membership.marketingPlans().length) {
+    <div class="plans-loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading plans…</p>
+    </div>
+  } @else if (membership.plansError()) {
+    <div class="plans-error">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>{{ membership.plansError() }}</p>
+      <ion-button fill="outline" size="small" (click)="retryPlans()">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Try again
+      </ion-button>
+    </div>
+  } @else {
+    <section class="plan-grid" aria-label="Membership plans">
+      @for (split of splitViews(); track split.id) {
+        <div class="plan-wrap">
+          <div class="plan-border" aria-hidden="true"></div>
 
-    <article class="plan-card">
-      <div class="plan-orb orb-1" aria-hidden="true"></div>
-      <div class="plan-orb orb-2" aria-hidden="true"></div>
-      <div class="plan-shine" aria-hidden="true"></div>
+          <article class="plan-card">
+            <div class="plan-orb orb-1" aria-hidden="true"></div>
+            <div class="plan-orb orb-2" aria-hidden="true"></div>
+            <div class="plan-shine" aria-hidden="true"></div>
 
-      <div class="plan-top">
-        <div class="plan-badge">
-          <ion-icon name="diamond-outline"></ion-icon>
+            <div class="plan-top">
+              <div class="plan-badge">
+                <ion-icon [name]="iconForSplit(split.id)"></ion-icon>
+              </div>
+              <span class="plan-ribbon mono">
+                <ion-icon name="sparkles-outline"></ion-icon>
+                {{ split.splitLabel }}
+              </span>
+            </div>
+
+            <h2>{{ split.name }}</h2>
+            <p class="plan-sub">{{ split.blurb }}</p>
+
+            <div class="mix-bar" aria-hidden="true">
+              <span class="mix-ai" [style.width.%]="split.aiShare"></span>
+            </div>
+            <div class="mix-key mono">
+              <span>{{ split.aiShare }}% AI</span>
+              <span>{{ 100 - split.aiShare }}% people</span>
+            </div>
+
+            <div class="tier-switch" role="group" [attr.aria-label]="split.name + ' tiers'">
+              @for (tier of split.tiers; track tier.plan.planId) {
+                <button
+                  type="button"
+                  class="tier-btn"
+                  [class.active]="split.selectedPlan?.planId === tier.plan.planId"
+                  [attr.aria-pressed]="split.selectedPlan?.planId === tier.plan.planId"
+                  (click)="chooseTier(split.id, tier.tierId)"
+                >
+                  <b>{{ tier.tierId | titlecase }}</b>
+                  <span>₹{{ formatInr(tier.plan.price) }}</span>
+                  @if (tier.plan.isPopular) {
+                    <u>{{ tier.plan.badge || 'Most picked' }}</u>
+                  }
+                </button>
+              }
+            </div>
+
+            @if (split.selectedPlan; as plan) {
+              <p class="plan-sub" style="margin-top:14px">{{ split.humanNote }}</p>
+
+              <div class="divider" aria-hidden="true"></div>
+
+              <div class="price" aria-live="polite">
+                <span class="currency">₹</span>
+                <span class="amount">{{ formatInr(plan.price) }}</span>
+              </div>
+              <p class="price-note mono">per {{ plan.durationDays }} days</p>
+
+              <ul class="features">
+                @for (feature of plan.features; track feature.featureId; let i = $index) {
+                  <li [style.animation-delay.ms]="200 + i * 60">
+                    <span class="feature-icon">
+                      <ion-icon name="checkmark-outline"></ion-icon>
+                    </span>
+                    <span class="feature-copy">
+                      <b>{{ feature.featureName }}</b>
+                    </span>
+                    <ion-icon name="checkmark-circle" class="feature-check"></ion-icon>
+                  </li>
+                }
+              </ul>
+
+              @if (isCurrentPlan(plan)) {
+                <button class="cta cta-active" type="button" disabled>
+                  <ion-icon name="shield-checkmark"></ion-icon>
+                  Your active plan
+                </button>
+              } @else {
+                <button
+                  class="cta"
+                  type="button"
+                  [disabled]="payingPlanId() !== null"
+                  (click)="confirmPurchase(plan)"
+                >
+                  <span class="cta-shine" aria-hidden="true"></span>
+                  @if (payingPlanId() === plan.planId) {
+                    <ion-spinner name="crescent"></ion-spinner>
+                    Processing...
+                  } @else {
+                    Choose {{ plan.planName }}
+                    <ion-icon name="arrow-forward"></ion-icon>
+                  }
+                </button>
+              }
+
+              <div class="trust mono">
+                <span><ion-icon name="lock-closed-outline"></ion-icon> Secure payment</span>
+                <span><ion-icon name="flash-outline"></ion-icon> Instant access</span>
+              </div>
+            }
+          </article>
         </div>
-        <span class="plan-ribbon mono">
-          <ion-icon name="star"></ion-icon>
-          Premium
-        </span>
-      </div>
-
-      <h2 id="plan-title">Digital Marketing Membership</h2>
-      <p class="plan-sub">Everything you need to run your brand's marketing from one app.</p>
-
-      <div class="price" aria-live="polite">
-        <span class="currency">₹</span>
-        <span class="amount">{{ formatInr(displayAmount()) }}</span>
-      </div>
-      <p class="price-note mono">Digital membership fee</p>
-
-      <div class="divider" aria-hidden="true"></div>
-
-      <ul class="features">
-        @for (feature of features; track feature.title; let i = $index) {
-          <li [style.animation-delay.ms]="300 + i * 70">
-            <span class="feature-icon">
-              <ion-icon [name]="feature.icon"></ion-icon>
-            </span>
-            <span class="feature-copy">
-              <b>{{ feature.title }}</b>
-              <small>{{ feature.detail }}</small>
-            </span>
-            <ion-icon name="checkmark-circle" class="feature-check"></ion-icon>
-          </li>
-        }
-      </ul>
-
-      @if (errorMessage()) {
-        <p class="plan-error" role="alert">
-          <ion-icon name="alert-circle-outline"></ion-icon>
-          {{ errorMessage() }}
-        </p>
+      } @empty {
+        <div class="plans-error">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <p>No membership plans are available right now.</p>
+        </div>
       }
+    </section>
+  }
 
-      @if (membership.membershipActive()) {
-        <button class="cta cta-active" type="button" disabled>
-          <ion-icon name="shield-checkmark"></ion-icon>
-          Your membership is active
-        </button>
-      } @else {
-        <button class="cta" type="button" [disabled]="activating()" (click)="confirmActivation()">
-          <span class="cta-shine" aria-hidden="true"></span>
-          @if (activating()) {
-            <ion-spinner name="crescent"></ion-spinner>
-            Activating...
-          } @else {
-            Activate membership
-            <ion-icon name="arrow-forward"></ion-icon>
-          }
-        </button>
-      }
-
-      <div class="trust mono">
-        <span><ion-icon name="lock-closed-outline"></ion-icon> Secure activation</span>
-        <span><ion-icon name="flash-outline"></ion-icon> Instant access</span>
-      </div>
-    </article>
-  </section>
+  @if (errorMessage()) {
+    <p class="plan-error-banner" role="alert">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      {{ errorMessage() }}
+    </p>
+  }
 
   <p class="footnote">
-    Need help choosing? Reach the Jyovix Marketing care desk from Help &amp; support.
+    Payments are processed securely via Razorpay. Need help choosing? Reach the
+    Jyovix Marketing care desk from Help &amp; support.
   </p>
+
+  <!-- Membership history -->
+  @if (membership.history().length || membership.historyLoading()) {
+    <section class="history-section" aria-labelledby="history-title">
+      <h3 id="history-title" class="history-title">
+        <ion-icon name="time-outline"></ion-icon>
+        Purchase history
+      </h3>
+
+      @if (membership.historyLoading()) {
+        <div class="plans-loading">
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
+      } @else {
+        <ul class="history-list">
+          @for (item of membership.history(); track item.historyId) {
+            <li class="history-row">
+              <div class="history-main">
+                <b>{{ item.plan?.planName || 'Membership' }}</b>
+                <span class="history-dates">
+                  {{ item.startDate | date: 'mediumDate' }} – {{ item.endDate | date: 'mediumDate' }}
+                </span>
+              </div>
+              <div class="history-amount mono">₹{{ formatInr(item.amount) }}</div>
+              <button
+                class="history-receipt"
+                type="button"
+                [disabled]="downloadingReceiptId() === item.paymentId"
+                (click)="downloadReceipt(item.paymentId)"
+                aria-label="Download receipt"
+              >
+                @if (downloadingReceiptId() === item.paymentId) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon name="document-text-outline"></ion-icon>
+                }
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
 
   <!-- Success celebration -->
   @if (activated()) {
@@ -139,7 +252,10 @@
           <path d="M15 27 l7 7 l15 -16" />
         </svg>
         <h2 id="success-title">Membership activated</h2>
-        <p>Welcome aboard. Publishing, regeneration and campaigns are now unlocked across your workspace.</p>
+        <p>
+          Welcome aboard, {{ activatedPlanName() }} is now active. Publishing,
+          regeneration and campaigns are unlocked across your workspace.
+        </p>
         <button class="cta" type="button" (click)="continueToDashboard()">
           <span class="cta-shine" aria-hidden="true"></span>
           Go to dashboard

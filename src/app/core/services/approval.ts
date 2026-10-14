@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment';
 import { API_ENDPOINTS } from '@app/endpoints/endpoints';
 import { Observable } from 'rxjs';
 import {
+  ContentQuotaStatus,
   GeneratedContentItem,
   GeneratedContentResponse,
 } from '../interfaces/socialMediaAcounts.interface';
@@ -126,6 +127,13 @@ export class ApprovalService {
   getPlatformAnalytics(platform: string): Observable<PlatformAnalyticsResponse> {
     return this.http.get<PlatformAnalyticsResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.GENERATED_CONTENT.ANALYTICS(this.getUserId(), platform)}`,
+    );
+  }
+
+  /** This month's content usage against the plan's quota — drives the upgrade banner. */
+  getContentQuotaUsage(): Observable<ContentQuotaStatus> {
+    return this.http.get<ContentQuotaStatus>(
+      `${environment.apiUrl}${API_ENDPOINTS.GENERATED_CONTENT.USAGE(this.getUserId())}`,
     );
   }
 

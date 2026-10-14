@@ -1,0 +1,28 @@
+<div class="menu-sheet">
+  <header class="menu-head">
+    <div class="menu-who">
+      <h2>{{ name }}</h2>
+      <p class="mk-muted">{{ subtitle }}</p>
+    </div>
+    <button type="button" class="close-btn" (click)="close()" aria-label="Close menu">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+  </header>
+
+  <nav class="menu-list">
+    @for (row of rows; track row.route) {
+      <button type="button" class="menu-row" (click)="go(row.route)">
+        <ion-icon [name]="row.icon"></ion-icon>
+        <span class="grow">{{ row.label }}</span>
+        @if (badgeFor(row.route) > 0) {
+          <span class="menu-badge">{{ badgeFor(row.route) }}</span>
+        }
+      </button>
+    }
+  </nav>
+
+  <button type="button" class="signout-btn" (click)="signOut()">
+    <ion-icon name="log-out-outline"></ion-icon>
+    Sign out
+  </button>
+</div>

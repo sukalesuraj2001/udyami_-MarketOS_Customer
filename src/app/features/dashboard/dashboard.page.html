@@ -1,8 +1,12 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Jyovix Marketing</ion-title>
+    <div class="brand" slot="start">
+      <img src="assets/icon/logo.png" alt="" class="brand-mark" />
+      <span class="brand-word">Jyovix</span>
+    </div>
     <ion-buttons slot="end">
       <mk-theme-toggle></mk-theme-toggle>
+      <mk-menu-button></mk-menu-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -12,96 +16,138 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
+  <div class="greeting mk-anim-in">
+    <h1>{{ getGreeting() }}, {{ businessName }}</h1>
+    <p class="mk-muted">
+      {{ todayLabel }}. {{ pendingCount() }} piece{{ pendingCount() === 1 ? '' : 's' }} of content
+      {{ pendingCount() === 1 ? 'is' : 'are' }} waiting for you.
+    </p>
+  </div>
+
   @if (membership.loaded() && !membership.membershipActive()) {
-  <div class="membership-renewal-card mk-anim-in">
-    <div class="membership-renewal-icon">
-      <ion-icon name="sparkles-outline"></ion-icon>
-    </div>
-    <div class="membership-renewal-copy">
-      <span class="membership-renewal-label mono">Membership renewal</span>
-      <h3>Keep your marketing moving</h3>
-      <p>
-        Your membership needs attention. Renew to publish and regenerate content again.
-      </p>
-    </div>
-    <ion-button size="small" fill="outline" color="primary" (click)="renewMembership()">
-      Renew now
-      <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
-    </ion-button>
-  </div>
-  }
-
-  @if (showBusinessReminder()) {
-  <mk-business-reminder class="business-reminder" [percent]="profileCompletion().percent"
-    (action)="openBusinessDetails()"></mk-business-reminder>
-  }
-
-  <mk-section-header [title]="getGreeting() + ', ' + ownerName + ' 👋'"
-    subtitle="Five items are waiting for your approval. Nothing publishes and nothing spends until you say so.">
-    <ion-button color="primary" (click)="goApprovals()">
-      Review approvals
-      <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
-    </ion-button>
-  </mk-section-header>
-
-  @if (data.loading() || isLoadingApprovalCounts()) {
-  <div class="mk-grid cols-2" style="margin-bottom:16px">
-    @for (s of skeletonRows; track $index) {
-    <div class="mk-card">
-      <div class="mk-skeleton" style="height:10px;width:60%;margin-bottom:12px"></div>
-      <div class="mk-skeleton" style="height:22px;width:80%;margin-bottom:10px"></div>
-      <div class="mk-skeleton" style="height:9px;width:50%"></div>
-    </div>
-    }
-  </div>
-  } @else {
-  <div class="mk-grid cols-2 mk-stagger" style="margin-bottom:16px">
-    @for (kpi of approvalKpis(); track kpi.label) {
-    <mk-kpi-card [kpi]="kpi"></mk-kpi-card>
-    }
-  </div>
-  }
-
-  <!-- <div class="mk-card mk-anim-in" style="margin-bottom:14px">
-    <div class="card-title">
-      <h3>Last night's brief</h3>
-      <p class="mini">Generated 06:00 · reviewed 41 metrics across Meta, Google and your CRM</p>
-    </div>
-
-    <div class="brief">
-      <p><b>Creative 04 is carrying the account.</b> It produced 61% of qualified leads on 28% of spend. Everything else
-        is close to breakeven.</p>
-      <p><b>Creative 07 should be retired.</b> 340 clicks, 19 leads, zero qualified. It attracts job seekers — the
-        search terms confirm it.</p>
-      <p><b>One risk:</b> your qualified-lead event fired 31 times last week. Meta needs about 50 per ad set to optimise
-        reliably. I would move optimisation up one stage to "contacted and confirmed" until volume grows.</p>
-    </div>
-
-    <hr class="mk-divider" />
-
-    <div class="row-actions">
-      <ion-button size="small" color="success" fill="outline" (click)="actOnCreative()">
-        <ion-icon name="checkmark-outline" slot="start"></ion-icon>
-        Act on Creative 07
-      </ion-button>
-      <ion-button size="small" fill="clear" routerLink="/reports">See full report</ion-button>
-    </div>
-  </div> -->
-
-  <div class="mk-card mk-anim-in">
-    <div class="card-title">
-      <h3>Activity</h3>
-    </div>
-    <div class="feed mk-stagger">
-      @for (f of data.feed(); track f.text) {
-      <div class="feed-row">
-        <div class="left">
-          <i class="dot" [class]="f.tone"></i>
-          <span class="txt">{{ f.text }}</span>
-        </div>
-        <span class="time mono">{{ f.time }}</span>
+    <div class="membership-renewal-card mk-anim-in">
+      <div class="membership-renewal-icon">
+        <ion-icon name="sparkles-outline"></ion-icon>
       </div>
+      <div class="membership-renewal-copy">
+        <span class="membership-renewal-label mono">Membership renewal</span>
+        <h3>Keep your marketing moving</h3>
+        <p>Your membership needs attention. Renew to publish and regenerate content again.</p>
+      </div>
+      <ion-button size="small" fill="outline" color="primary" (click)="renewMembership()">
+        Renew now
+        <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+  }
+
+  @if (contentQuota()?.limitReached) {
+    <div class="quota-banner mk-anim-in">
+      <div class="quota-banner-icon">
+        <ion-icon name="trending-up-outline"></ion-icon>
+      </div>
+      <div class="quota-banner-copy">
+        <span class="quota-banner-label mono">Plan limit reached</span>
+        <h3>You've used this month's content on {{ contentQuota()?.planName }}</h3>
+        <p>
+          @if (contentQuota()?.postLimitReached && contentQuota()?.videoLimitReached) {
+            All {{ contentQuota()?.postLimit }} posts and {{ contentQuota()?.videoLimit }} videos for this month are used.
+          } @else if (contentQuota()?.postLimitReached) {
+            All {{ contentQuota()?.postLimit }} posts for this month are used.
+          } @else {
+            All {{ contentQuota()?.videoLimit }} videos for this month are used.
+          }
+          Upgrade your plan to keep publishing this month.
+        </p>
+      </div>
+      <ion-button size="small" fill="outline" color="primary" (click)="goMembership()">
+        See upgrade options
+        <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+  }
+
+  @if (showProfileGate()) {
+    <div class="gate-card mk-anim-in">
+      <ion-icon name="warning-outline" class="gate-icon"></ion-icon>
+      <div class="gate-copy">
+        <h3>Your profile needs a little more</h3>
+        <p>{{ profileGateMessage() }} Nothing here is charged for work we haven't done.</p>
+        <div class="gate-actions">
+          <ion-button size="small" (click)="openBusinessDetails()">Finish the profile</ion-button>
+          <span class="mk-muted mini">{{ profileCompletion().missingCount }} details left</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (contentsLoading() || leadsLoading()) {
+    <div class="mk-grid cols-2" style="margin-bottom:16px">
+      @for (s of [1,2,3,4]; track s) {
+        <div class="mk-card">
+          <div class="mk-skeleton" style="height:10px;width:60%;margin-bottom:12px"></div>
+          <div class="mk-skeleton" style="height:22px;width:80%;margin-bottom:10px"></div>
+          <div class="mk-skeleton" style="height:9px;width:50%"></div>
+        </div>
       }
     </div>
+  } @else {
+    <div class="mk-grid cols-2 mk-stagger" style="margin-bottom:16px">
+      @for (kpi of kpis(); track kpi.label) {
+        <mk-kpi-card [kpi]="kpi"></mk-kpi-card>
+      }
+    </div>
+  }
+
+  <div class="mk-card mk-anim-in" style="margin-bottom:14px">
+    <div class="card-title">
+      <h3>Needs your decision</h3>
+      @if (pendingCount() > 0) {
+        <span class="mk-tag gold">{{ pendingCount() }} WAITING</span>
+      }
+    </div>
+
+    @if (!contentsLoading() && decisionItems().length === 0) {
+      <p class="mk-muted mini empty-copy">All caught up — nothing is waiting on you right now.</p>
+    } @else {
+      <div class="decision-list mk-stagger">
+        @for (item of decisionItems(); track item.id) {
+          <button type="button" class="decision-row" (click)="goApprovals()">
+            <span class="mk-thumb">{{ thumbLabelFor(item) }}</span>
+            <span class="decision-copy">
+              <b class="decision-title">{{ titleFor(item) }}</b>
+              <span class="mini mk-muted">{{ decisionSubtitle(item) }}</span>
+            </span>
+            <ion-icon name="chevron-forward-outline" class="mk-dim"></ion-icon>
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="mk-card mk-anim-in" style="margin-bottom:14px">
+    <div class="card-title">
+      <h3>Latest enquiries</h3>
+      <button type="button" class="link-btn" (click)="goLeads()">See all</button>
+    </div>
+
+    @if (!leadsLoading() && latestLeads().length === 0) {
+      <p class="mk-muted mini empty-copy">No enquiries yet — they'll show up here as soon as one comes in.</p>
+    } @else {
+      <div class="lead-list mk-stagger">
+        @for (lead of latestLeads(); track lead.id) {
+          <div class="lead-row">
+            <span class="mk-avatar">{{ initialsFor(leadName(lead)) }}</span>
+            <span class="lead-copy">
+              <b>{{ leadName(lead) }}</b>
+              <span class="mini mk-muted">{{ leadSubtitle(lead) }}</span>
+            </span>
+            @if (leadIsNew(lead)) {
+              <span class="mk-tag gold">NEW</span>
+            }
+          </div>
+        }
+      </div>
+    }
   </div>
 </ion-content>

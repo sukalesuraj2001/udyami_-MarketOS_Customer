@@ -11,6 +11,7 @@ import { ToastService } from '@core/services/toast.service';
 import { ThemeService, ThemeMode } from '@core/services/theme.service';
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { MenuButtonComponent } from '@shared/components/menu-button/menu-button.component';
 import { Profile } from '@app/core/services/profileService/profile';
 import {
   FacebookPage,
@@ -51,7 +52,7 @@ interface OAuthReturn {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [BackButtonComponent, CommonModule, FormsModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, FormsModule, IonicModule, SectionHeaderComponent, ThemeToggleComponent, MenuButtonComponent],
   templateUrl: './settings.page.html',
   styleUrls: ['./settings.page.scss'],
 })
@@ -267,9 +268,32 @@ export class SettingsPage {
     }
   }
 
-  openPagePicker(): void {
-    this.pickedPageId = this.selectedPage()?.id ?? this.pages()[0]?.id ?? '';
-    this.pagePickerOpen.set(true);
+  /**
+   * "Change Page" for both the Facebook Page and Instagram Business rows —
+   * Instagram has no account of its own here, it's whichever Instagram is
+   * linked to the chosen Page. When more than one Page is already available
+   * from the current Facebook login, just open the picker; otherwise there's
+   * nothing to switch to yet, so send the user back through Facebook login
+   * to grant access to another Page (which can belong to a different
+   * Facebook account too).
+   */
+  async openPagePicker(): Promise<void> {
+    if (this.pages().length > 1) {
+      this.pickedPageId = this.selectedPage()?.id ?? this.pages()[0]?.id ?? '';
+      this.pagePickerOpen.set(true);
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'Add or change your Page',
+      message: 'You’ll be sent to Facebook to log in and choose which Page (and its Instagram account) to share with Jyovix.',
+      cssClass: 'mk-alert',
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        { text: 'Continue', role: 'confirm', handler: () => this.connectFacebook() },
+      ],
+    });
+    await alert.present();
   }
 
   onPagePickerDismiss(): void {
@@ -345,6 +369,7 @@ export class SettingsPage {
       header: 'Disconnect Facebook?',
       message:
         'This removes Facebook, Instagram and ad account access for Jyovix Studio. Scheduled posts to these accounts will stop.',
+      cssClass: 'mk-alert',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
@@ -441,6 +466,7 @@ export class SettingsPage {
     const alert = await this.alertCtrl.create({
       header: `Connect ${name}`,
       message: `Enter your ${name} account credentials.`,
+      cssClass: 'mk-alert',
 
       inputs: [
         {
@@ -693,6 +719,7 @@ export class SettingsPage {
           : product === 'ADS'
           ? 'Your Google Ads account will no longer be linked. Our team will no longer be able to manage campaigns for it.'
           : 'Website traffic will stop updating in your reports. Figures already collected are kept.',
+      cssClass: 'mk-alert',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
@@ -737,6 +764,7 @@ export class SettingsPage {
     const alert = await this.alertCtrl.create({
       header: 'Pause everything?',
       message: 'This stops every scheduled post and pauses every live campaign within 60 seconds. Nothing is deleted.',
+      cssClass: 'mk-alert',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {

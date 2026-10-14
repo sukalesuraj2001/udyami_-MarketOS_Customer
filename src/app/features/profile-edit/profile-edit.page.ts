@@ -13,6 +13,7 @@ import {
   UserProfile,
 } from '@app/core/services/profileService/profile';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { MenuButtonComponent } from '@shared/components/menu-button/menu-button.component';
 import { RepeatListComponent } from '@shared/components/repeat-list/repeat-list.component';
 import {
   BusinessCoreForm,
@@ -73,7 +74,7 @@ const tagged = (file: File, prefix: string): File =>
 @Component({
   selector: 'app-profile-edit',
   standalone: true,
-  imports: [BackButtonComponent, CommonModule, FormsModule, IonicModule, ThemeToggleComponent, RepeatListComponent],
+  imports: [BackButtonComponent, CommonModule, FormsModule, IonicModule, ThemeToggleComponent, RepeatListComponent, MenuButtonComponent],
   templateUrl: './profile-edit.page.html',
   styleUrls: ['./profile-edit.page.scss'],
 })

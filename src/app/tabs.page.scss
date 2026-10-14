@@ -41,6 +41,7 @@ ion-tabs {
 
 // Pill starts as a small dot-width shape and grows when the tab is selected.
 .icon-pill {
+  position: relative;
   display: grid;
   place-items: center;
   width: 30px;
@@ -55,6 +56,22 @@ ion-tabs {
     font-size: 18px;
     transition: transform var(--mk-speed) var(--mk-ease);
   }
+}
+
+.tab-badge {
+  position: absolute;
+  top: -4px;
+  right: -2px;
+  display: grid;
+  place-items: center;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: 99px;
+  color: #171008;
+  font: 700 9px/1 var(--mk-font-display);
+  background: linear-gradient(135deg, var(--mk-gold-2), var(--mk-gold));
+  box-shadow: 0 0 0 2px var(--mk-surf);
 }
 
 .main-tabs ion-tab-button:active .icon-pill ion-icon {

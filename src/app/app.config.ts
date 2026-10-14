@@ -7,6 +7,7 @@ import { provideIonicAngular } from '@ionic/angular/standalone';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { loaderInterceptor } from './core/interceptors/loader.interceptor';
+import { sessionExpiryInterceptor } from './core/interceptors/session-expiry.interceptor';
 
 const ionicConfig = {
   mode: 'ios' as const,
@@ -22,7 +23,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideHttpClient(withInterceptors([loaderInterceptor, authInterceptor])),
+    provideHttpClient(withInterceptors([loaderInterceptor, authInterceptor, sessionExpiryInterceptor])),
     provideIonicAngular(ionicConfig),
     importProvidersFrom(IonicModule.forRoot(ionicConfig)),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

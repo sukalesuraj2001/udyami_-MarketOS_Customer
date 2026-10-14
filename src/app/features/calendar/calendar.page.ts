@@ -9,6 +9,7 @@ import { AICalenders } from '@app/core/services/aicalenders';
 import { Component, computed, inject, signal } from '@angular/core';
 import { MarketingCalendarActivity } from '@app/core/interfaces/ai-calender.interface';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { MenuButtonComponent } from '@shared/components/menu-button/menu-button.component';
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
 import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
@@ -32,6 +33,7 @@ type Filter =
     RouterLink,
     SectionHeaderComponent,
     ThemeToggleComponent,
+    MenuButtonComponent,
   ],
   templateUrl: './calendar.page.html',
   styleUrls: ['./calendar.page.scss'],

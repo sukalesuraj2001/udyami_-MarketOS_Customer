@@ -137,6 +137,39 @@ ion-content::part(scroll) {
   border: 0;
 }
 
+/* initials circle — used for lead/contact avatars */
+.mk-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: var(--mk-gold-2);
+  font: 700 13px var(--mk-font-display);
+  background: var(--mk-gold-fade);
+  border: 1px solid rgba(184, 134, 42, 0.3);
+}
+
+/* small colour-block placeholder for a piece of content awaiting approval */
+.mk-thumb {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  padding: 4px;
+  overflow: hidden;
+  color: rgba(240, 206, 122, 0.85);
+  text-align: center;
+  font: 700 8.5px/1.2 var(--mk-font-display);
+  letter-spacing: 0.05em;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(240, 206, 122, 0.35), rgba(184, 134, 42, 0.2) 60%, var(--mk-surf-3) 100%);
+  border: 1px solid var(--mk-line);
+}
+
 .mk-muted {
   color: var(--mk-muted);
 }
@@ -229,6 +262,15 @@ ion-alert.mk-alert {
   --ion-text-color: var(--mk-text);
   --button-color: var(--mk-gold);
   --backdrop-opacity: 0.58;
+}
+
+/* the hamburger menu's bottom sheet (AppMenuService) */
+ion-modal.app-menu-sheet-modal {
+  --background: var(--mk-surf);
+  --border-radius: 22px 22px 0 0;
+  --box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  --backdrop-opacity: 0.55;
+  --handle-background: var(--mk-line-2);
 }
 
 ::-webkit-scrollbar {

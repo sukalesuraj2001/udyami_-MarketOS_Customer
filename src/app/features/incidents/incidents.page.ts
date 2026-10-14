@@ -11,6 +11,7 @@ import {
 } from '@core/services/incident.service';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { MenuButtonComponent } from '@shared/components/menu-button/menu-button.component';
 import { ToastService } from '@core/services/toast.service';
 import { ApprovalService } from '@core/services/approval';
 import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interface';
@@ -21,7 +22,7 @@ type IncidentFilter = 'ALL' | IncidentStatus;
 @Component({
   selector: 'app-incidents',
   standalone: true,
-  imports: [BackButtonComponent, CommonModule, FormsModule, IonicModule, EmptyStateComponent, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, FormsModule, IonicModule, EmptyStateComponent, ThemeToggleComponent, MenuButtonComponent],
   templateUrl: './incidents.page.html',
   styleUrls: ['./incidents.page.scss'],
 })

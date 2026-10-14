@@ -3,110 +3,183 @@
   color: var(--mk-dim);
 }
 
-.kpi {
-  min-height: 96px;
-  .lab {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--mk-dim);
+/* ---------------- header ---------------- */
+
+.page-heading {
+  padding: 2px 0 2px 4px;
+
+  h1 {
+    font-size: 19px;
+    margin-bottom: 3px;
   }
-  .val {
-    font-size: 22px;
-    font-weight: 700;
-    margin: 8px 0 3px;
+
+  p {
+    max-width: 230px;
+    margin: 0;
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
+}
+
+/* ---------------- uncalled notice ---------------- */
+
+.notice-card {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: var(--mk-radius);
+  background:
+    radial-gradient(120% 90% at 0% 0%, var(--mk-gold-fade), transparent 60%),
+    var(--mk-surf);
+  border: 1px solid rgba(212, 164, 56, 0.4);
+}
+
+.notice-icon {
+  flex: none;
+  margin-top: 1px;
+  color: var(--mk-gold);
+  font-size: 17px;
+}
+
+.notice-copy {
+  min-width: 0;
+
+  b {
+    display: block;
+    margin-bottom: 2px;
     color: var(--mk-text);
-    &.green {
-      color: var(--mk-green);
-    }
+    font-size: 13px;
   }
-  .sub {
-    font-size: 11px;
+
+  p {
+    margin: 0;
     color: var(--mk-muted);
+    font-size: 12px;
+    line-height: 1.45;
   }
 }
 
-// ── Hero header, same gradient/orb/live-pulse language used in Reports ──
-.lead-hero {
-  position: relative;
-  overflow: hidden;
+/* ---------------- status filters ---------------- */
+
+.filter-chips {
+  display: flex;
+  gap: 8px;
   margin-bottom: 16px;
-  padding: 20px 16px 16px;
-  color: #fff;
+  padding-bottom: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.chip-btn {
+  flex: none;
+  padding: 8px 14px;
   border: 1px solid var(--mk-line);
-  border-radius: calc(var(--mk-radius) + 4px);
-  background: linear-gradient(128deg, #18253c 0%, #33426e 52%, #8d3a72 145%);
-  box-shadow: 0 12px 32px rgba(27, 36, 48, 0.08);
+  border-radius: 20px;
+  color: var(--mk-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--mk-surf);
+  transition: background var(--mk-speed) var(--mk-ease), color var(--mk-speed) var(--mk-ease), border-color var(--mk-speed) var(--mk-ease);
+
+  &.active {
+    color: #171008;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--mk-gold-2), var(--mk-gold));
+    border-color: transparent;
+  }
 }
 
-.hero-orb { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(1px); }
-.orb-one { width: 140px; height: 140px; right: -42px; top: -70px; background: rgba(239, 160, 89, 0.23); }
-.orb-two { width: 88px; height: 88px; right: 65px; bottom: -55px; border: 1px solid rgba(255, 255, 255, 0.18); }
+/* ---------------- lead detail cards ---------------- */
 
-.lead-heading { position: relative; z-index: 1; }
-.lead-eyebrow { display: flex; align-items: center; gap: 6px; color: #eab96d; font-size: 9px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
-.lead-eyebrow span { width: 6px; height: 6px; border-radius: 50%; background: #85dfb3; box-shadow: 0 0 0 4px rgba(133, 223, 179, .15); animation: livePulse 2s infinite; }
-.lead-heading h2 { margin: 7px 0 5px; color: #fff; font-size: 23px; }
-.lead-heading p { max-width: 290px; margin: 0; color: rgba(255, 255, 255, .72); font-size: 11.5px; line-height: 1.55; }
-
-.platform-switch { position: relative; z-index: 1; display: flex; gap: 6px; margin-top: 17px; }
-.platform-switch button {
-  display: inline-flex; align-items: center; gap: 5px; padding: 7px 10px; border: 1px solid rgba(255, 255, 255, .18);
-  border-radius: 9px; color: rgba(255,255,255,.76); font: 700 11px var(--mk-font-body); background: rgba(255,255,255,.08);
-  transition: all 220ms var(--mk-ease);
-  ion-icon { font-size: 14px; }
-  &.active { color: #27304e; border-color: #fff; background: #fff; box-shadow: 0 5px 12px rgba(0,0,0,.17); }
-  &:active { transform: scale(.96); }
-}
-
-// ── Lead cards ──
 .lead-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .lead-card {
-  .top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-  }
-  .who {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    b {
-      display: block;
-      font-size: 13.5px;
-      color: var(--mk-text);
-    }
-    .mini {
-      display: block;
-      margin-top: 2px;
-    }
-  }
-  .bottom {
-    margin-top: 10px;
-  }
+  padding: 14px 16px;
+  background: var(--mk-surf);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-radius);
 }
 
-.channel-icon {
-  display: grid; flex: none; width: 34px; height: 34px; place-items: center; color: #fff;
-  border-radius: 10px; font-size: 18px;
-  background: radial-gradient(circle at 70% 90%, #ffcb59, #e34371 48%, #603aa9);
-  box-shadow: 0 4px 10px rgba(188, 63, 124, .24);
+.lead-card-head {
+  margin-bottom: 4px;
 }
-.channel-icon.facebook { background: #2374e1; box-shadow: 0 4px 10px rgba(35,116,225,.24); }
-.channel-icon.unknown { background: var(--mk-surf-3); color: var(--mk-dim); box-shadow: none; }
 
-.source-tag {
-  display: inline-flex;
+.kv-row {
+  display: flex;
   align-items: center;
-  gap: 5px;
-  ion-icon { font-size: 12px; }
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--mk-line);
+}
+
+.lead-card-head + .kv-row {
+  border-top: 0;
+  padding-top: 4px;
+}
+
+.kv-label {
+  flex: none;
+  color: var(--mk-dim);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.kv-value {
+  overflow: hidden;
+  color: var(--mk-text);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kv-link {
+  color: var(--mk-gold-2);
+}
+
+.status-tag {
+  border: 1px solid;
+  cursor: pointer;
+
+  &.new {
+    color: var(--mk-gold);
+    background: var(--mk-gold-fade);
+    border-color: rgba(212, 164, 56, 0.4);
+  }
+  &.called {
+    color: var(--mk-blue);
+    background: rgba(42, 111, 168, 0.12);
+    border-color: rgba(42, 111, 168, 0.35);
+  }
+  &.quoted {
+    color: var(--mk-blue);
+    background: rgba(42, 111, 168, 0.12);
+    border-color: rgba(42, 111, 168, 0.35);
+  }
+  &.won {
+    color: var(--mk-green);
+    background: rgba(31, 143, 95, 0.12);
+    border-color: rgba(31, 143, 95, 0.35);
+  }
+  &.lost {
+    color: var(--mk-red);
+    background: rgba(194, 63, 44, 0.12);
+    border-color: rgba(194, 63, 44, 0.35);
+  }
 }
 
 .fetch-warning {
@@ -124,5 +197,4 @@
 
 ion-icon.spin { animation: spin 900ms linear infinite; }
 
-@keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 @keyframes spin { to { transform: rotate(360deg); } }
