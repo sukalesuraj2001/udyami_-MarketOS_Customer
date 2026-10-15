@@ -48,6 +48,10 @@ export class AuthService {
     return this.storedLogin?.accessToken ?? null;
   }
 
+  get userId(): string | null {
+    return this.storedLogin?.user?.userId ?? null;
+  }
+
   get isAuthenticated(): boolean {
     return Boolean(this.token);
   }

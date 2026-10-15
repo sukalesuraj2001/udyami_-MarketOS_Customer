@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { RouterLink } from '@angular/router';
+
+import { BadgeCountsService } from '@core/services/badge-counts.service';
 
 @Component({
   selector: 'app-tabs',
@@ -9,4 +11,10 @@ import { RouterLink } from '@angular/router';
   templateUrl: './tabs.page.html',
   styleUrls: ['./tabs.page.scss'],
 })
-export class TabsPage {}
+export class TabsPage {
+  readonly badges = inject(BadgeCountsService);
+
+  ionViewWillEnter(): void {
+    this.badges.refreshAll();
+  }
+}

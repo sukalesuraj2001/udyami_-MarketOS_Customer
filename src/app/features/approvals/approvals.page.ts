@@ -9,10 +9,13 @@ import { Approval, ContentApproval, SpendApproval, } from '@core/models/models';
 import { GeneratedContentItem } from '@core/interfaces/socialMediaAcounts.interface';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { MenuButtonComponent } from '@shared/components/menu-button/menu-button.component';
 import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
 import { AlertController } from '@ionic/angular/standalone';
 import { MembershipService } from '@core/services/membership.service';
 import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
+
+type ApprovalFilter = 'waiting' | 'changes' | 'approved' | 'rejected' | 'all';
 
 @Component({
   selector: 'app-approvals',
@@ -25,6 +28,7 @@ import { BackButtonComponent } from '@shared/components/back-button/back-button.
     SectionHeaderComponent,
     EmptyStateComponent,
     ThemeToggleComponent,
+    MenuButtonComponent,
   ],
   templateUrl: './approvals.page.html',
   styleUrls: ['./approvals.page.scss'],
@@ -72,7 +76,69 @@ export class ApprovalsPage {
     return `Your 7 days content generated. Publish it before ${dateFormatter.format(end)}.`;
   });
 
-  visibleContents = computed(() => this.generatedContents());
+  // ============================================
+  // STATUS FILTERS
+  // ============================================
+
+  readonly filterChips: { id: ApprovalFilter; label: string }[] = [
+    { id: 'waiting', label: 'Waiting' },
+    { id: 'changes', label: 'Changes asked' },
+    { id: 'approved', label: 'Approved' },
+    { id: 'rejected', label: 'Rejected' },
+    { id: 'all', label: 'All' },
+  ];
+
+  readonly activeFilter = signal<ApprovalFilter>('waiting');
+
+  readonly filterCounts = computed(() => {
+    const counts: Record<ApprovalFilter, number> = { waiting: 0, changes: 0, approved: 0, rejected: 0, all: 0 };
+    for (const content of this.generatedContents()) {
+      counts[this.bucketOf(content)]++;
+      counts.all++;
+    }
+    return counts;
+  });
+
+  visibleContents = computed(() => {
+    const filter = this.activeFilter();
+    if (filter === 'all') return this.generatedContents();
+    return this.generatedContents().filter((content) => this.bucketOf(content) === filter);
+  });
+
+  setFilter(filter: ApprovalFilter): void {
+    this.activeFilter.set(filter);
+  }
+
+  emptyStateCopy(): { title: string; subtitle: string } {
+    switch (this.activeFilter()) {
+      case 'changes':
+        return { title: 'No changes in progress', subtitle: 'Nothing is currently being regenerated after a change request.' };
+      case 'approved':
+        return { title: 'Nothing approved yet', subtitle: 'Content you approve or that goes live will show up here.' };
+      case 'rejected':
+        return { title: 'Nothing rejected', subtitle: 'Content you reject will show up here.' };
+      case 'all':
+        return { title: 'Nothing here yet', subtitle: 'No generated marketing content is available.' };
+      default:
+        return { title: 'Nothing waiting', subtitle: 'No generated marketing content is available for approval.' };
+    }
+  }
+
+  /** Which bucket a piece of content falls into — drives both the chip counts and the filtered list. */
+  private bucketOf(content: GeneratedContentItem): ApprovalFilter {
+    const status = String(content?.status || '').toUpperCase();
+
+    if (content?.active === false || status === 'REJECTED') {
+      return 'rejected';
+    }
+    if (status === 'APPROVED' || status === 'PUBLISHED' || content?.publishedAt) {
+      return 'approved';
+    }
+    if (content?.aiResponse?.regeneration?.isRegenerated === true) {
+      return 'changes';
+    }
+    return 'waiting';
+  }
 
   isLoading = signal(false);
 

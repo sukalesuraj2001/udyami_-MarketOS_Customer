@@ -37,9 +37,19 @@ export const routes: Routes = [
         title: 'Brand brief · Jyovix Marketing',
       },
       {
+        path: 'ai',
+        loadComponent: () => import('./features/ai/ai.page').then((m) => m.AiPage),
+        title: 'Ask UB · Jyovix Marketing',
+      },
+      {
         path: 'calendar',
         loadComponent: () => import('./features/calendar/calendar.page').then((m) => m.CalendarPage),
         title: 'Calendar · Jyovix Marketing',
+      },
+      {
+        path: 'ad-budget',
+        loadComponent: () => import('./features/ad-budget/ad-budget.page').then((m) => m.AdBudgetPage),
+        title: 'Ad Budget · Jyovix Marketing',
       },
       {
         path: 'approvals',

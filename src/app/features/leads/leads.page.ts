@@ -2,40 +2,39 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { ActionSheetController } from '@ionic/angular/standalone';
 import { catchError, of } from 'rxjs';
 
-import { LeadFieldDatum, LeadItem, LeadsService } from '@core/services/leadsService/leads';
+import {
+  LeadItem,
+  LeadsService,
+  leadField,
+  leadSource,
+  leadWants,
+  leadArea,
+  leadDisplayName,
+  formatLeadTime,
+} from '@core/services/leadsService/leads';
+import { LeadStatus, LeadStatusService, LEAD_STATUS_LABEL } from '@core/services/lead-status.service';
 import { ToastService } from '@core/services/toast.service';
-import { SectionHeaderComponent } from '@shared/components/section-header/section-header.component';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
-import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
+import { MenuButtonComponent } from '@shared/components/menu-button/menu-button.component';
 
-type PlatformFilter = 'all' | 'fb' | 'ig';
+type StatusFilter = 'all' | LeadStatus;
 
-const PLATFORM_TABS: { value: PlatformFilter; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'fb', label: 'Facebook' },
-  { value: 'ig', label: 'Instagram' },
-];
-
-const FIELD_ALIASES: Record<string, string[]> = {
-  name: ['full_name', 'first_name', 'name'],
-  email: ['email'],
-  phone: ['phone_number', 'phone'],
-};
+const STATUS_FILTERS: StatusFilter[] = ['all', 'new', 'called', 'quoted', 'won', 'lost'];
 
 @Component({
   selector: 'app-leads',
   standalone: true,
   imports: [
-    BackButtonComponent,
     CommonModule,
     FormsModule,
     IonicModule,
-    SectionHeaderComponent,
     EmptyStateComponent,
     ThemeToggleComponent,
+    MenuButtonComponent,
   ],
   templateUrl: './leads.page.html',
   styleUrls: ['./leads.page.scss'],
@@ -43,39 +42,49 @@ const FIELD_ALIASES: Record<string, string[]> = {
 export class LeadsPage {
   private readonly leadsService = inject(LeadsService);
   private readonly toast = inject(ToastService);
+  private readonly actionSheetCtrl = inject(ActionSheetController);
+  readonly leadStatus = inject(LeadStatusService);
 
-  readonly platformTabs = PLATFORM_TABS;
+  readonly statusFilters = STATUS_FILTERS;
+  readonly statusLabel = LEAD_STATUS_LABEL;
 
   readonly isLoading = signal(false);
   readonly hasError = signal(false);
   readonly isPulling = signal(false);
   readonly leads = signal<LeadItem[]>([]);
   readonly query = signal('');
-  readonly platform = signal<PlatformFilter>('all');
+  readonly statusFilter = signal<StatusFilter>('all');
 
   readonly filtered = computed(() => {
     const q = this.query().toLowerCase().trim();
-    const p = this.platform();
-    return this.leads().filter((lead) => {
-      if (p !== 'all' && lead.platform !== p) return false;
-      if (q) {
-        const haystack = `${lead.name ?? ''} ${this.fieldValue(lead, 'email') ?? ''} ${this.fieldValue(lead, 'phone') ?? ''}`.toLowerCase();
-        if (!haystack.includes(q)) return false;
-      }
-      return true;
-    });
+    const status = this.statusFilter();
+    // Reading .version() ties this computed to the status store, so changing
+    // a lead's status re-filters the list immediately.
+    this.leadStatus.version();
+
+    return [...this.leads()]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .filter((lead) => {
+        if (status !== 'all' && this.leadStatus.getStatus(lead.id) !== status) return false;
+        if (q) {
+          const haystack = `${lead.name ?? ''} ${leadField(lead, 'email') ?? ''} ${leadField(lead, 'phone') ?? ''}`.toLowerCase();
+          if (!haystack.includes(q)) return false;
+        }
+        return true;
+      });
   });
 
   readonly counts = computed(() => {
-    const all = this.leads();
-    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    return {
-      total: all.length,
-      facebook: all.filter((l) => l.platform === 'fb').length,
-      instagram: all.filter((l) => l.platform === 'ig').length,
-      thisWeek: all.filter((l) => new Date(l.createdAt).getTime() >= weekAgo).length,
-    };
+    this.leadStatus.version();
+    const counts: Record<StatusFilter, number> = { all: 0, new: 0, called: 0, quoted: 0, won: 0, lost: 0 };
+    for (const lead of this.leads()) {
+      counts.all++;
+      counts[this.leadStatus.getStatus(lead.id)]++;
+    }
+    return counts;
   });
+
+  readonly uncalledCount = computed(() => this.counts().new);
 
   ionViewWillEnter(): void {
     this.loadLeads();
@@ -126,47 +135,60 @@ export class LeadsPage {
       });
   }
 
-  selectPlatform(platform: PlatformFilter): void {
-    this.platform.set(platform);
+  selectStatus(status: StatusFilter): void {
+    this.statusFilter.set(status);
   }
 
   onSearch(ev: Event): void {
     this.query.set((ev as CustomEvent).detail.value ?? '');
   }
 
-  platformIcon(platform: string | null): string {
-    if (platform === 'fb') return 'logo-facebook';
-    if (platform === 'ig') return 'logo-instagram';
-    return 'help-circle-outline';
+
+  name(lead: LeadItem): string {
+    return leadDisplayName(lead);
   }
 
-  platformLabel(platform: string | null): string {
-    if (platform === 'fb') return 'Facebook';
-    if (platform === 'ig') return 'Instagram';
-    return 'Unknown';
+  phone(lead: LeadItem): string | null {
+    return leadField(lead, 'phone');
   }
 
-  /** Human-friendly "came from" line — page name plus whichever ad/form reference is available. */
+  wants(lead: LeadItem): string {
+    return leadWants(lead) || 'Not specified';
+  }
+
+  area(lead: LeadItem): string {
+    return leadArea(lead) || '—';
+  }
+
   source(lead: LeadItem): string {
-    const parts: string[] = [];
-    if (lead.pageName) parts.push(lead.pageName);
-    if (lead.adId) parts.push(`Ad ${lead.adId}`);
-    else if (lead.formId) parts.push(`Form ${lead.formId}`);
-    return parts.join(' · ') || 'Source unavailable';
-  }
-
-  fieldValue(lead: LeadItem, key: keyof typeof FIELD_ALIASES): string | null {
-    return this.findField(lead.fieldData, FIELD_ALIASES[key]);
+    return leadSource(lead);
   }
 
   timeAgo(value: string): string {
-    return new Intl.DateTimeFormat('en-IN', {
-      day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit',
-    }).format(new Date(value));
+    return formatLeadTime(value);
   }
 
-  private findField(fieldData: LeadFieldDatum[] | null, aliases: string[]): string | null {
-    const field = fieldData?.find((f) => aliases.includes(f.name?.toLowerCase()));
-    return field?.values?.[0]?.trim() || null;
+  initialsFor(lead: LeadItem): string {
+    return this.name(lead).trim().split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? '').join('') || '?';
+  }
+
+  statusOf(lead: LeadItem): LeadStatus {
+    return this.leadStatus.getStatus(lead.id);
+  }
+
+  async changeStatus(lead: LeadItem): Promise<void> {
+    const current = this.statusOf(lead);
+    const sheet = await this.actionSheetCtrl.create({
+      header: 'Mark this enquiry as…',
+      cssClass: 'mk-alert',
+      buttons: [
+        ...(['new', 'called', 'quoted', 'won', 'lost'] as LeadStatus[]).map((status) => ({
+          text: LEAD_STATUS_LABEL[status] + (status === current ? ' ✓' : ''),
+          handler: () => this.leadStatus.setStatus(lead.id, status),
+        })),
+        { text: 'Cancel', role: 'cancel' },
+      ],
+    });
+    await sheet.present();
   }
 }

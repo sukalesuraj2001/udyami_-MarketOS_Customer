@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar>
+    <div class="page-heading" slot="start">
+      <h1>Ask UB</h1>
+      <p class="mk-muted">Your AI assistant — ask anything about your account or the app.</p>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" [disabled]="!messages().length" (click)="newChat()" aria-label="Start a new chat">
+        <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      <mk-theme-toggle></mk-theme-toggle>
+      <mk-menu-button></mk-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ai-content">
+  @if (loadingHistory()) {
+    <div class="mk-card mk-anim-in" style="margin-bottom:16px">
+      <div class="mk-skeleton" style="height:12px;width:60%;margin-bottom:14px"></div>
+      <div class="mk-skeleton" style="height:12px;width:85%;margin-bottom:14px"></div>
+      <div class="mk-skeleton" style="height:12px;width:45%"></div>
+    </div>
+  } @else if (!messages().length) {
+    <div class="ai-empty mk-anim-in">
+      <span class="ai-empty-icon"><ion-icon name="sparkles-outline"></ion-icon></span>
+      <h2>Ask me anything</h2>
+      <p class="mk-muted">How to connect an account, what your plan includes, how publishing works — I'm trained on this app.</p>
+      <div class="starter-list">
+        @for (starter of starters; track starter) {
+          <button type="button" class="starter-btn" (click)="ask(starter)">{{ starter }}</button>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="chat-log mk-stagger">
+      @for (bubble of messages(); track $index) {
+        <div class="bubble-row" [class.me]="bubble.role === 'user'">
+          <div class="bubble" [class.me]="bubble.role === 'user'" [class.failed]="bubble.failed">
+            {{ bubble.content }}
+          </div>
+        </div>
+      }
+      @if (thinking()) {
+        <div class="bubble-row">
+          <div class="bubble thinking">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</ion-content>
+
+<ion-footer class="ai-footer">
+  <form class="ai-form" (submit)="onSubmit($event)">
+    <ion-textarea
+      class="ai-input"
+      placeholder="Ask a question…"
+      [autoGrow]="true"
+      rows="1"
+      [ngModel]="draft()"
+      (ngModelChange)="draft.set($event)"
+      name="draft"
+      [disabled]="thinking()"
+    ></ion-textarea>
+    <button type="submit" class="ai-send" [disabled]="!draft().trim() || thinking()" aria-label="Send">
+      <ion-icon name="arrow-forward"></ion-icon>
+    </button>
+  </form>
+</ion-footer>

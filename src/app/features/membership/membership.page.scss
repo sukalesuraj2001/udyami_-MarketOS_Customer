@@ -235,6 +235,92 @@ $gold-2: #f0ce7a;
   font: 13.5px/1.5 var(--mk-font-body);
 }
 
+/* ---------------- AI / human mix bar ---------------- */
+
+.mix-bar {
+  position: relative;
+  display: flex;
+  height: 8px;
+  margin: 4px 0 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mix-ai {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, $gold, $gold-2);
+}
+
+.mix-key {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  color: $card-muted;
+  font-size: 10.5px;
+}
+
+/* ---------------- tier switcher ---------------- */
+
+.tier-switch {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.tier-btn {
+  padding: 10px 5px;
+  text-align: center;
+  color: $card-text;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  transition: border-color var(--mk-speed) var(--mk-ease), background var(--mk-speed) var(--mk-ease);
+
+  b {
+    display: block;
+    color: $card-muted;
+    font: 600 10px var(--mk-font-display);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  span {
+    display: block;
+    margin-top: 4px;
+    color: $card-text;
+    font: 700 14px var(--mk-font-display);
+    letter-spacing: -0.01em;
+  }
+
+  u {
+    display: block;
+    margin-top: 4px;
+    color: rgba($gold, 0.8);
+    font: 600 8px var(--mk-font-display);
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  &.active {
+    border-color: $gold;
+    background: rgba($gold, 0.14);
+
+    b, span {
+      color: $gold-2;
+    }
+
+    u {
+      color: $gold-2;
+    }
+  }
+}
+
 .price {
   position: relative;
   display: flex;
@@ -539,6 +625,147 @@ $gold-2: #f0ce7a;
     stroke-dasharray: 40;
     stroke-dashoffset: 40;
     animation: drawStroke 420ms var(--mk-ease) 800ms forwards;
+  }
+}
+
+/* ---------------- plan grid (multiple plans) ---------------- */
+
+.plan-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.plans-loading,
+.plans-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 440px;
+  margin: 24px auto 0;
+  padding: 28px 22px;
+  text-align: center;
+  color: var(--mk-muted);
+  font: 13.5px/1.5 var(--mk-font-body);
+
+  ion-icon {
+    font-size: 22px;
+    color: var(--mk-gold);
+  }
+}
+
+.plan-error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: calc(440px - 32px);
+  margin: 16px auto 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: #ffb4a8;
+  font: 13px/1.45 var(--mk-font-body);
+  background: rgba(194, 63, 44, 0.14);
+  border: 1px solid rgba(194, 63, 44, 0.35);
+
+  ion-icon {
+    flex: none;
+    margin-top: 1px;
+    font-size: 16px;
+  }
+}
+
+/* ---------------- membership history ---------------- */
+
+.history-section {
+  max-width: 440px;
+  margin: 8px auto 0;
+  padding: 0 16px;
+}
+
+.history-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--mk-text);
+  font: 700 15px var(--mk-font-display);
+
+  ion-icon {
+    color: var(--mk-gold);
+    font-size: 16px;
+  }
+}
+
+.history-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--mk-radius);
+  background: var(--mk-surf);
+  border: 1px solid var(--mk-line);
+  overflow: hidden;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+
+  & + .history-row {
+    border-top: 1px solid var(--mk-line);
+  }
+}
+
+.history-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+
+  b {
+    color: var(--mk-text);
+    font: 600 13.5px var(--mk-font-body);
+  }
+}
+
+.history-dates {
+  color: var(--mk-muted);
+  font-size: 11.5px;
+}
+
+.history-amount {
+  flex: none;
+  color: var(--mk-gold);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.history-receipt {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--mk-gold);
+  background: var(--mk-gold-fade);
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 17px;
+  }
+
+  ion-spinner {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
   }
 }
 

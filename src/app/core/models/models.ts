@@ -84,4 +84,6 @@ export interface Kpi {
   trend?: 'up' | 'down' | 'neutral';
   trendLabel?: string;
   accent?: string;
+  /** 0–100 — renders a thin progress bar under the card when set. */
+  meterPct?: number;
 }

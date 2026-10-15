@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 import { MockDataService } from '@core/services/mock-data.service';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { MenuButtonComponent } from '@shared/components/menu-button/menu-button.component';
 import { Profile, UserProfile } from '@app/core/services/profileService/profile';
 import { AuthService } from '@core/services/auth.service';
 import { getProfileCompletion } from '@app/core/services/profileService/profile-completion';
@@ -21,7 +22,7 @@ interface ProfileOption {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [BackButtonComponent, CommonModule, IonicModule, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, IonicModule, ThemeToggleComponent, MenuButtonComponent],
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
 })

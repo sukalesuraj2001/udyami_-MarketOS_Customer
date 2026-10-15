@@ -8,12 +8,13 @@ import {
 } from '@core/services/mock-data.service';
 import { ToastService } from '@core/services/toast.service';
 import { ThemeToggleComponent } from '@shared/components/theme-toggle/theme-toggle.component';
+import { MenuButtonComponent } from '@shared/components/menu-button/menu-button.component';
 import { BackButtonComponent } from '@shared/components/back-button/back-button.component';
 
 @Component({
   selector: 'app-help-support',
   standalone: true,
-  imports: [BackButtonComponent, CommonModule, IonicModule, ThemeToggleComponent],
+  imports: [BackButtonComponent, CommonModule, IonicModule, ThemeToggleComponent, MenuButtonComponent],
   templateUrl: './help-support.page.html',
   styleUrls: ['./help-support.page.scss'],
 })

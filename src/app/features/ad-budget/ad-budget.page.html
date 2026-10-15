@@ -1,0 +1,91 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <mk-back-button defaultHref="/tabs/dashboard"></mk-back-button>
+    </ion-buttons>
+    <ion-title>Ad Budget</ion-title>
+    <ion-buttons slot="end">
+      <mk-theme-toggle></mk-theme-toggle>
+      <mk-menu-button></mk-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <main class="budget-shell">
+
+    <section class="budget-card mk-anim-in">
+      <div class="budget-orb" aria-hidden="true"></div>
+      <span class="eyebrow mono">YOUR AD BUDGET</span>
+
+      @if (balanceLoading()) {
+        <div class="balance-skeleton">
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
+      } @else {
+        <h1 class="balance-value">₹{{ formatInr(balance() ?? 0) }}</h1>
+      }
+
+      @if (spentThisMonth() > 0) {
+        <span class="spent-chip mono">₹{{ formatInr(spentThisMonth()) }} spent this month</span>
+      }
+
+      <p class="budget-copy">
+        Separate from the plan fee. It goes entirely to Facebook or Google —
+        Jyovix takes no share of it.
+      </p>
+
+      @if (errorMessage()) {
+        <p class="budget-error">{{ errorMessage() }}</p>
+      }
+
+      <ion-button
+        expand="block"
+        class="change-budget-btn"
+        [disabled]="processing()"
+        (click)="changeBudget()">
+        @if (processing()) {
+          <ion-spinner name="crescent" slot="start"></ion-spinner>
+        } @else {
+          <ion-icon name="wallet-outline" slot="start"></ion-icon>
+        }
+        Change budget
+      </ion-button>
+    </section>
+
+    <section class="history-section">
+      <div class="card-title">
+        <h3>Recent activity</h3>
+      </div>
+
+      @if (historyLoading()) {
+        <div class="history-loading">
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
+      } @else if (!history().length) {
+        <p class="empty-copy mini">No wallet activity yet.</p>
+      } @else {
+        <div class="tx-list">
+          @for (tx of history(); track tx.adBudgetTransactionId) {
+            <div class="tx-row">
+              <div class="tx-icon" [class.debit]="tx.type === 'DEBIT'">
+                <ion-icon [name]="tx.type === 'CREDIT' ? 'add-outline' : 'remove-outline'"></ion-icon>
+              </div>
+              <div class="tx-copy">
+                <b>{{ tx.referenceType === 'RECHARGE' ? 'Budget added' : (tx.referenceType === 'AD_SPEND' ? 'Ad spend' : 'Refund') }}</b>
+                <small class="mono">{{ tx.createdAt | date: 'MMM d, y · h:mm a' }}</small>
+              </div>
+              <div class="tx-right">
+                <span class="tx-amount mono" [class.debit]="tx.type === 'DEBIT'">
+                  {{ tx.type === 'CREDIT' ? '+' : '−' }}₹{{ formatInr(tx.amount) }}
+                </span>
+                <span class="mk-tag" [ngClass]="tagForTransaction(tx)">{{ tx.status }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+  </main>
+</ion-content>

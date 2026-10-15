@@ -11,4 +11,9 @@
       {{ kpi.sub }}
     }
   </div>
+  @if (kpi.meterPct != null) {
+    <div class="meter" role="progressbar" [attr.aria-valuenow]="kpi.meterPct" aria-valuemin="0" aria-valuemax="100">
+      <span [style.width.%]="kpi.meterPct"></span>
+    </div>
+  }
 </div>

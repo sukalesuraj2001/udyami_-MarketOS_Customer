@@ -1,3 +1,36 @@
+.filter-chips {
+  display: flex;
+  gap: 8px;
+  margin: 2px 0 16px;
+  padding-bottom: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.chip-btn {
+  flex: none;
+  padding: 8px 14px;
+  border: 1px solid var(--mk-line);
+  border-radius: 20px;
+  color: var(--mk-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--mk-surf);
+  transition: background var(--mk-speed) var(--mk-ease), color var(--mk-speed) var(--mk-ease), border-color var(--mk-speed) var(--mk-ease);
+
+  &.active {
+    color: #171008;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--mk-gold-2), var(--mk-gold));
+    border-color: transparent;
+  }
+}
+
 .appr {
   background: var(--mk-surf);
   border: 1px solid var(--mk-line);
